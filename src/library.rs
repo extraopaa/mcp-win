@@ -9,6 +9,8 @@ use std::{
 pub struct SharedFolder {
     pub id: String,
     pub path: PathBuf,
+    #[serde(default)]
+    pub writable: bool,
 }
 
 impl SharedFolder {
@@ -93,6 +95,7 @@ pub fn read(
         .unwrap_or_default()
         .to_string_lossy()
         .to_lowercase();
+    let sha256 = crate::writing::hash(&fs::read(&target).map_err(|e| e.to_string())?);
     let mut metadata = json!({});
     let text = if ext == "pdf" {
         let bytes = fs::read(&target).map_err(|_| "Lecture impossible")?;
@@ -103,6 +106,10 @@ pub fn read(
             .ok_or("Page inexistante")?
             .clone();
         metadata = json!({"page": page, "pages": pages.len(), "warning": if text.trim().is_empty() {Some("Aucun texte : OCR nécessaire pour les pages scannées. OCR non inclus.")} else {None}});
+        text
+    } else if ["docx", "pptx", "xlsx", "xls", "xlsb", "xlsm", "ods"].contains(&ext.as_str()) {
+        let (text, meta) = crate::office::read(&target, page)?;
+        metadata = meta;
         text
     } else {
         if ![
@@ -138,7 +145,7 @@ pub fn read(
         .collect();
     let end = offset.saturating_add(segment.chars().count());
     Ok(
-        json!({"path": relative, "format": ext, "metadata": metadata, "text": segment, "total_characters": total, "next_offset": (end < total).then_some(end)}),
+        json!({"path": relative, "format": ext, "sha256":sha256, "metadata": metadata, "text": segment, "total_characters": total, "next_offset": (end < total).then_some(end)}),
     )
 }
 
@@ -210,6 +217,7 @@ mod tests {
         ));
         fs::write(temp.path().join("sample.pdf"), pdf).unwrap();
         let folders = vec![SharedFolder {
+            writable: false,
             id: "test".into(),
             path: temp.path().into(),
         }];
@@ -223,6 +231,7 @@ mod tests {
         let temp = tempfile::tempdir().unwrap();
         fs::write(temp.path().join("note.txt"), "été ☀ bonjour").unwrap();
         let folders = vec![SharedFolder {
+            writable: false,
             id: "one".into(),
             path: temp.path().into(),
         }];
@@ -242,6 +251,7 @@ mod tests {
         )
         .unwrap();
         let folders = vec![SharedFolder {
+            writable: false,
             id: "one".into(),
             path: temp.path().into(),
         }];

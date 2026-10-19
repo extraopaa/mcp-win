@@ -147,6 +147,7 @@ mod tests {
         let server = tokio::spawn(server::serve(
             listener,
             vec![crate::library::SharedFolder {
+                writable: false,
                 id: "test".into(),
                 path: temp.path().into(),
             }],

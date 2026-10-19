@@ -108,7 +108,7 @@ impl Desktop {
 pub fn snapshot(state: State<'_, Desktop>) -> Value {
     let prefs = state.core.preferences.lock().unwrap().clone();
     let running = state.core.running.lock().unwrap();
-    json!({"connection": prefs.connection, "folders": prefs.folders.iter().map(|f| json!({"id": f.id, "name": f.name(), "path": f.path})).collect::<Vec<_>>(),
+    json!({"connection": prefs.connection, "folders": prefs.folders.iter().map(|f| json!({"id": f.id, "name": f.name(), "path": f.path, "writable":f.writable})).collect::<Vec<_>>(),
         "running": running.is_some(), "ready": running.as_ref().is_some_and(|r| r.ready),
         "address": running.as_ref().and_then(|r| r.address.clone()), "active_connections": running.as_ref().map(|r| r.active.load(Ordering::Relaxed)).unwrap_or(0),
         "logs": state.core.logs.lock().unwrap().clone()})
@@ -129,6 +129,7 @@ pub async fn add_folder(state: State<'_, Desktop>) -> Result<(), String> {
         let mut prefs = state.core.preferences.lock().unwrap();
         if !prefs.folders.iter().any(|f| f.path == path) {
             prefs.folders.push(SharedFolder {
+                writable: false,
                 id: uuid::Uuid::new_v4().simple().to_string(),
                 path,
             });
@@ -148,6 +149,23 @@ pub fn remove_folder(id: String, state: State<'_, Desktop>) -> Result<(), String
         .unwrap()
         .folders
         .retain(|f| f.id != id);
+    state.persist()
+}
+#[tauri::command]
+pub fn set_folder_writable(
+    id: String,
+    writable: bool,
+    state: State<'_, Desktop>,
+) -> Result<(), String> {
+    state.check_stopped()?;
+    let mut prefs = state.core.preferences.lock().unwrap();
+    let folder = prefs
+        .folders
+        .iter_mut()
+        .find(|f| f.id == id)
+        .ok_or("Dossier inconnu")?;
+    folder.writable = writable;
+    drop(prefs);
     state.persist()
 }
 #[tauri::command]

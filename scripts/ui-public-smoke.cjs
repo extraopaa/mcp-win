@@ -19,6 +19,10 @@ let connectedBrowser;
   await page.waitForFunction(()=>document.getElementById('token').value.length>20);
   let result;
   try {
+    const before=await page.evaluate(()=>window.__TAURI__.core.invoke('snapshot'));
+    assert.equal(before.folders[0].writable,false);
+    await page.locator('.write-permission').first().click();
+    for(let attempt=0;attempt<20;attempt++){const s=await page.evaluate(()=>window.__TAURI__.core.invoke('snapshot'));if(s.folders[0].writable)break;await new Promise(r=>setTimeout(r,100));}
     await page.locator('#toggle-server').click();
     let state;
     for(let attempt=0;attempt<80;attempt++) {
@@ -38,8 +42,21 @@ let connectedBrowser;
     const text=await response.text();
     assert.equal(response.status,200);
     assert(text.includes('NATIVE-TAURI-PUBLIC-OK'),text);
+    async function tool(name,args){
+      const response=await fetch(state.address,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream','MCP-Protocol-Version':'2025-03-26','bypass-tunnel-reminder':'true'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'tools/call',params:{name,arguments:{folder:'ui-test',...args}}}),signal:AbortSignal.timeout(30000)});
+      const payload=await response.json();assert(!payload.error,JSON.stringify(payload));assert(!payload.result.isError,JSON.stringify(payload.result));return JSON.parse(payload.result.content[0].text);
+    }
+    for(const extension of ['pdf','docx','pptx']){
+      await tool('create_document',{path:`native.${extension}`,title:'Validation MCP Win',sections:[{heading:'Résultats',text:'Document généré via le tunnel public.',bullets:['Création en Rust','Sans authentification']}]});
+      const bytes=await tool('read_file_bytes',{path:`native.${extension}`,max_bytes:64});
+      assert(Buffer.from(bytes.data,'base64').subarray(0,extension==='pdf'?5:2).equals(Buffer.from(extension==='pdf'?'%PDF-':'PK')));
+    }
+    await tool('write_spreadsheet',{output_path:'native.xlsx',cells:[{sheet:'Sheet1',cell:'A1',kind:'text',value:'Création Excel'},{sheet:'Sheet1',cell:'B2',kind:'number',value:'42'}]});
+    const workbook=await tool('read_file',{path:'native.xlsx'});assert(workbook.text.includes('42'));
+    const note=await tool('read_file',{path:'note.txt'});
+    await tool('write_text_file',{path:'note.txt',content:'NATIVE-TAURI-PUBLIC-OK — modifié',expected_sha256:note.sha256});
     await page.screenshot({path:path.resolve(__dirname,'../preview-online.png')});
-    result='Native Tauri start → Rust tunnel → public HTTPS MCP → file read: passed.';
+    result='Native Tauri → public HTTPS MCP: PDF, DOCX, PPTX, XLSX generation, binary retrieval and text editing passed.';
   } finally {
     await page.evaluate(()=>window.__TAURI__.core.invoke('stop_mcp'));
     await browser.close();

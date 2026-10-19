@@ -10,9 +10,9 @@ L’application regroupe une interface Rust/Tauri 2, le serveur MCP, le tunnel e
 
 [Guide utilisateur](docs/wiki/Home.md) · [32 outils MCP](docs/MCP-TOOLS.md) · [Création avancée](docs/AUTHORING.md) · [Fonctions et limites v0.4](docs/V0.4.md)
 
-## Version 0.4.0-preview.1
+## Version 0.4.0
 
-Les sources de cette préversion sont publiées ici. **Les anciennes archives v0.3.2 et antérieures ne contiennent pas les protections v0.4.** Construisez le paquet selon les instructions ci-dessous pour utiliser cette version.
+**[Télécharger MCP Win v0.4.0 pour Windows x64](https://github.com/extraopaa/mcp-win/releases/tag/v0.4.0)**. Extraire toute l’archive avant de lancer l’application. Les anciennes archives v0.3.2 et antérieures ne contiennent pas les protections v0.4.
 
 - Recherche récursive, expressions régulières, filtres glob, pagination, extraits et cache local.
 - Plans des documents, lectures ciblées et aperçus compacts des tableurs.
@@ -28,7 +28,7 @@ Microsoft Office n’est pas nécessaire. Les anciens DOC/PPT ne sont pas interp
 
 ## Démarrer
 
-1. Construire le paquet et ouvrir **dist/MCP Win.exe** en conservant engines à côté.
+1. Télécharger et extraire le paquet v0.4.0, puis ouvrir **MCP Win.exe** en conservant engines à côté.
 2. Ajouter un dossier, en lecture seule par défaut. Arrêter le MCP pour activer l’écriture dans l’interface.
 3. Choisir **Tunnel simple** pour Cloudflare gratuit sans compte, **Mon propre relais** pour frp, ou le mode local.
 4. Démarrer le MCP et copier son URL dans le client IA.

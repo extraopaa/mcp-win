@@ -1,4 +1,4 @@
-# Validation locale v0.4.0-preview.1 — 19 octobre 2026
+# Validation locale v0.4.0 — 19 octobre 2026
 
 - `cargo fmt --check` : réussi.
 - `cargo test --no-default-features --locked` : **29 réussis, 0 échec, 1 essai Internet séparé**.

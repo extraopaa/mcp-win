@@ -2,11 +2,11 @@
 
 MCP Win est destiné à **Windows x64**. La distribution est portable : vous extrayez une archive et lancez l'application, sans installer Rust, Node.js, Python ni Microsoft Office.
 
-## Préversion v0.4
+## Version v0.4
 
-La version 0.4.0-preview.1 est disponible en sources. Suivre [Développement](Developpement.md) pour construire le paquet avec scripts/package.ps1. Les anciennes archives v0.3.2 ne contiennent pas les nouvelles protections.
+Télécharger [la release v0.4.0 Windows x64](https://github.com/extraopaa/mcp-win/releases/tag/v0.4.0), extraire toute l’archive, puis ouvrir **MCP Win.exe** en conservant tous les fichiers et engines à côté. Rust, Node.js, Python et Office ne sont pas nécessaires sur le PC utilisateur.
 
-Ouvrir **dist/MCP Win.exe** en conservant tous les fichiers et engines à côté. Rust, Node.js, Python et Office ne sont pas nécessaires sur le PC utilisateur.
+Les anciennes archives v0.3.2 ne contiennent pas les nouvelles protections. Pour compiler depuis les sources, voir [Développement](Developpement.md).
 
 L'application repose sur **Tauri 2** et nécessite le runtime système **Microsoft Edge WebView2**, habituellement déjà présent sur Windows. Si l'interface ne s'ouvre pas, vérifiez ce prérequis.
 

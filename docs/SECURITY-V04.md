@@ -1,6 +1,6 @@
 # Vérification de sécurité v0.4 — 19 octobre 2026
 
-Rapport de vérification du code v0.4.0-preview.1 publié dans le dépôt. Les anciennes archives de release restent inchangées.
+Rapport de vérification du code v0.4.0 publié dans le dépôt. Les anciennes archives de release restent inchangées.
 
 ## Failles corrigées
 
@@ -52,7 +52,7 @@ Restrictions officielles : https://developers.cloudflare.com/tunnel/get-started/
 
 Essai Internet exécuté séparément : **Cloudflare HTTPS réussi**, refus sans jeton et avec jeton erroné, lecture JSON autorisée du seul fichier synthétique. Aucun dossier personnel partagé pendant cet essai. Un premier essai immédiat a échoué sur la propagation DNS ; la vérification laisse désormais le temps à l’adresse temporaire de devenir joignable.
 
-## Fonctions documentaires ajoutées à la préversion
+## Fonctions documentaires ajoutées à la version
 
 Les archives et la manipulation/remplissage de PDF sont traités dans un sous-processus limité à 768 Mio, un processus et 30 secondes. Les chemins restent résolus dans les partages ; aucune extraction globale ni écrasement d’archive n’est autorisé. Les champs AcroForms canoniques, valeurs de widgets et apparences sont vérifiés après écriture ; les documents signés ou structures ambiguës sont refusés. L’aplatissement PDF est explicite et vérifié sans widgets/AcroForm restants.
 

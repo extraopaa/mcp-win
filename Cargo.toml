@@ -1,6 +1,6 @@
 [package]
 name = "mcp-win"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 license = "MIT"
 description = "Application native de partage de documents par MCP HTTP"
@@ -33,6 +33,7 @@ windows-sys = { version = "0.61", features = ["Win32_System_JobObjects", "Win32_
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "tiff", "bmp", "webp"] }
 pdfium-render = "0.9.4"
 tempfile = "3"
+typst-syntax = "0.15.1"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

@@ -16,6 +16,8 @@ L'application regroupe une interface simple, le serveur MCP, le tunnel d'accès 
 
 ## Nouveautés v0.3
 
+Fiabilité PDF : vérification avant création avec `validate_designed_pdf`, correction des oublis de contexte dans les en-têtes/pieds de page avec compteurs, nettoyage des balises Markdown externes, variantes Lato gras/italique, diagnostics et avertissements exploitables par l'IA. Un nom de sortie déjà occupé peut être automatiquement versionné sans écraser l'existant ; utiliser le chemin réellement retourné.
+
 Correctif v0.3.1 : les IA découvrent les dossiers avec `list_folders`, peuvent omettre `folder` lorsqu'un seul dossier est partagé, ou fournir son nom exact unique. Les erreurs indiquent les dossiers disponibles et comment réessayer, sans demander un identifiant à la personne.
 
 **Mise en page PDF complète avec Typst**, contrôle des styles et de la mise en page Word/Excel/PowerPoint via OOXML, aperçu visuel des pages et **OCR local des images/PDF numérisés**. Voir le [guide de création avancée](docs/AUTHORING.md), également accessible aux IA avec `get_authoring_guide`.

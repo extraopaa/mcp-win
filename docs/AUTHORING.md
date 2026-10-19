@@ -8,7 +8,7 @@ Appeler `list_folders` pour obtenir les identifiants et le statut `writable`. Ne
 
 ## PDF : `create_designed_pdf`
 
-Arguments : `folder`, `output_path` (nouveau `.pdf`), `source` (source Typst complète), `assets` (optionnel, liste `{path,name}`).
+Arguments : `folder`, `output_path`, `source` (source Typst complète), `assets` (optionnel, liste `{path,name}`), `collision_policy` (optionnel : `rename` par défaut, ou `error`). Si l'extension est absente, `.pdf` est ajoutée. Si le nom existe déjà, `rename` crée `rapport_2.pdf`, puis `_3`, etc. L'existant n'est jamais écrasé. **Toujours utiliser le `path` retourné pour lire ou afficher le résultat**, et non le nom demandé au départ.
 
 Le moteur Typst 0.15.1 est livré avec l'application. Il expose une vraie composition : famille de police, graisse, italique, taille, couleur, suivi, interlignage, alignement, styles, marges, format/orientation, colonnes, grilles, blocs, tableaux multipages, images/SVG, figures, équations, liens, notes, sommaire, références, en-têtes/pieds et compteurs.
 
@@ -26,11 +26,22 @@ Exemple minimal de `source` :
 ```
 
 Un exemple complet se trouve dans `docs/examples/designed.typ`.
-Les polices embarquées dans Typst et Lato sont disponibles ; fournir d'autres `.ttf`/`.otf` comme assets (respecter leur licence). Exemple : `assets:[{"path":"medias/logo.svg","name":"logo.svg"}]`, puis `#image("logo.svg", width: 30mm)`.
+Polices disponibles : **Lato** (normal, gras, italique, gras italique), **Libertinus Serif**, **New Computer Modern**, **New Computer Modern Math**, **DejaVu Sans Mono**. Fournir les autres `.ttf`/`.otf` comme assets (respecter leur licence). Exemple : `assets:[{"path":"medias/logo.svg","name":"logo.svg"}]`, puis `#image("logo.svg", width: 30mm)`.
 
 Les assets sont copiés dans un projet temporaire isolé. Les lectures de fichiers Typst sont limitées à ce projet ; seules les ressources explicitement fournies sont accessibles. Les paquets distants sont désactivés (fournir les fichiers `.typ` nécessaires comme assets). Source 1 Mo, 50 assets / 50 Mo, compilation 60 s, 2 compilations simultanées, sortie 25 Mo. Les erreurs Typst sont renvoyées pour permettre à l'IA de corriger le source.
 
-Workflow : créer → appeler `render_pdf_page` pour chaque page importante → inspecter l'image → corriger le source → créer une nouvelle version. Le source peut être conservé avec `write_text_file` dans un fichier `.typ`.
+Workflow : lire ce guide → **`validate_designed_pdf(folder?,source,assets?)`** → corriger si `valid:false` → créer → appeler `render_pdf_page` avec le `path` retourné pour chaque page importante → inspecter l'image → corriger le source → créer une nouvelle version. Le source peut être conservé avec `write_text_file` dans un fichier `.typ`.
+
+La validation compile dans un dossier temporaire sans enregistrer dans le dossier partagé. Elle fonctionne en lecture seule, retourne `valid`, `can_create` (permission du dossier), les avertissements de polices, les corrections appliquées et éventuellement `normalized_source` si le source a changé. Une source incorrecte renvoie `valid:false` et des diagnostics avec pistes de correction ; cela signifie qu'il faut corriger le source, pas que la génération PDF est indisponible.
+
+Prévention des erreurs courantes :
+
+- Les balises externes ` ```typst ` sont retirées automatiquement. Fournir de préférence du Typst brut.
+- Pour les en-têtes/pieds utilisant `counter`, `here`, `query` ou `state`, écrire `footer: context [...]`. L'outil ajoute le contexte manquant dans les arguments `header`/`footer` de `page` grâce au parseur officiel ; les chaînes, exemples de code et fonctions fléchées ne sont pas réécrits.
+- Utiliser les noms de polices disponibles ci-dessus, pas une police système supposée installée. Lire les avertissements de validation pour repérer un remplacement de police.
+- Chaque fichier utilisé dans `image`, `read` ou `import` doit être déclaré dans `assets`. Dans le source Typst, utiliser les chemins `/` et les noms `name`. Les noms d'assets Windows avec `\\` sont normalisés ; doublons et noms de travail réservés sont refusés avant copie.
+- Utiliser un nom relatif simple comme `rapport.pdf`, ou un sous-dossier déjà existant. Les chemins absolus et `..` ne sont pas autorisés.
+- La syntaxe est celle de **Typst 0.15.1**, pas du LaTeX, HTML ou CSS. Lire les diagnostics : fonction inconnue, argument inattendu et délimiteur manquant nécessitent encore une correction par l'IA. Aucun correcteur arbitraire ne réécrit le texte du document.
 
 ## Word, Excel, PowerPoint : OOXML complet
 

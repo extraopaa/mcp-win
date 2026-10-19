@@ -1,18 +1,34 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod advanced;
+mod archives;
+mod cloudflare;
 mod desktop;
+mod documents;
+mod duckdb;
 mod generate;
+mod history;
 mod library;
 mod ocr;
 mod office;
+mod patching;
 mod pdf_design;
+mod pdf_forms;
+mod pdf_ops;
 mod process_job;
 mod server;
-mod tunnel;
+mod sqlite;
+mod templates;
+mod worker;
 mod writing;
+
+#[cfg(test)]
+mod v04_tests;
 
 use tauri::Manager;
 fn main() {
+    if worker::worker_main() {
+        return;
+    }
     tauri::Builder::default()
         .setup(|app| {
             let folder = app.path().app_data_dir()?;
@@ -28,6 +44,8 @@ fn main() {
             desktop::save_settings,
             desktop::start_mcp,
             desktop::stop_mcp,
+            desktop::list_history,
+            desktop::restore_version,
             desktop::preview_file
         ])
         .on_window_event(|window, event| {

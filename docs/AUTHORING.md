@@ -6,6 +6,18 @@ Les outils simples restent disponibles. Pour un document travaillé, utiliser le
 
 Appeler `list_folders` pour obtenir les identifiants et le statut `writable`. Ne pas demander ces identifiants à la personne : ils sont accessibles par MCP. Pour créer, choisir un dossier `writable:true`. Le paramètre `folder` accepte un identifiant ou un nom exact unique ; il peut être omis si un seul dossier est partagé. Plusieurs dossiers ou noms ambigus : choisir un identifiant retourné par `list_folders`. En cas d'erreur, relire cette liste et réessayer. Une autorisation d'écriture désactivée nécessite toujours une action dans l'application.
 
+## D’abord chercher et lire le minimum — v0.4
+
+Utiliser `search_files` (littéral/regex, glob et curseur) et `get_document_outline` avant de lire de longs documents. `read_file` accepte `line_range`, `matching_regex` et `compact:true` pour les tableurs. `list_files` accepte glob/recursive/compact. `ocr_file` renvoie le texte seul par défaut ; demander `plain_text_only:false` uniquement si les coordonnées sont utiles. `inspect_office_package` est paginé : suivre next_offset.
+
+Pour les archives, inspecter puis extraire uniquement les entrées utiles (ZIP/TAR/TAR.GZ/7z). `query_sqlite` et `query_duckdb` font des SELECT bornés en lecture seule ; omettre query pour le schéma. Ne pas convertir une grande base en texte intégral.
+
+Pour les modèles : `list_templates`, `inspect_template`, puis `create_from_template`. Les générateurs PDF acceptent `template` + `data` à la place de source : Typst accède à l’objet `data`, avec les assets du sous-dossier du modèle. Word/DOTX et PowerPoint/POTX remplacent `{{clé}}`, même coupée entre segments. `write_spreadsheet(template=...)` réutilise un XLSX. Ne pas inventer les noms de placeholders : inspecter le modèle.
+
+`merge_pdfs` et `split_pdf` créent de nouvelles copies de pages. Les formulaires ne doivent pas être aplatis automatiquement : ne définir `flatten_forms:true` que si un résultat figé est explicitement demandé. Pour remplir, appeler `inspect_pdf_form` puis `fill_pdf_form` avec noms exacts et SHA256 ; le résultat reste interactif et doit être rendu pour vérification. XFA, PDF signé et champs non pris en charge sont signalés ; ne pas annoncer une réussite si l’outil les refuse.
+
+`apply_file_patch` applique un diff unifié exact avec SHA256. Texte : sauvegarde puis modification. Office : part + output_path pour une copie, sans réécrire toute l’archive dans le contexte. L’historique est réservé à la restauration locale dans l’interface. Les sources Office sont déjà conservées quand une copie est créée.
+
 ## PDF : `create_designed_pdf`
 
 Arguments : `folder`, `output_path`, `source` (source Typst complète), `assets` (optionnel, liste `{path,name}`), `collision_policy` (optionnel : `rename` par défaut, ou `error`). Si l'extension est absente, `.pdf` est ajoutée. Si le nom existe déjà, `rename` crée `rapport_2.pdf`, puis `_3`, etc. L'existant n'est jamais écrasé. **Toujours utiliser le `path` retourné pour lire ou afficher le résultat**, et non le nom demandé au départ.

@@ -22,3 +22,5 @@ documents/*
 *.log
 .env.*
 !.env.example
+
+/dist-*/

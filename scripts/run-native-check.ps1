@@ -11,8 +11,9 @@ $appProcess = $null
 try {
     New-Item -ItemType Directory -Path $fixture -Force | Out-Null
     [IO.File]::WriteAllText((Join-Path $fixture 'note.txt'), 'NATIVE-TAURI-PUBLIC-OK')
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'target/qa-v04/filled-form.pdf') -Destination (Join-Path $fixture 'form.pdf')
     $preferences = @{
-        connection = @{ mode='localtunnel'; port=8787; token=[guid]::NewGuid().ToString('N'); relay='https://localtunnel.me'; frp_server=''; frp_port=7000; frp_token=''; public_url='' }
+        connection = @{ mode='cloudflare'; require_auth=$true; port=8787; token=[guid]::NewGuid().ToString('N'); relay='https://localtunnel.me'; frp_server=''; frp_port=7000; frp_token=''; public_url='' }
         folders = @(@{id='ui-test';path=$fixture})
     }
     New-Item -ItemType Directory -Path (Split-Path -Parent $settingsPath) -Force | Out-Null
@@ -28,6 +29,8 @@ try {
     if ($appProcess) { $appProcess.Refresh(); if (-not $appProcess.HasExited) { Stop-Process -Id $appProcess.Id } }
     if ($existing) { [IO.File]::WriteAllBytes($settingsPath, $previousBytes) } elseif (Test-Path -LiteralPath $settingsPath) { Remove-Item -LiteralPath $settingsPath }
     if ($null -eq $previousDebug) { Remove-Item Env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS -ErrorAction SilentlyContinue } else { $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=$previousDebug }
-    foreach ($name in @('note.txt','native.pdf','native.docx','native.pptx','native.xlsx','designed.pdf','scan.png','styled.docx')) { Remove-Item -LiteralPath (Join-Path $fixture $name) -ErrorAction SilentlyContinue }
-    Remove-Item -LiteralPath $fixture -ErrorAction SilentlyContinue
+    $resolvedFixture=[IO.Path]::GetFullPath($fixture)
+    $allowedTemp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\')+'\'
+    if (-not $resolvedFixture.StartsWith($allowedTemp,[StringComparison]::OrdinalIgnoreCase) -or -not (Split-Path -Leaf $resolvedFixture).StartsWith('mcp-win-ui-')) {throw 'Nettoyage refusé : chemin fixture inattendu'}
+    if (Test-Path -LiteralPath $resolvedFixture) {Remove-Item -LiteralPath $resolvedFixture -Recurse -Force}
 }

@@ -25,6 +25,11 @@ jobs:
       - name: Fetch verified document engines
         shell: pwsh
         run: ./scripts/fetch-engines.ps1
+      - name: Fetch verified tunnel and database engines
+        shell: pwsh
+        run: |
+          ./scripts/fetch-cloudflared.ps1
+          ./scripts/fetch-duckdb.ps1
       - name: Test
         run: cargo test --locked
       - name: Build portable application

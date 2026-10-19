@@ -1,3 +1,19 @@
+# Validation locale v0.4.0-preview.1 — 19 octobre 2026
+
+- `cargo fmt --check` : réussi.
+- `cargo test --no-default-features --locked` : **29 réussis, 0 échec, 1 essai Internet séparé**.
+- Interface Playwright/Edge : headers JSON, Bearer, authentification obligatoire, CA frp, historique/restauration, état serveur et dimensions minimales vérifiés.
+- Sous-processus réels du binaire release : inspection/remplissage AcroForm, aplatissement sans widgets/AcroForm, création/inspection 7z réussis. Entrée/sortie par canaux privés.
+- Test natif Tauri → Cloudflare HTTPS sur dossier fictif : recherche, listes/lectures compactes, fusion/extraction PDF, formulaires, ZIP sélectif, PDF/Office avancés, rendu PNG, OCR et modification avec SHA réussis.
+- Préférences existantes sauvegardées puis restaurées par le test natif ; aucun document personnel utilisé.
+- Vérification visuelle du formulaire rempli et de l’interface d’historique : texte accentué, case, choix de liste et contrôles affichés correctement.
+- Builds/moteurs épinglés : cloudflared 2026.10.1, DuckDB 1.5.6, Typst 0.15.1, Pdfium chromium8100, Tesseract 5.5.0 (fra/eng).
+- Paquet local : `dist-v04/`, puis copie dans `dist/`. Les sources sont publi?es s?par?ment du paquet de validation.
+
+Fonctions et limites : [V0.4](docs/V0.4.md). Sécurité : [rapport](docs/SECURITY-V04.md). Le contrôle ciblé et les tests ne constituent pas une garantie d’absence de toute vulnérabilité.
+
+---
+
 # Validation du 19 octobre 2026
 
 - Compilation Windows MSVC en mode release.

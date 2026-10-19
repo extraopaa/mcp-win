@@ -35,11 +35,15 @@ pub fn destination(
     folder: &str,
     relative: &str,
 ) -> Result<PathBuf, String> {
+    library::validate_relative(relative)?;
     let shared = library::select_folder(folders, folder)?;
     if !shared.writable {
         return Err("Écriture désactivée : activez-la pour ce dossier dans l'application, puis redémarrez le MCP".into());
     }
     let path = Path::new(relative);
+    if crate::history::reserved(path) {
+        return Err("Le dossier d'historique est réservé".into());
+    }
     if relative.is_empty()
         || relative.contains('\0')
         || relative.contains(':')
@@ -78,6 +82,9 @@ pub fn commit(
     let target = destination(folders, folder, relative)?;
     let existed = target.exists();
     if existed {
+        if fs::metadata(&target).map_err(|e| e.to_string())?.len() > 25 * 1024 * 1024 {
+            return Err("Original trop volumineux pour une modification sauvegardée".into());
+        }
         if !target.is_file() {
             return Err("La destination n'est pas un fichier".into());
         }
@@ -104,16 +111,25 @@ pub fn commit(
             .and_then(|_| file.sync_all())
             .map_err(|e| e.to_string())?;
         drop(file);
+        let mut backup = None;
         if existed {
-            if hash(&fs::read(&target).map_err(|e| e.to_string())?) != expected_hash.unwrap() {
+            let previous = fs::read(&target).map_err(|e| e.to_string())?;
+            if hash(&previous) != expected_hash.unwrap() {
                 return Err("Conflit : le fichier a changé pendant la génération".into());
             }
+            let root = library::select_folder(folders, folder)?
+                .path
+                .canonicalize()
+                .map_err(|e| e.to_string())?;
+            backup = Some(crate::history::snapshot(&root, relative, &previous)?);
             fs::rename(&temporary, &target).map_err(|e| e.to_string())?;
         } else {
             create_without_replace(&temporary, &target)
                 .map_err(|e| format!("Création impossible sans écrasement : {e}"))?;
         }
-        Ok(json!({"path":relative,"bytes":bytes.len(),"sha256":hash(bytes),"created":!existed}))
+        Ok(
+            json!({"path":relative,"bytes":bytes.len(),"sha256":hash(bytes),"created":!existed,"previous_version":backup}),
+        )
     })();
     let _ = fs::remove_file(temporary);
     outcome

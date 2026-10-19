@@ -4,6 +4,8 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $projectRoot
 try {
     & (Join-Path $PSScriptRoot 'fetch-engines.ps1')
+    & (Join-Path $PSScriptRoot 'fetch-cloudflared.ps1')
+    & (Join-Path $PSScriptRoot 'fetch-duckdb.ps1')
     if (-not (Test-Path -LiteralPath 'vendor\frp\frp_0.71.1_windows_amd64\frpc.exe')) {
         & (Join-Path $PSScriptRoot 'fetch-frp.ps1')
     }
@@ -24,6 +26,10 @@ try {
     Copy-Item -LiteralPath 'vendor\frp\frp_0.71.1_windows_amd64\LICENSE' -Destination (Join-Path $dist 'LICENSE-frp.txt')
     Copy-Item -LiteralPath 'assets\fonts\OFL.txt' -Destination (Join-Path $dist 'LICENSE-fonts.txt')
     New-Item -ItemType Directory -Force (Join-Path $dist 'engines') | Out-Null
+    Copy-Item -LiteralPath 'vendor/engines/runtime/duckdb' -Destination (Join-Path $dist 'engines') -Recurse -Force
+    Copy-Item -LiteralPath 'vendor/duckdb/LICENSE' -Destination (Join-Path $dist 'LICENSE-duckdb.txt')
+    Copy-Item -LiteralPath 'vendor/engines/runtime/cloudflared.exe' -Destination (Join-Path $dist 'engines')
+    Copy-Item -LiteralPath 'vendor/cloudflared/LICENSE' -Destination (Join-Path $dist 'LICENSE-cloudflared.txt')
     Copy-Item -LiteralPath 'vendor/engines/runtime/typst.exe','vendor/engines/runtime/pdfium.dll','vendor/engines/runtime/tesseract' -Destination (Join-Path $dist 'engines') -Recurse -Force
     Copy-Item -LiteralPath 'vendor/engines/typst/typst-x86_64-pc-windows-msvc/LICENSE' -Destination (Join-Path $dist 'LICENSE-typst.txt')
     Copy-Item -LiteralPath 'vendor/engines/typst/typst-x86_64-pc-windows-msvc/NOTICE' -Destination (Join-Path $dist 'NOTICE-typst.txt')

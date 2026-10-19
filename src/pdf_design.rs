@@ -104,13 +104,23 @@ pub fn diagnostics(raw: &str) -> Value {
     json!({"message":raw,"hints":hints,"typst_version":"0.15.1"})
 }
 
+#[cfg(test)]
 pub async fn validate(
     folders: &[SharedFolder],
     folder: &str,
     source: &str,
     assets: &[Asset],
 ) -> Value {
-    match advanced::compile_typst(folders, folder, source, assets).await {
+    validate_with_data(folders, folder, source, assets, None).await
+}
+pub async fn validate_with_data(
+    folders: &[SharedFolder],
+    folder: &str,
+    source: &str,
+    assets: &[Asset],
+    data: Option<&Value>,
+) -> Value {
+    match advanced::compile_typst_with_data(folders, folder, source, assets, data).await {
         Ok(pdf) => {
             let normalized_source = (pdf.source != source).then_some(pdf.source);
             let writable = crate::library::select_folder(folders, folder).is_ok_and(|f| f.writable);
@@ -214,6 +224,7 @@ mod tests {
     }
 }
 
+#[cfg(test)]
 pub async fn create(
     folders: &[SharedFolder],
     folder: &str,
@@ -221,6 +232,26 @@ pub async fn create(
     source: &str,
     assets: &[Asset],
     collision_policy: &str,
+) -> Result<Value, String> {
+    create_with_data(
+        folders,
+        folder,
+        output,
+        source,
+        assets,
+        collision_policy,
+        None,
+    )
+    .await
+}
+pub async fn create_with_data(
+    folders: &[SharedFolder],
+    folder: &str,
+    output: &str,
+    source: &str,
+    assets: &[Asset],
+    collision_policy: &str,
+    data: Option<&Value>,
 ) -> Result<Value, String> {
     let requested_output = output;
     if output.trim().is_empty() || output.ends_with(['/', '\\']) {
@@ -242,7 +273,7 @@ pub async fn create(
     if original.exists() && collision_policy == "error" {
         return Err("Ce fichier existe déjà. Choisir un nouveau nom ou collision_policy=rename pour conserver les deux versions.".into());
     }
-    let pdf = advanced::compile_typst(folders, folder, source, assets)
+    let pdf = advanced::compile_typst_with_data(folders, folder, source, assets, data)
         .await
         .map_err(|e| diagnostics(&e).to_string())?;
     for version in 1..=100 {

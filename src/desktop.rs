@@ -1,7 +1,6 @@
 use crate::{
     library::{self, SharedFolder},
     server::{self, Logs},
-    tunnel,
 };
 use base64::Engine;
 use serde::{Deserialize, Serialize};
@@ -29,25 +28,30 @@ pub struct Connection {
     pub frp_port: u16,
     pub frp_token: String,
     pub public_url: String,
+    pub frp_ca_pem: String,
+    pub frp_tls_name: String,
 }
 impl Default for Connection {
     fn default() -> Self {
         Self {
-            mode: "localtunnel".into(),
+            mode: "cloudflare".into(),
             port: 8787,
             token: uuid::Uuid::new_v4().simple().to_string(),
-            require_auth: false,
+            require_auth: true,
             relay: "https://localtunnel.me".into(),
             frp_server: String::new(),
             frp_port: 7000,
             frp_token: String::new(),
             public_url: String::new(),
+            frp_ca_pem: String::new(),
+            frp_tls_name: String::new(),
         }
     }
 }
 #[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct Preferences {
+    security_revision: u32,
     connection: Connection,
     folders: Vec<SharedFolder>,
 }
@@ -70,18 +74,45 @@ pub struct Desktop {
 }
 impl Desktop {
     pub fn new(directory: PathBuf) -> Self {
-        let prefs = std::fs::read(directory.join("settings.json"))
+        let mut prefs: Preferences = std::fs::read(directory.join("settings.json"))
             .ok()
             .and_then(|data| serde_json::from_slice(&data).ok())
             .unwrap_or_default();
-        Self {
+        // Retire any credential that may have travelled through an insecure legacy relay.
+        let migrate = prefs.security_revision < 1;
+        if migrate {
+            prefs.connection.token = uuid::Uuid::new_v4().simple().to_string();
+            prefs.security_revision = 1;
+        }
+        // Migrate insecure historical preferences without opening any connection.
+        if prefs.connection.mode == "localtunnel" {
+            prefs.connection.mode = "local".into();
+        }
+        prefs.connection.require_auth = true;
+        if prefs.connection.token.len() < 32 {
+            prefs.connection.token = uuid::Uuid::new_v4().simple().to_string();
+        }
+        let desktop = Self {
             core: Arc::new(Core {
                 preferences: Mutex::new(prefs),
                 running: Mutex::new(None),
                 logs: Arc::new(Mutex::new(VecDeque::new())),
                 directory,
             }),
+        };
+        if migrate {
+            if let Err(_) = desktop.persist() {
+                server::log(
+                    &desktop.core.logs,
+                    "Migration sécurisée en mémoire ; enregistrement des préférences impossible",
+                );
+            }
+            server::log(
+                &desktop.core.logs,
+                "Sécurité v0.4 : ancien jeton révoqué, authentification obligatoire",
+            );
         }
+        desktop
     }
     pub fn stop(&self) {
         if let Some(running) = self.core.running.lock().unwrap().take() {
@@ -171,10 +202,11 @@ pub fn set_folder_writable(
 #[tauri::command]
 pub fn save_settings(connection: Connection, state: State<'_, Desktop>) -> Result<(), String> {
     state.check_stopped()?;
-    if connection.port == 0 || (connection.require_auth && connection.token.len() < 24) {
+    validate_connection(&connection)?;
+    if connection.port == 0 || (connection.require_auth && connection.token.len() < 32) {
         return Err("Port invalide ou jeton trop court (24 caractères minimum)".into());
     }
-    if !["localtunnel", "frp", "local"].contains(&connection.mode.as_str()) {
+    if !["cloudflare", "frp", "local"].contains(&connection.mode.as_str()) {
         return Err("Mode de connexion inconnu".into());
     }
     state.core.preferences.lock().unwrap().connection = connection;
@@ -188,7 +220,8 @@ pub fn stop_mcp(state: State<'_, Desktop>) {
 #[tauri::command]
 pub async fn start_mcp(state: State<'_, Desktop>) -> Result<(), String> {
     let prefs = state.core.preferences.lock().unwrap().clone();
-    if (prefs.connection.require_auth && prefs.connection.token.len() < 24)
+    validate_connection(&prefs.connection)?;
+    if (prefs.connection.require_auth && prefs.connection.token.len() < 32)
         || prefs.connection.port == 0
     {
         return Err("Port ou jeton MCP invalide".into());
@@ -229,6 +262,7 @@ pub async fn start_mcp(state: State<'_, Desktop>) -> Result<(), String> {
         cancel.cancel();
         finish(&core, &id);
         let _ = std::fs::remove_file(core.directory.join(format!("frpc-{id}.json")));
+        let _ = std::fs::remove_file(core.directory.join(format!("frpc-{id}.ca.pem")));
         server::log(&core.logs, error);
     }
     result
@@ -244,19 +278,20 @@ async fn launch(
     core: Arc<Core>,
     prefs: Preferences,
     cancel: CancellationToken,
-    active: Arc<AtomicUsize>,
+    _active: Arc<AtomicUsize>,
     id: String,
 ) -> Result<(), String> {
     let c = prefs.connection;
     let listener = tokio::net::TcpListener::bind(("127.0.0.1", c.port))
         .await
         .map_err(|e| format!("Port local indisponible : {e}"))?;
-    let mut lt = None;
+    validate_connection(&c)?;
+    let mut cloudflare = None;
     let address = match c.mode.as_str() {
-        "localtunnel" => {
-            let allocated = tunnel::allocate(&c.relay).await?;
-            let address = format!("{}/mcp", allocated.url);
-            lt = Some(allocated);
+        "cloudflare" => {
+            let tunnel = crate::cloudflare::start(c.port, &cancel).await?;
+            let address = format!("{}/mcp", tunnel.url);
+            cloudflare = Some(tunnel);
             address
         }
         "frp" => {
@@ -317,31 +352,70 @@ async fn launch(
             logs.clone(),
             public_host,
         ));
-        let tunnel_task = lt.map(|lt| {
-            tokio::spawn(tunnel::run(
-                lt,
-                c.port,
-                server_cancel.clone(),
-                active,
-                logs.clone(),
-            ))
-        });
         tokio::select! {
             _ = cancel.cancelled() => {},
             result = async { if let Some(child) = &mut frp { child.wait().await.map(|s| format!("Le relais personnel s'est arrêté : {s}")) } else { std::future::pending().await } } => { if let Ok(message) = result { server::log(&logs, message); } },
+            result = async { if let Some(tunnel) = &mut cloudflare { tunnel.child.wait().await.map(|s| format!("Le tunnel Cloudflare s'est arrêté : {s}")) } else { std::future::pending().await } } => { if let Ok(message) = result { server::log(&logs, message); } },
             _ = async { while !server_task.is_finished() { tokio::time::sleep(std::time::Duration::from_millis(200)).await; } } => { server::log(&logs, "Le serveur MCP s'est arrêté"); },
         }
         cancel.cancel();
         if let Some(mut child) = frp {
             let _ = child.kill().await;
         }
-        let _ = server_task.await;
-        if let Some(task) = tunnel_task {
-            let _ = task.await;
+        if let Some(mut tunnel) = cloudflare {
+            let _ = tunnel.child.kill().await;
         }
+        let _ = server_task.await;
         let _ = std::fs::remove_file(core.directory.join(format!("frpc-{id}.json")));
+        let _ = std::fs::remove_file(core.directory.join(format!("frpc-{id}.ca.pem")));
         finish(&core, &id);
     });
+    Ok(())
+}
+
+fn validate_connection(c: &Connection) -> Result<(), String> {
+    if !["local", "frp", "cloudflare"].contains(&c.mode.as_str()) {
+        return Err("Tunnel localtunnel désactivé : transport non chiffré. Utilisez un relais frp avec certificat vérifié.".into());
+    }
+    if !c.require_auth
+        || c.token.len() < 32
+        || c.token.len() > 256
+        || !c
+            .token
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+    {
+        return Err(
+            "Un jeton MCP de 32 caractères minimum est obligatoire (lettres, chiffres, tirets)."
+                .into(),
+        );
+    }
+    if c.port == 0 {
+        return Err("Port invalide".into());
+    }
+    if c.mode == "frp" {
+        if c.frp_ca_pem.len() > 65536
+            || !c.frp_ca_pem.contains("-----BEGIN CERTIFICATE-----")
+            || c.frp_tls_name.trim().is_empty()
+            || c.frp_token.len() < 32
+        {
+            return Err("Relais sécurisé : certificat CA PEM, nom TLS du certificat et jeton frp de 32 caractères requis.".into());
+        }
+        let url = reqwest::Url::parse(&c.public_url).map_err(|_| "URL HTTPS invalide")?;
+        if url.scheme() != "https"
+            || url.host_str().is_none()
+            || !url.username().is_empty()
+            || url.password().is_some()
+            || url.query().is_some()
+            || url.fragment().is_some()
+            || !["/", "/mcp", ""].contains(&url.path())
+        {
+            return Err(
+                "Utilisez une URL HTTPS sans identifiants, paramètres ni chemin autre que /mcp."
+                    .into(),
+            );
+        }
+    }
     Ok(())
 }
 
@@ -351,13 +425,16 @@ async fn spawn_frp(
     id: &str,
     domain: &str,
 ) -> Result<tokio::process::Child, String> {
+    validate_connection(c)?;
     let bytes = include_bytes!("../vendor/frp/frp_0.71.1_windows_amd64/frpc.exe");
     let binary = core.directory.join("frpc-0.71.1.exe");
     if std::fs::read(&binary).ok().as_deref() != Some(bytes.as_slice()) {
         std::fs::write(&binary, bytes).map_err(|e| e.to_string())?;
     }
+    let ca_path = core.directory.join(format!("frpc-{id}.ca.pem"));
+    std::fs::write(&ca_path, &c.frp_ca_pem).map_err(|e| e.to_string())?;
     let config = json!({"serverAddr": c.frp_server.trim(), "serverPort": c.frp_port, "auth": {"method":"token", "token":c.frp_token},
-        "transport":{"tls":{"enable":true}}, "loginFailExit":true,
+        "transport":{"tls":{"enable":true,"trustedCaFile":ca_path,"serverName":c.frp_tls_name.trim()}}, "loginFailExit":true, "log":{"to":"console","level":"info","disablePrintColor":true},
         "proxies":[{"name":format!("mcp-win-{id}"),"type":"http","localIP":"127.0.0.1","localPort":c.port,"customDomains":[domain],"hostHeaderRewrite":format!("127.0.0.1:{}", c.port)}]});
     let path = core.directory.join(format!("frpc-{id}.json"));
     std::fs::write(&path, serde_json::to_vec(&config).unwrap()).map_err(|e| e.to_string())?;
@@ -367,19 +444,78 @@ async fn spawn_frp(
         .arg(path)
         .kill_on_drop(true)
         .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null());
     #[cfg(windows)]
     command.creation_flags(0x08000000);
     let mut child = command
         .spawn()
         .map_err(|e| format!("Impossible de lancer frpc : {e}"))?;
-    tokio::time::sleep(std::time::Duration::from_millis(900)).await;
-    if let Some(status) = child.try_wait().map_err(|e| e.to_string())? {
-        return Err(format!("frpc n'a pas pu se connecter au relais ({status})"));
+    use tokio::io::AsyncBufReadExt;
+    let stdout = child.stdout.take().ok_or("Sortie frpc indisponible")?;
+    let mut lines = tokio::io::BufReader::new(stdout).lines();
+    let expected = format!("[mcp-win-{id}] start proxy success");
+    let ready = tokio::time::timeout(std::time::Duration::from_secs(20), async {
+        while let Some(line) = lines
+            .next_line()
+            .await
+            .map_err(|_| "Lecture frpc impossible")?
+        {
+            if line.contains(&expected) {
+                return Ok::<_, String>(());
+            }
+        }
+        Err(
+            "Connexion frp refusée : vérifier le certificat, le nom TLS, le jeton et le relais."
+                .into(),
+        )
+    })
+    .await;
+    match ready {
+        Ok(Ok(())) => {}
+        other => {
+            let _ = child.kill().await;
+            return Err(match other {
+                Ok(Err(e)) => e,
+                _ => "Le relais n’a pas confirmé l’ouverture sécurisée du proxy en 20 secondes"
+                    .into(),
+            });
+        }
     }
+    // Drain trusted sidecar logs without exposing relay diagnostics or secrets to the UI.
+    tokio::spawn(async move { while lines.next_line().await.ok().flatten().is_some() {} });
     server::log(&core.logs, "Client frpc démarré (relais personnel)");
     Ok(child)
+}
+
+#[tauri::command]
+pub async fn list_history(folder: String, state: State<'_, Desktop>) -> Result<Value, String> {
+    let folders = state.core.preferences.lock().unwrap().folders.clone();
+    tauri::async_runtime::spawn_blocking(move || crate::history::list(&folders, &folder, None))
+        .await
+        .map_err(|_| "Lecture de l’historique interrompue")?
+}
+#[tauri::command]
+pub async fn restore_version(
+    folder: String,
+    version: String,
+    state: State<'_, Desktop>,
+) -> Result<Value, String> {
+    state.check_stopped()?;
+    let mut folders = state.core.preferences.lock().unwrap().folders.clone();
+    // Explicit local restoration is owned by the user; remote writable preferences stay unchanged.
+    crate::library::select_folder(&folders, &folder)?;
+    let selected_id = crate::library::select_folder(&folders, &folder)?.id.clone();
+    if let Some(selected) = folders.iter_mut().find(|f| f.id == selected_id) {
+        selected.writable = true;
+    }
+    let result = tauri::async_runtime::spawn_blocking(move || {
+        crate::history::restore_local(&folders, &folder, &version)
+    })
+    .await
+    .map_err(|_| "Restauration interrompue")??;
+    server::log(&state.core.logs, "Version précédente restaurée localement");
+    Ok(result)
 }
 
 #[tauri::command]
@@ -436,6 +572,30 @@ pub async fn preview_file(folder: String, state: State<'_, Desktop>) -> Result<V
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn insecure_settings_are_rejected_and_migrated() {
+        let mut c = Connection::default();
+        assert!(validate_connection(&c).is_ok());
+        c.mode = "localtunnel".into();
+        assert!(validate_connection(&c).is_err());
+        c.mode = "local".into();
+        c.require_auth = false;
+        assert!(validate_connection(&c).is_err());
+        c.require_auth = true;
+        c.mode = "frp".into();
+        assert!(validate_connection(&c).is_err());
+        let temp = tempfile::tempdir().unwrap();
+        std::fs::write(
+            temp.path().join("settings.json"),
+            br#"{"connection":{"mode":"localtunnel","require_auth":false,"token":"old"}}"#,
+        )
+        .unwrap();
+        let desktop = Desktop::new(temp.path().into());
+        let prefs = desktop.core.preferences.lock().unwrap();
+        assert_eq!(prefs.connection.mode, "local");
+        assert!(prefs.connection.require_auth && prefs.connection.token.len() >= 32);
+    }
+
     #[tokio::test]
     async fn embedded_frpc_routes_to_local_backend_and_job_closes_it() {
         let temp = tempfile::tempdir().unwrap();
@@ -444,7 +604,7 @@ mod tests {
         let control = control_socket.local_addr().unwrap().port();
         let vhost = vhost_socket.local_addr().unwrap().port();
         let config = temp.path().join("frps.json");
-        std::fs::write(&config, serde_json::to_vec(&json!({"bindAddr":"127.0.0.1","bindPort":control,"proxyBindAddr":"127.0.0.1","vhostHTTPPort":vhost,"auth":{"method":"token","token":"test-frp-token"},"transport":{"tls":{"force":true}}})).unwrap()).unwrap();
+        std::fs::write(&config, serde_json::to_vec(&json!({"bindAddr":"127.0.0.1","bindPort":control,"proxyBindAddr":"127.0.0.1","vhostHTTPPort":vhost,"auth":{"method":"token","token":"test-frp-token-long-enough-for-security"},"transport":{"tls":{"force":true,"certFile":concat!(env!("CARGO_MANIFEST_DIR"),"/tests/fixtures/relay-cert.pem"),"keyFile":concat!(env!("CARGO_MANIFEST_DIR"),"/tests/fixtures/relay-key.pem")}}})).unwrap()).unwrap();
         let mut relay_command = tokio::process::Command::new(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/vendor/frp/frp_0.71.1_windows_amd64/frps.exe"
@@ -495,13 +655,66 @@ mod tests {
             logs: Arc::new(Mutex::new(VecDeque::new())),
             directory: temp.path().into(),
         };
+        // Controlled wire tap on the frpc -> frps segment: payload must not be plaintext.
+        let tap = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let tap_port = tap.local_addr().unwrap().port();
+        let wire = Arc::new(Mutex::new(Vec::<u8>::new()));
+        let tap_cancel = CancellationToken::new();
+        let shutdown_tap = tap_cancel.clone();
+        let observed = wire.clone();
+        let tap_task = tokio::spawn(async move {
+            let mut tasks = tokio::task::JoinSet::new();
+            loop {
+                let incoming = tokio::select! { _ = shutdown_tap.cancelled() => break, incoming = tap.accept() => incoming.unwrap().0 };
+                let outgoing = tokio::net::TcpStream::connect(("127.0.0.1", control))
+                    .await
+                    .unwrap();
+                let observed = observed.clone();
+                let stop = shutdown_tap.clone();
+                tasks.spawn(async move {
+                    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+                    let (ir, iw) = incoming.into_split();
+                    let (or, ow) = outgoing.into_split();
+                    let capture = |mut reader: tokio::net::tcp::OwnedReadHalf, mut writer: tokio::net::tcp::OwnedWriteHalf, bytes: Arc<Mutex<Vec<u8>>>| async move {
+                        let mut buf = [0u8;8192];
+                        loop { let n = reader.read(&mut buf).await?; if n == 0 { break; }
+                            { let mut v = bytes.lock().unwrap(); if v.len() < 1024*1024 { v.extend_from_slice(&buf[..n]); } }
+                            writer.write_all(&buf[..n]).await?;
+                        }
+                        Ok::<_, std::io::Error>(())
+                    };
+                    tokio::select! { _ = stop.cancelled() => {}, _ = async { tokio::try_join!(capture(ir, ow, observed.clone()), capture(or, iw, observed)) } => {} }
+                });
+            }
+            tasks.abort_all();
+            while tasks.join_next().await.is_some() {}
+        });
         let connection = Connection {
             port,
             frp_server: "127.0.0.1".into(),
-            frp_port: control,
-            frp_token: "test-frp-token".into(),
+            frp_port: tap_port,
+            mode: "frp".into(),
+            frp_token: "test-frp-token-long-enough-for-security".into(),
+            public_url: "https://mcp.test.example".into(),
+            frp_ca_pem: include_str!("../tests/fixtures/relay-cert.pem").into(),
+            frp_tls_name: "localhost".into(),
             ..Default::default()
         };
+        // Active MITM simulation: same reachable endpoint, but a forged TLS identity.
+        let mut impostor = connection.clone();
+        impostor.frp_tls_name = "attacker.invalid".into();
+        assert!(
+            spawn_frp(&core, &impostor, "bad-name", "mcp.test.example")
+                .await
+                .is_err()
+        );
+        impostor = connection.clone();
+        impostor.frp_ca_pem = include_str!("../tests/fixtures/untrusted-cert.pem").into();
+        assert!(
+            spawn_frp(&core, &impostor, "bad-ca", "mcp.test.example")
+                .await
+                .is_err()
+        );
         let mut child = spawn_frp(&core, &connection, "test", "mcp.test.example")
             .await
             .unwrap();
@@ -523,6 +736,20 @@ mod tests {
         cancel.cancel();
         backend.await.unwrap();
         let _ = relay.kill().await;
+        tap_cancel.cancel();
+        tap_task.await.unwrap();
+        let captured = wire.lock().unwrap();
+        assert!(!captured.is_empty());
+        for secret in [
+            b"FRP-ROUNDTRIP-OK".as_slice(),
+            b"GET /mcp",
+            b"test-frp-token-long-enough-for-security",
+        ] {
+            assert!(
+                !captured.windows(secret.len()).any(|w| w == secret),
+                "Plaintext leaked into tunnel"
+            );
+        }
         assert_eq!(response, "FRP-ROUNDTRIP-OK");
     }
 }

@@ -18,6 +18,10 @@ pub struct OcrArgs {
     pub layout: Option<String>,
     /// Rotation horaire avant reconnaissance : 0, 90, 180, 270 degrés.
     pub rotate: Option<u16>,
+    /// Texte seul par défaut. false ajoute mots, boîtes et confiance (coûteux en tokens).
+    pub plain_text_only: Option<bool>,
+    pub offset: Option<usize>,
+    pub limit: Option<usize>,
 }
 
 fn prepare(
@@ -77,6 +81,9 @@ pub async fn recognize(folders: Vec<SharedFolder>, args: OcrArgs) -> Result<Valu
         _ => return Err("layout : auto, block ou sparse".into()),
     };
     let page = args.page.unwrap_or(1);
+    let plain = args.plain_text_only.unwrap_or(true);
+    let offset = args.offset.unwrap_or(0);
+    let limit = args.limit.unwrap_or(8000).clamp(1, 50000);
     let (image, pages) = tokio::task::spawn_blocking(move || prepare(&folders, &args))
         .await
         .map_err(|_| "Préparation image échouée")??;
@@ -166,6 +173,30 @@ pub async fn recognize(folders: Vec<SharedFolder>, args: OcrArgs) -> Result<Valu
         .filter_map(|l| l["text"].as_str())
         .collect::<Vec<_>>()
         .join("\n");
+    if plain {
+        let mut text = String::new();
+        let mut paragraph = None;
+        for ((block, par, _), words) in &groups {
+            let key = (*block, *par);
+            if !text.is_empty() {
+                text.push_str(if paragraph == Some(key) { "\n" } else { "\n\n" });
+            }
+            text.push_str(
+                &words
+                    .iter()
+                    .filter_map(|w| w["text"].as_str())
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            );
+            paragraph = Some(key);
+        }
+        let total = text.chars().count();
+        let segment: String = text.chars().skip(offset).take(limit).collect();
+        let end = offset.saturating_add(segment.chars().count());
+        return Ok(
+            json!({"text":segment,"page":page,"pages":pages,"total_characters":total,"next_offset":(end<total).then_some(end),"plain_text_only":true}),
+        );
+    }
     Ok(
         json!({"text":text,"lines":lines,"words":words,"page":page,"pages":pages,"width":width,"height":height,"languages":languages,"engine":"tesseract-5.5.0","warning":"OCR imprimé : vérifier les valeurs critiques. Manuscrits et documents dégradés non garantis ; pas de reconstruction automatique des tableaux."}),
     )

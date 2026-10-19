@@ -9,13 +9,25 @@ Installer Rust stable MSVC, les outils C++ Windows et le runtime WebView2. Depui
 ```powershell
 ./scripts/fetch-frp.ps1
 ./scripts/fetch-engines.ps1
+./scripts/fetch-cloudflared.ps1
+./scripts/fetch-duckdb.ps1
 cargo fmt --check
 cargo test --locked
 cargo run --locked
 ```
 
-Les téléchargements frp, Typst, Pdfium et modèles OCR sont épinglés et vérifiés par SHA-256. Les moteurs OCR/PDF sont requis pour les tests avancés. Le frontend HTML/CSS/JS ne nécessite aucun build ni dépendance npm.
+Les téléchargements frp, Cloudflare, DuckDB, Typst, Pdfium et modèles OCR sont épinglés et vérifiés par SHA-256. Les moteurs OCR/PDF sont requis pour les tests avancés. Le frontend HTML/CSS/JS ne nécessite aucun build ni dépendance npm.
 
 Pour les tests facultatifs de l'interface native, installer Node.js puis `npm ci --prefix tools/dev`. Construire le paquet avec `./scripts/package.ps1`, puis lancer `./scripts/run-native-check.ps1`. Ces tests utilisent uniquement un document synthétique et restaurent les préférences précédentes. Ils ouvrent temporairement un tunnel public et nécessitent donc Internet. Les tests standard n'utilisent aucun relais public.
 
 Pour une pull request, décrire le problème, le changement et les vérifications effectuées. Ne pas ajouter de jetons, documents personnels, exécutables compilés ou captures contenant des chemins locaux. Le projet et les nouvelles dépendances doivent rester open source, sans API payante obligatoire.
+
+## Vérifications v0.4
+
+`cargo test --no-default-features --locked` couvre les fonctions documentaires, archives, SQL, formulaires et accès HTTP. L’essai Internet Cloudflare est ignoré par défaut ; le lancer explicitement uniquement avec les fixtures synthétiques : `cargo test cloudflare::tests::public_tunnel_auth_and_read -- --ignored`.
+
+`node scripts/security-ui-smoke.cjs` vérifie l’interface avec données simulées (authentification, presse-papiers des headers/Bearer, historique/restauration, rendu aux dimensions minimales). Aucun tunnel ni préférence personnelle modifiée.
+
+Après les tests Rust et un build release : `./scripts/check-v04-workers.ps1` vérifie les vrais sous-processus de production sur la fixture AcroForm de target/qa-v04. Les sorties sont isolées dans un nouveau sous-dossier de test. `./scripts/package.ps1 -OutputDirectory dist-v04` prépare le paquet local complet, sans publication.
+
+Les exécutables et moteurs sont distribués séparément des sources ; ne pas les ajouter aux commits.

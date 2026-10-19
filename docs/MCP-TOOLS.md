@@ -1,14 +1,31 @@
 # Outils MCP et génération de fichiers
 
-Pour le contrôle de typographie/mise en page et l'OCR, voir [AUTHORING.md](AUTHORING.md) ou appeler `get_authoring_guide`. Outils v0.3 : `validate_designed_pdf`, `create_designed_pdf`, `inspect_office_package`, `write_office_package`, `render_pdf_page`, `ocr_file`. Valider le source avant création pour corriger les erreurs Typst sans échouer lors de l'enregistrement. En cas de nom occupé, la création PDF ajoute un suffixe ; toujours relire le `path` retourné.
+Préversion v0.4 : [nouveaux outils et exemples](V0.4.md). Recherche, lectures ciblées, PDF, archives, SQL, modèles, patchs et historique. Les en-têtes sécurisés se copient séparément de l’adresse du serveur.
 
-MCP Win v0.3 reste accessible sans authentification par défaut. **Les dossiers sont en lecture seule à l'ajout.** Pour autoriser une génération ou une modification, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier : le bouton devient **Écriture autorisée**. Redémarrer ensuite le serveur. Cette autorisation appartient au dossier et ne peut pas être activée par un outil MCP distant.
+Pour le contrôle de typographie/mise en page et l'OCR, voir [AUTHORING.md](AUTHORING.md) ou appeler `get_authoring_guide`. Création avancée : `validate_designed_pdf`, `create_designed_pdf`, `inspect_office_package`, `write_office_package`, `render_pdf_page`, `ocr_file`. Valider le source avant création pour corriger les erreurs Typst sans échouer lors de l'enregistrement. En cas de nom occupé, la création PDF ajoute un suffixe ; toujours relire le `path` retourné.
+
+**Le jeton Bearer est obligatoire dans tous les modes en v0.4.** **Les dossiers sont en lecture seule à l'ajout.** Pour autoriser une génération ou une modification, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier : le bouton devient **Écriture autorisée**. Redémarrer ensuite le serveur. Cette autorisation appartient au dossier et ne peut pas être activée par un outil MCP distant.
+
+## Catalogue des 32 outils v0.4
+
+| Usage | Outils |
+| --- | --- |
+| Découverte et lecture | `list_folders`, `list_files`, `search_files`, `get_document_outline`, `read_file`, `read_file_bytes` |
+| Aperçu et OCR | `render_svg`, `render_pdf_page`, `ocr_file` |
+| Création et modification | `write_text_file`, `create_document`, `write_spreadsheet`, `replace_office_text`, `create_binary_file`, `apply_file_patch` |
+| Mise en page avancée | `get_authoring_guide`, `validate_designed_pdf`, `create_designed_pdf`, `inspect_office_package`, `write_office_package` |
+| PDF existants | `merge_pdfs`, `split_pdf`, `inspect_pdf_form`, `fill_pdf_form` |
+| Archives | `inspect_archive`, `extract_archive`, `create_archive` |
+| Bases en lecture seule | `query_sqlite`, `query_duckdb` |
+| Modèles | `list_templates`, `inspect_template`, `create_from_template` |
+
+Les schémas du serveur donnent les paramètres exacts. Voir [V0.4](V0.4.md) pour les exemples et limites. Commencer par une recherche ou un plan puis lire les extraits utiles. L’OCR renvoie du texte simple par défaut ; `plain_text_only:false` active les métadonnées détaillées.
 
 ## Formats pris en charge
 
 | Format | Lire | Créer | Modifier |
 | --- | --- | --- | --- |
-| PDF | Texte, page par page | Document A4, titres, paragraphes, listes, pagination | Pas encore d'édition de PDF existant |
+| PDF | Texte, page par page | Document A4, titres, paragraphes, listes, pagination | Fusion, extraction de pages et formulaires AcroForm |
 | DOCX | Corps et tableaux sous forme de texte | Titres, paragraphes, listes | Remplacement de texte, dans une nouvelle copie |
 | XLSX | Feuilles et valeurs mises en cache | Feuilles, cellules texte/nombre/booléen/formule | Cellules modifiées, dans une nouvelle copie |
 | PPTX | Texte par diapositive, dans l'ordre du document | Titre et diapositives de contenu | Remplacement de texte, dans une nouvelle copie |
@@ -23,7 +40,7 @@ Les générateurs ne lancent ni Microsoft Office, ni scripts, ni macros, ni API 
 ## Découverte et lecture
 
 - `list_folders` : identifiants des dossiers, noms et autorisation `writable`.
-- `list_files` : 100 entrées par segment.
+- `list_files` : Parcours récursif, glob, mode compact et pagination, 500 entrées maximum par segment.
 - `read_file` : texte, métadonnées et `sha256`. `page` désigne une page PDF, une diapositive PowerPoint ou une feuille de calcul ; la première vaut 1. `offset` et `limit` segmentent le texte.
 - `read_file_bytes` : octets en base64, jusqu'à 1 Mo par segment. Continuer avec `next_offset` pour reconstituer un fichier généré.
 - `render_svg` : aperçu PNG retourné à un modèle compatible avec les images.
@@ -49,7 +66,7 @@ Appeler `create_document`. L'extension de `path` sélectionne le générateur ; 
 
 Utiliser `rapport.pdf` pour un PDF ou `presentation.pptx` pour des diapositives. Les longs contenus PowerPoint sont répartis sur plusieurs diapositives. Les PDF utilisent la police libre Lato, avec les caractères couverts par cette police (notamment latin, grec et cyrillique). Les autres caractères sont refusés plutôt qu'affichés comme carrés vides.
 
-Limites : 100 sections, 200 Ko de contenu textuel, 100 pages PDF, 150 diapositives PowerPoint, 90 caractères par titre PowerPoint. Ces générateurs structurés ne remplacent pas encore un logiciel de mise en page complet et ne prennent pas en charge les graphiques, médias ou styles arbitraires fournis par le client.
+Limites : 100 sections, 200 Ko de contenu textuel, 100 pages PDF, 150 diapositives PowerPoint, 90 caractères par titre PowerPoint. Pour contrôler les styles, tableaux et médias, utiliser Typst ou les outils OOXML du guide avancé.
 
 ## Créer ou modifier un classeur Excel
 

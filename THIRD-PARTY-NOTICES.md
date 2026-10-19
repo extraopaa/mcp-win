@@ -34,7 +34,9 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | bincode | 1.3.3 | MIT | https://crates.io/crates/bincode/1.3.3 |
 | bitflags | 1.3.2 | MIT/Apache-2.0 | https://crates.io/crates/bitflags/1.3.2 |
 | bitflags | 2.13.2 | MIT OR Apache-2.0 | https://crates.io/crates/bitflags/2.13.2 |
+| bit-set | 0.6.0 | MIT/Apache-2.0 | https://crates.io/crates/bit-set/0.6.0 |
 | bit-set | 0.8.0 | Apache-2.0 OR MIT | https://crates.io/crates/bit-set/0.8.0 |
+| bit-vec | 0.7.0 | MIT/Apache-2.0 | https://crates.io/crates/bit-vec/0.7.0 |
 | bit-vec | 0.8.0 | Apache-2.0 OR MIT | https://crates.io/crates/bit-vec/0.8.0 |
 | block2 | 0.6.2 | MIT | https://crates.io/crates/block2/0.6.2 |
 | block-buffer | 0.10.4 | MIT OR Apache-2.0 | https://crates.io/crates/block-buffer/0.10.4 |
@@ -45,6 +47,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | brotli-decompressor | 5.0.3 | BSD-3-Clause/MIT | https://crates.io/crates/brotli-decompressor/5.0.3 |
 | brotli-decompressor | 6.0.1 | BSD-3-Clause/MIT | https://crates.io/crates/brotli-decompressor/6.0.1 |
 | bs58 | 0.5.1 | MIT/Apache-2.0 | https://crates.io/crates/bs58/0.5.1 |
+| bstr | 1.13.1 | MIT OR Apache-2.0 | https://crates.io/crates/bstr/1.13.1 |
 | bumpalo | 3.20.3 | MIT OR Apache-2.0 | https://crates.io/crates/bumpalo/3.20.3 |
 | bytemuck | 1.25.2 | Zlib OR Apache-2.0 OR MIT | https://crates.io/crates/bytemuck/1.25.2 |
 | bytemuck_derive | 1.12.1 | Zlib OR Apache-2.0 OR MIT | https://crates.io/crates/bytemuck_derive/1.12.1 |
@@ -90,7 +93,9 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | cpubits | 0.1.1 | MIT OR Apache-2.0 | https://crates.io/crates/cpubits/0.1.1 |
 | cpufeatures | 0.2.17 | MIT OR Apache-2.0 | https://crates.io/crates/cpufeatures/0.2.17 |
 | cpufeatures | 0.3.1 | MIT OR Apache-2.0 | https://crates.io/crates/cpufeatures/0.3.1 |
+| crc | 3.4.0 | MIT OR Apache-2.0 | https://crates.io/crates/crc/3.4.0 |
 | crc32fast | 1.5.2 | MIT OR Apache-2.0 | https://crates.io/crates/crc32fast/1.5.2 |
+| crc-catalog | 2.5.0 | MIT OR Apache-2.0 | https://crates.io/crates/crc-catalog/2.5.0 |
 | crossbeam-channel | 0.5.17 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-channel/0.5.17 |
 | crossbeam-deque | 0.8.8 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-deque/0.8.8 |
 | crossbeam-epoch | 0.9.21 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-epoch/0.9.21 |
@@ -100,6 +105,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | crypto-common | 0.2.2 | MIT OR Apache-2.0 | https://crates.io/crates/crypto-common/0.2.2 |
 | cssparser | 0.37.0 | MPL-2.0 | https://crates.io/crates/cssparser/0.37.0 |
 | cssparser-macros | 0.7.1 | MPL-2.0 | https://crates.io/crates/cssparser-macros/0.7.1 |
+| csv | 1.4.0 | Unlicense/MIT | https://crates.io/crates/csv/1.4.0 |
+| csv-core | 0.1.13 | Unlicense/MIT | https://crates.io/crates/csv-core/0.1.13 |
 | ctor | 1.0.13 | Apache-2.0 OR MIT | https://crates.io/crates/ctor/1.0.13 |
 | ctutils | 0.4.3 | Apache-2.0 OR MIT | https://crates.io/crates/ctutils/0.4.3 |
 | darling | 0.24.1 | MIT | https://crates.io/crates/darling/0.24.1 |
@@ -114,6 +121,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | deranged | 0.5.9 | MIT OR Apache-2.0 | https://crates.io/crates/deranged/0.5.9 |
 | derive_more | 2.1.1 | MIT | https://crates.io/crates/derive_more/2.1.1 |
 | derive_more-impl | 2.1.1 | MIT | https://crates.io/crates/derive_more-impl/2.1.1 |
+| diffy | 0.5.2 | MIT OR Apache-2.0 | https://crates.io/crates/diffy/0.5.2 |
 | digest | 0.10.7 | MIT OR Apache-2.0 | https://crates.io/crates/digest/0.10.7 |
 | digest | 0.11.3 | MIT OR Apache-2.0 | https://crates.io/crates/digest/0.11.3 |
 | dirs | 7.0.0 | MIT OR Apache-2.0 | https://crates.io/crates/dirs/7.0.0 |
@@ -145,6 +153,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | errno | 0.3.14 | MIT OR Apache-2.0 | https://crates.io/crates/errno/0.3.14 |
 | euclid | 0.20.14 | MIT / Apache-2.0 | https://crates.io/crates/euclid/0.20.14 |
 | euclid | 0.22.14 | MIT OR Apache-2.0 | https://crates.io/crates/euclid/0.22.14 |
+| fallible-iterator | 0.3.0 | MIT/Apache-2.0 | https://crates.io/crates/fallible-iterator/0.3.0 |
+| fallible-streaming-iterator | 0.1.9 | MIT/Apache-2.0 | https://crates.io/crates/fallible-streaming-iterator/0.1.9 |
 | fancy-regex | 0.16.2 | MIT | https://crates.io/crates/fancy-regex/0.16.2 |
 | fancy-regex | 0.18.0 | MIT | https://crates.io/crates/fancy-regex/0.18.0 |
 | fast-float2 | 0.2.4 | MIT OR Apache-2.0 | https://crates.io/crates/fast-float2/0.2.4 |
@@ -152,6 +162,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | fax | 0.2.7 | MIT | https://crates.io/crates/fax/0.2.7 |
 | fdeflate | 0.3.7 | MIT OR Apache-2.0 | https://crates.io/crates/fdeflate/0.3.7 |
 | field-offset | 0.3.6 | MIT OR Apache-2.0 | https://crates.io/crates/field-offset/0.3.6 |
+| filetime | 0.2.29 | MIT/Apache-2.0 | https://crates.io/crates/filetime/0.2.29 |
+| filetime_creation | 0.2.0 | MIT/Apache-2.0 | https://crates.io/crates/filetime_creation/0.2.0 |
 | find-msvc-tools | 0.1.15 | MIT OR Apache-2.0 | https://crates.io/crates/find-msvc-tools/0.1.15 |
 | flate2 | 1.1.10 | MIT OR Apache-2.0 | https://crates.io/crates/flate2/1.1.10 |
 | float-cmp | 0.9.0 | MIT | https://crates.io/crates/float-cmp/0.9.0 |
@@ -192,6 +204,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | glib-macros | 0.18.5 | MIT | https://crates.io/crates/glib-macros/0.18.5 |
 | glib-sys | 0.18.1 | MIT | https://crates.io/crates/glib-sys/0.18.1 |
 | glob | 0.3.4 | MIT OR Apache-2.0 | https://crates.io/crates/glob/0.3.4 |
+| globset | 0.4.20 | Unlicense OR MIT | https://crates.io/crates/globset/0.4.20 |
 | glyph-names | 0.2.0 | BSD-3-Clause | https://crates.io/crates/glyph-names/0.2.0 |
 | gobject-sys | 0.18.0 | MIT | https://crates.io/crates/gobject-sys/0.18.0 |
 | gtk | 0.18.2 | MIT | https://crates.io/crates/gtk/0.18.2 |
@@ -200,7 +213,9 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | half | 2.7.1 | MIT OR Apache-2.0 | https://crates.io/crates/half/2.7.1 |
 | harfrust | 0.12.0 | MIT | https://crates.io/crates/harfrust/0.12.0 |
 | hashbrown | 0.12.3 | MIT OR Apache-2.0 | https://crates.io/crates/hashbrown/0.12.3 |
+| hashbrown | 0.16.1 | MIT OR Apache-2.0 | https://crates.io/crates/hashbrown/0.16.1 |
 | hashbrown | 0.17.1 | MIT OR Apache-2.0 | https://crates.io/crates/hashbrown/0.17.1 |
+| hashlink | 0.12.2 | MIT OR Apache-2.0 | https://crates.io/crates/hashlink/0.12.2 |
 | heck | 0.4.1 | MIT OR Apache-2.0 | https://crates.io/crates/heck/0.4.1 |
 | heck | 0.5.0 | MIT OR Apache-2.0 | https://crates.io/crates/heck/0.5.0 |
 | hex | 0.4.3 | MIT OR Apache-2.0 | https://crates.io/crates/hex/0.4.3 |
@@ -268,6 +283,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | libloading | 0.8.9 | ISC | https://crates.io/crates/libloading/0.8.9 |
 | libm | 0.2.16 | MIT | https://crates.io/crates/libm/0.2.16 |
 | libredox | 0.1.25 | MIT | https://crates.io/crates/libredox/0.1.25 |
+| libsqlite3-sys | 0.38.2 | MIT | https://crates.io/crates/libsqlite3-sys/0.38.2 |
 | linked-hash-map | 0.5.6 | MIT/Apache-2.0 | https://crates.io/crates/linked-hash-map/0.5.6 |
 | linux-raw-sys | 0.12.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | https://crates.io/crates/linux-raw-sys/0.12.1 |
 | litemap | 0.8.3 | Unicode-3.0 | https://crates.io/crates/litemap/0.8.3 |
@@ -276,6 +292,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | lopdf | 0.42.0 | MIT | https://crates.io/crates/lopdf/0.42.0 |
 | lopdf | 0.44.0 | MIT | https://crates.io/crates/lopdf/0.44.0 |
 | lru-slab | 0.1.3 | MIT OR Apache-2.0 OR Zlib | https://crates.io/crates/lru-slab/0.1.3 |
+| lzma-rust | 0.1.7 | Apache-2.0 | https://crates.io/crates/lzma-rust/0.1.7 |
 | markup5ever | 0.39.0 | MIT OR Apache-2.0 | https://crates.io/crates/markup5ever/0.39.0 |
 | matchit | 0.8.4 | MIT AND BSD-3-Clause | https://crates.io/crates/matchit/0.8.4 |
 | maybe-owned | 0.3.4 | MIT OR Apache-2.0 | https://crates.io/crates/maybe-owned/0.3.4 |
@@ -297,6 +314,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | new_debug_unreachable | 1.0.6 | MIT | https://crates.io/crates/new_debug_unreachable/1.0.6 |
 | nix | 0.31.3 | MIT | https://crates.io/crates/nix/0.31.3 |
 | nom | 8.0.0 | MIT | https://crates.io/crates/nom/8.0.0 |
+| nt-time | 0.8.1 | Apache-2.0 OR MIT | https://crates.io/crates/nt-time/0.8.1 |
 | num_enum | 0.7.6 | BSD-3-Clause OR MIT OR Apache-2.0 | https://crates.io/crates/num_enum/0.7.6 |
 | num_enum_derive | 0.7.6 | BSD-3-Clause OR MIT OR Apache-2.0 | https://crates.io/crates/num_enum_derive/0.7.6 |
 | num-conv | 0.2.2 | MIT OR Apache-2.0 | https://crates.io/crates/num-conv/0.2.2 |
@@ -406,6 +424,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | rmcp-macros | 3.5.1 | Apache-2.0 | https://crates.io/crates/rmcp-macros/3.5.1 |
 | roxmltree | 0.20.0 | MIT OR Apache-2.0 | https://crates.io/crates/roxmltree/0.20.0 |
 | roxmltree | 0.21.1 | MIT OR Apache-2.0 | https://crates.io/crates/roxmltree/0.21.1 |
+| rsqlite-vfs | 0.1.1 | MIT | https://crates.io/crates/rsqlite-vfs/0.1.1 |
+| rusqlite | 0.40.2 | MIT | https://crates.io/crates/rusqlite/0.40.2 |
 | rustc_version | 0.4.1 | MIT OR Apache-2.0 | https://crates.io/crates/rustc_version/0.4.1 |
 | rustc-hash | 2.1.3 | Apache-2.0 OR MIT | https://crates.io/crates/rustc-hash/2.1.3 |
 | rustix | 1.1.5 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | https://crates.io/crates/rustix/1.1.5 |
@@ -441,6 +461,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | serialize-to-javascript | 0.1.2 | MIT OR Apache-2.0 | https://crates.io/crates/serialize-to-javascript/0.1.2 |
 | serialize-to-javascript-impl | 0.1.2 | MIT OR Apache-2.0 | https://crates.io/crates/serialize-to-javascript-impl/0.1.2 |
 | servo_arc | 0.4.3 | MIT OR Apache-2.0 | https://crates.io/crates/servo_arc/0.4.3 |
+| sevenz-rust | 0.6.1 | Apache-2.0 | https://crates.io/crates/sevenz-rust/0.6.1 |
 | sha1 | 0.10.7 | MIT OR Apache-2.0 | https://crates.io/crates/sha1/0.10.7 |
 | sha2 | 0.10.9 | MIT OR Apache-2.0 | https://crates.io/crates/sha2/0.10.9 |
 | sha2 | 0.11.1 | MIT OR Apache-2.0 | https://crates.io/crates/sha2/0.11.1 |
@@ -459,6 +480,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | softbuffer | 0.4.8 | MIT OR Apache-2.0 | https://crates.io/crates/softbuffer/0.4.8 |
 | soup3 | 0.5.0 | MIT | https://crates.io/crates/soup3/0.5.0 |
 | soup3-sys | 0.5.0 | MIT | https://crates.io/crates/soup3-sys/0.5.0 |
+| sqlite-wasm-rs | 0.5.5 | MIT | https://crates.io/crates/sqlite-wasm-rs/0.5.5 |
 | sse-stream | 0.2.6 | MIT OR Apache-2.0 | https://crates.io/crates/sse-stream/0.2.6 |
 | stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 | https://crates.io/crates/stable_deref_trait/1.2.1 |
 | static_assertions | 1.1.0 | MIT OR Apache-2.0 | https://crates.io/crates/static_assertions/1.1.0 |
@@ -481,6 +503,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | system-deps | 6.2.2 | MIT OR Apache-2.0 | https://crates.io/crates/system-deps/6.2.2 |
 | tao | 0.37.1 | Apache-2.0 | https://crates.io/crates/tao/0.37.1 |
 | tao-macros | 0.1.4 | MIT OR Apache-2.0 | https://crates.io/crates/tao-macros/0.1.4 |
+| tar | 0.4.46 | MIT OR Apache-2.0 | https://crates.io/crates/tar/0.4.46 |
 | target-lexicon | 0.12.16 | Apache-2.0 WITH LLVM-exception | https://crates.io/crates/target-lexicon/0.12.16 |
 | tauri | 2.12.4 | Apache-2.0 OR MIT | https://crates.io/crates/tauri/2.12.4 |
 | tauri-build | 2.7.3 | Apache-2.0 OR MIT | https://crates.io/crates/tauri-build/2.7.3 |
@@ -558,6 +581,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | utf16string | 0.2.0 | MIT OR Apache-2.0 | https://crates.io/crates/utf16string/0.2.0 |
 | utf8_iter | 1.0.4 | Apache-2.0 OR MIT | https://crates.io/crates/utf8_iter/1.0.4 |
 | uuid | 1.28.0 | Apache-2.0 OR MIT | https://crates.io/crates/uuid/1.28.0 |
+| vcpkg | 0.2.15 | MIT/Apache-2.0 | https://crates.io/crates/vcpkg/0.2.15 |
 | vecmath | 1.0.0 | MIT | https://crates.io/crates/vecmath/1.0.0 |
 | version_check | 0.9.5 | MIT/Apache-2.0 | https://crates.io/crates/version_check/0.9.5 |
 | version-compare | 0.2.1 | MIT | https://crates.io/crates/version-compare/0.2.1 |
@@ -635,6 +659,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | wry | 0.57.0 | Apache-2.0 OR MIT | https://crates.io/crates/wry/0.57.0 |
 | x11 | 2.21.0 | MIT | https://crates.io/crates/x11/2.21.0 |
 | x11-dl | 2.21.0 | MIT | https://crates.io/crates/x11-dl/2.21.0 |
+| xattr | 1.6.1 | MIT OR Apache-2.0 | https://crates.io/crates/xattr/1.6.1 |
 | xml-rs | 0.8.29 | MIT | https://crates.io/crates/xml-rs/0.8.29 |
 | xmlwriter | 0.1.0 | MIT | https://crates.io/crates/xmlwriter/0.1.0 |
 | yaml-rust | 0.4.5 | MIT/Apache-2.0 | https://crates.io/crates/yaml-rust/0.4.5 |

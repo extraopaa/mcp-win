@@ -85,13 +85,49 @@ mod folder_selection_tests {
     }
 }
 
+pub fn validate_relative(relative: &str) -> Result<(), String> {
+    if relative.contains([':', '\0']) {
+        return Err("Chemin interdit (flux alternatifs inclus)".into());
+    }
+    for part in relative.split(['/', '\\']) {
+        if part.is_empty() || part == "." {
+            continue;
+        }
+        let stem = part.split('.').next().unwrap_or("").to_ascii_uppercase();
+        let numbered = stem
+            .strip_prefix("COM")
+            .or_else(|| stem.strip_prefix("LPT"));
+        if part == ".."
+            || part.ends_with(['.', ' '])
+            || ["CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$", "CLOCK$"].contains(&stem.as_str())
+            || numbered.is_some_and(|n| {
+                ["1", "2", "3", "4", "5", "6", "7", "8", "9", "¹", "²", "³"].contains(&n)
+            })
+        {
+            return Err("Nom de fichier Windows ambigu ou réservé".into());
+        }
+    }
+    Ok(())
+}
+
 pub fn resolve(folders: &[SharedFolder], folder: &str, relative: &str) -> Result<PathBuf, String> {
+    validate_relative(relative)?;
     let root = select_folder(folders, folder)?;
     let root = root
         .path
         .canonicalize()
         .map_err(|_| "Dossier partagé inaccessible")?;
+    if relative.contains(':') || relative.contains('\0') {
+        return Err("Chemin interdit (flux alternatifs inclus)".into());
+    }
     let relative = Path::new(relative);
+    if crate::history::reserved(relative)
+        || root
+            .file_name()
+            .is_some_and(|n| n.eq_ignore_ascii_case(crate::history::DIRECTORY))
+    {
+        return Err("L'historique local est réservé à la restauration".into());
+    }
     if relative.is_absolute()
         || relative.components().any(|c| {
             matches!(
@@ -111,35 +147,17 @@ pub fn resolve(folders: &[SharedFolder], folder: &str, relative: &str) -> Result
     if !target.starts_with(&root) {
         return Err("Accès hors du dossier partagé interdit".into());
     }
+    if crate::history::reserved(target.strip_prefix(&root).unwrap()) {
+        return Err("Accès à l'historique réservé".into());
+    }
     Ok(target)
 }
 
-pub fn list(
-    folders: &[SharedFolder],
-    folder: &str,
-    relative: &str,
-    offset: usize,
-) -> Result<Value, String> {
-    let dir = resolve(folders, folder, relative)?;
-    let mut items = fs::read_dir(dir).map_err(|_| "Dossier inaccessible")?
-        .filter_map(Result::ok).filter(|e| e.file_type().is_ok_and(|t| !t.is_symlink()))
-        .map(|e| json!({"name": e.file_name().to_string_lossy(), "path": Path::new(relative).join(e.file_name()).to_string_lossy().replace('\\', "/"),
-            "directory": e.file_type().is_ok_and(|t| t.is_dir())})).collect::<Vec<_>>();
-    items.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
-    let total = items.len();
-    let entries: Vec<_> = items.into_iter().skip(offset).take(100).collect();
-    Ok(
-        json!({"entries": entries, "total": total, "next_offset": (offset.saturating_add(100) < total).then_some(offset.saturating_add(100))}),
-    )
-}
-
-pub fn read(
+pub fn extract(
     folders: &[SharedFolder],
     folder: &str,
     relative: &str,
     page: usize,
-    offset: usize,
-    limit: usize,
 ) -> Result<Value, String> {
     let target = resolve(folders, folder, relative)?;
     let info = fs::metadata(&target).map_err(|_| "Fichier inaccessible")?;
@@ -196,16 +214,30 @@ pub fn read(
         }
         text
     };
+    Ok(json!({"path":relative,"format":ext,"sha256":sha256,"metadata":metadata,"text":text}))
+}
+
+pub fn read(
+    folders: &[SharedFolder],
+    folder: &str,
+    relative: &str,
+    page: usize,
+    offset: usize,
+    limit: usize,
+) -> Result<Value, String> {
+    let mut value = extract(folders, folder, relative, page)?;
+    let text = value["text"].as_str().unwrap_or("");
     let total = text.chars().count();
     let segment: String = text
         .chars()
         .skip(offset)
-        .take(limit.clamp(1, 50_000))
+        .take(limit.clamp(1, 50000))
         .collect();
     let end = offset.saturating_add(segment.chars().count());
-    Ok(
-        json!({"path": relative, "format": ext, "sha256":sha256, "metadata": metadata, "text": segment, "total_characters": total, "next_offset": (end < total).then_some(end)}),
-    )
+    value["text"] = json!(segment);
+    value["total_characters"] = json!(total);
+    value["next_offset"] = json!((end < total).then_some(end));
+    Ok(value)
 }
 
 pub fn render_svg(

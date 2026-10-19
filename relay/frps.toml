@@ -6,3 +6,8 @@ vhostHTTPPort = 8080
 auth.method = "token"
 auth.token = "REMPLACER_PAR_UN_SECRET_ALEATOIRE_LONG"
 transport.tls.force = true
+
+# OBLIGATOIRE : certificat signé par la CA copiée dans MCP Win.
+# Le SAN du certificat doit contenir le nom TLS saisi dans l'application.
+transport.tls.certFile = "/etc/frp/server.crt"
+transport.tls.keyFile = "/etc/frp/server.key"

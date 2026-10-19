@@ -80,11 +80,21 @@ pub struct CompiledPdf {
     pub source: String,
 }
 
+#[cfg(test)]
 pub async fn compile_typst(
     folders: &[SharedFolder],
     folder: &str,
     source: &str,
     assets: &[Asset],
+) -> Result<CompiledPdf, String> {
+    compile_typst_with_data(folders, folder, source, assets, None).await
+}
+pub async fn compile_typst_with_data(
+    folders: &[SharedFolder],
+    folder: &str,
+    source: &str,
+    assets: &[Asset],
+    data: Option<&Value>,
 ) -> Result<CompiledPdf, String> {
     static SLOTS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
     let _slot = SLOTS
@@ -104,6 +114,13 @@ pub async fn compile_typst(
     }
     let temp = tempfile::tempdir().map_err(|e| e.to_string())?;
     let root = temp.path();
+    if let Some(data) = data {
+        let bytes = serde_json::to_vec(data).map_err(|e| e.to_string())?;
+        if bytes.len() > 1_000_000 {
+            return Err("Données du modèle limitées à 1 Mo".into());
+        }
+        fs::write(root.join("mcp-data.json"), bytes).map_err(|e| e.to_string())?;
+    }
     fs::write(root.join("main.typ"), &source).map_err(|e| e.to_string())?;
     let mut total = source.len() as u64;
     let mut names = std::collections::HashSet::new();
@@ -112,6 +129,7 @@ pub async fn compile_typst(
         if !safe_name(&name)
             || [
                 "main.typ",
+                "mcp-data.json",
                 "output.pdf",
                 "errors.txt",
                 "lato-regular.ttf",
@@ -232,9 +250,32 @@ mod tests {
         assert_eq!(pages, 1);
         let bytes = png(&image).unwrap();
         fs::write(tmp.path().join("scan.png"), &bytes).unwrap();
+        let compact_ocr = crate::ocr::recognize(
+            folders.clone(),
+            crate::ocr::OcrArgs {
+                folder: "qa".into(),
+                path: "scan.png".into(),
+                page: None,
+                languages: None,
+                layout: None,
+                rotate: None,
+                plain_text_only: Some(true),
+                offset: Some(10),
+                limit: Some(20),
+            },
+        )
+        .await
+        .unwrap();
+        assert_eq!(compact_ocr["text"].as_str().unwrap().chars().count(), 20);
+        assert!(compact_ocr.get("words").is_none());
+        assert!(compact_ocr.get("lines").is_none());
+        assert_eq!(compact_ocr["next_offset"], 30);
         let recognized = crate::ocr::recognize(
             folders.clone(),
             crate::ocr::OcrArgs {
+                plain_text_only: Some(false),
+                offset: None,
+                limit: None,
                 folder: "qa".into(),
                 path: "scan.png".into(),
                 page: None,
@@ -269,6 +310,9 @@ mod tests {
         let scanned = crate::ocr::recognize(
             folders.clone(),
             crate::ocr::OcrArgs {
+                plain_text_only: Some(false),
+                offset: None,
+                limit: None,
                 folder: "qa".into(),
                 path: "scan.pdf".into(),
                 page: None,
@@ -552,6 +596,15 @@ pub fn package(
     writing::commit(folders, folder, output, &bytes, None)
 }
 
+pub(crate) static PDF_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+pub fn bind_pdfium() -> Result<pdfium_render::prelude::Pdfium, String> {
+    use pdfium_render::prelude::*;
+    match Pdfium::bind_to_library(engine_path("pdfium.dll")?) {
+        Ok(b) => Ok(Pdfium::new(b)),
+        Err(PdfiumError::PdfiumLibraryBindingsAlreadyInitialized) => Ok(Pdfium::default()),
+        Err(e) => Err(e.to_string()),
+    }
+}
 pub fn pdf_image(
     folders: &[SharedFolder],
     folder: &str,
@@ -560,16 +613,11 @@ pub fn pdf_image(
     width: u32,
 ) -> Result<(image::DynamicImage, usize), String> {
     use pdfium_render::prelude::*;
-    static PDF_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _guard = PDF_LOCK.lock().map_err(|_| "Rendu PDF indisponible")?;
     if page == 0 || !(400..=2400).contains(&width) {
         return Err("Page >=1, largeur entre 400 et 2400 pixels".into());
     }
-    let pdfium = match Pdfium::bind_to_library(engine_path("pdfium.dll")?) {
-        Ok(bindings) => Pdfium::new(bindings),
-        Err(PdfiumError::PdfiumLibraryBindingsAlreadyInitialized) => Pdfium::default(),
-        Err(e) => return Err(e.to_string()),
-    };
+    let pdfium = bind_pdfium()?;
     let document = pdfium
         .load_pdf_from_file(&input(folders, folder, path)?, None)
         .map_err(|e| e.to_string())?;

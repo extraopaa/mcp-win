@@ -1,7 +1,8 @@
 use windows_sys::Win32::{
     Foundation::CloseHandle,
     System::JobObjects::{
-        AssignProcessToJobObject, CreateJobObjectW, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+        AssignProcessToJobObject, CreateJobObjectW, JOB_OBJECT_LIMIT_ACTIVE_PROCESS,
+        JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, JOB_OBJECT_LIMIT_PROCESS_MEMORY,
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JobObjectExtendedLimitInformation,
         SetInformationJobObject,
     },
@@ -18,7 +19,11 @@ impl ProcessJob {
             }
             let job = Self(handle as isize);
             let mut limits: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = std::mem::zeroed();
-            limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+            limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+                | JOB_OBJECT_LIMIT_PROCESS_MEMORY
+                | JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
+            limits.ProcessMemoryLimit = 768 * 1024 * 1024;
+            limits.BasicLimitInformation.ActiveProcessLimit = 1;
             if SetInformationJobObject(
                 handle,
                 JobObjectExtendedLimitInformation,

@@ -12,7 +12,7 @@ Par exemple, vous pouvez demander : « Lis les documents de mon dossier, résume
 
 L'application regroupe une interface simple, le serveur MCP, le tunnel d'accès extérieur et les moteurs de documents/OCR. Aucun abonnement ni API payante n'est intégré ; le coût éventuel de votre assistant IA reste indépendant. Elle est développée en Rust avec Tauri 2.
 
-**[Télécharger pour Windows](https://github.com/extraopaa/mcp-win/releases/latest)** · [Guide de création pour les IA](docs/AUTHORING.md) · [Liste des outils MCP](docs/MCP-TOOLS.md)
+**[Télécharger pour Windows](https://github.com/extraopaa/mcp-win/releases/latest)** · **[Wiki MCP Win](docs/wiki/Home.md)** · [Guide de création pour les IA](docs/AUTHORING.md) · [Liste des outils MCP](docs/MCP-TOOLS.md)
 
 ## Nouveautés v0.3
 

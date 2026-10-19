@@ -1,6 +1,18 @@
 # MCP Win
 
-Application Windows en Rust avec une interface Tauri 2, pour donner à une application IA compatible MCP un accès **depuis Internet** aux dossiers choisis sur votre PC. Aucun abonnement, API payante ou service propriétaire de tunnel n'est intégré.
+**MCP Win est une application Windows gratuite et open source qui permet à votre assistant IA de lire, créer et modifier des documents dans les dossiers de votre ordinateur que vous choisissez de partager.**
+
+Elle est utile lorsqu'un assistant n'accepte pas directement certains fichiers, ou lorsque vous voulez lui faire produire de vrais documents sur votre PC : PDF mis en page, fichiers Word, classeurs Excel, présentations PowerPoint, images SVG ou fichiers texte. Elle peut aussi reconnaître le texte des images et des PDF numérisés grâce à un OCR local en français et en anglais.
+
+Vous ajoutez un dossier dans l'application, cliquez sur **Démarrer le MCP**, puis copiez l'adresse HTTPS obtenue dans les réglages de votre assistant. Celui-ci peut alors utiliser les outils de MCP Win à distance, y compris depuis un service IA en ligne. **MCP** est le protocole qui permet à l'assistant de découvrir et d'utiliser ces outils. Votre application IA doit donc accepter les connexions à un serveur MCP distant.
+
+Par exemple, vous pouvez demander : « Lis les documents de mon dossier, résume-les, puis crée un rapport PDF avec une belle mise en page et un tableau Excel des résultats. » L'assistant utilise MCP Win pour consulter les fichiers et enregistrer les documents produits.
+
+**Vous choisissez les accès :** seuls les dossiers ajoutés sont partagés. Ils sont en lecture seule au départ ; la création et la modification nécessitent d'activer l'écriture dans l'interface. Le PC et l'application doivent rester allumés. Le contenu demandé par l'assistant lui est transmis via la connexion MCP ; le traitement OCR et la génération des documents sont effectués sur votre ordinateur.
+
+L'application regroupe une interface simple, le serveur MCP, le tunnel d'accès extérieur et les moteurs de documents/OCR. Aucun abonnement ni API payante n'est intégré ; le coût éventuel de votre assistant IA reste indépendant. Elle est développée en Rust avec Tauri 2.
+
+**[Télécharger pour Windows](https://github.com/extraopaa/mcp-win/releases/latest)** · [Guide de création pour les IA](docs/AUTHORING.md) · [Liste des outils MCP](docs/MCP-TOOLS.md)
 
 ## Nouveautés v0.3
 

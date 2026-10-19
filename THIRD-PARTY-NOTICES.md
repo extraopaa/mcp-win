@@ -92,6 +92,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | cpufeatures | 0.3.1 | MIT OR Apache-2.0 | https://crates.io/crates/cpufeatures/0.3.1 |
 | crc32fast | 1.5.2 | MIT OR Apache-2.0 | https://crates.io/crates/crc32fast/1.5.2 |
 | crossbeam-channel | 0.5.17 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-channel/0.5.17 |
+| crossbeam-deque | 0.8.8 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-deque/0.8.8 |
+| crossbeam-epoch | 0.9.21 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-epoch/0.9.21 |
 | crossbeam-utils | 0.8.23 | MIT OR Apache-2.0 | https://crates.io/crates/crossbeam-utils/0.8.23 |
 | crunchy | 0.2.4 | MIT | https://crates.io/crates/crunchy/0.2.4 |
 | crypto-common | 0.1.7 | MIT OR Apache-2.0 | https://crates.io/crates/crypto-common/0.1.7 |
@@ -131,6 +133,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | dyn-clone | 1.0.20 | MIT OR Apache-2.0 | https://crates.io/crates/dyn-clone/1.0.20 |
 | ecb | 0.1.2 | MIT | https://crates.io/crates/ecb/0.1.2 |
 | ecb | 0.2.1 | MIT OR Apache-2.0 | https://crates.io/crates/ecb/0.2.1 |
+| ecow | 0.2.6 | MIT OR Apache-2.0 | https://crates.io/crates/ecow/0.2.6 |
 | either | 1.19.0 | MIT OR Apache-2.0 | https://crates.io/crates/either/1.19.0 |
 | embed_plist | 1.2.2 | MIT OR Apache-2.0 | https://crates.io/crates/embed_plist/1.2.2 |
 | embed-resource | 3.0.12 | MIT | https://crates.io/crates/embed-resource/3.0.12 |
@@ -263,6 +266,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | libdbus-sys | 0.2.7 | Apache-2.0/MIT | https://crates.io/crates/libdbus-sys/0.2.7 |
 | libloading | 0.7.4 | ISC | https://crates.io/crates/libloading/0.7.4 |
 | libloading | 0.8.9 | ISC | https://crates.io/crates/libloading/0.8.9 |
+| libm | 0.2.16 | MIT | https://crates.io/crates/libm/0.2.16 |
 | libredox | 0.1.25 | MIT | https://crates.io/crates/libredox/0.1.25 |
 | linked-hash-map | 0.5.6 | MIT/Apache-2.0 | https://crates.io/crates/linked-hash-map/0.5.6 |
 | linux-raw-sys | 0.12.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | https://crates.io/crates/linux-raw-sys/0.12.1 |
@@ -379,6 +383,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | rand_pcg | 0.10.2 | MIT OR Apache-2.0 | https://crates.io/crates/rand_pcg/0.10.2 |
 | rangemap | 1.8.0 | MIT/Apache-2.0 | https://crates.io/crates/rangemap/1.8.0 |
 | raw-window-handle | 0.6.2 | MIT OR Apache-2.0 OR Zlib | https://crates.io/crates/raw-window-handle/0.6.2 |
+| rayon | 1.12.0 | MIT OR Apache-2.0 | https://crates.io/crates/rayon/1.12.0 |
+| rayon-core | 1.13.0 | MIT OR Apache-2.0 | https://crates.io/crates/rayon-core/1.13.0 |
 | read-fonts | 0.39.2 | MIT OR Apache-2.0 | https://crates.io/crates/read-fonts/0.39.2 |
 | read-fonts | 0.41.0 | MIT OR Apache-2.0 | https://crates.io/crates/read-fonts/0.41.0 |
 | redox_syscall | 0.5.18 | MIT | https://crates.io/crates/redox_syscall/0.5.18 |
@@ -486,6 +492,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | tauri-winres | 0.3.6 | MIT | https://crates.io/crates/tauri-winres/0.3.6 |
 | tempfile | 3.27.0 | MIT OR Apache-2.0 | https://crates.io/crates/tempfile/3.27.0 |
 | tendril | 0.5.1 | MIT OR Apache-2.0 | https://crates.io/crates/tendril/0.5.1 |
+| thin-vec | 0.2.21 | MIT OR Apache-2.0 | https://crates.io/crates/thin-vec/0.2.21 |
 | thiserror | 1.0.69 | MIT OR Apache-2.0 | https://crates.io/crates/thiserror/1.0.69 |
 | thiserror | 2.0.21 | MIT OR Apache-2.0 | https://crates.io/crates/thiserror/2.0.21 |
 | thiserror-impl | 1.0.69 | MIT OR Apache-2.0 | https://crates.io/crates/thiserror-impl/1.0.69 |
@@ -527,6 +534,9 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | typed-path | 0.12.3 | MIT OR Apache-2.0 | https://crates.io/crates/typed-path/0.12.3 |
 | typeid | 1.0.3 | MIT OR Apache-2.0 | https://crates.io/crates/typeid/1.0.3 |
 | typenum | 1.20.1 | MIT OR Apache-2.0 | https://crates.io/crates/typenum/1.20.1 |
+| typst-syntax | 0.15.1 | Apache-2.0 | https://crates.io/crates/typst-syntax/0.15.1 |
+| typst-timing | 0.15.1 | Apache-2.0 | https://crates.io/crates/typst-timing/0.15.1 |
+| typst-utils | 0.15.1 | Apache-2.0 | https://crates.io/crates/typst-utils/0.15.1 |
 | ucd-trie | 0.1.7 | MIT OR Apache-2.0 | https://crates.io/crates/ucd-trie/0.1.7 |
 | umya-spreadsheet | 3.1.1 | MIT | https://crates.io/crates/umya-spreadsheet/3.1.1 |
 | unicode-bidi | 0.3.18 | MIT OR Apache-2.0 | https://crates.io/crates/unicode-bidi/0.3.18 |
@@ -534,11 +544,13 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | unicode-general-category | 1.1.0 | Apache-2.0 | https://crates.io/crates/unicode-general-category/1.1.0 |
 | unicode-ident | 1.0.27 | (MIT OR Apache-2.0) AND Unicode-3.0 | https://crates.io/crates/unicode-ident/1.0.27 |
 | unicode-joining-type | 1.0.0 | Apache-2.0 | https://crates.io/crates/unicode-joining-type/1.0.0 |
+| unicode-math-class | 0.1.0 | MIT OR Apache-2.0 | https://crates.io/crates/unicode-math-class/0.1.0 |
 | unicode-normalization | 0.1.26 | (MIT OR Apache-2.0) AND Unicode-3.0 | https://crates.io/crates/unicode-normalization/0.1.26 |
 | unicode-properties | 0.1.4 | MIT/Apache-2.0 | https://crates.io/crates/unicode-properties/0.1.4 |
 | unicode-script | 0.5.8 | MIT OR Apache-2.0 | https://crates.io/crates/unicode-script/0.5.8 |
 | unicode-segmentation | 1.13.3 | MIT OR Apache-2.0 | https://crates.io/crates/unicode-segmentation/1.13.3 |
 | unicode-vo | 0.1.0 | MIT/Apache-2.0 | https://crates.io/crates/unicode-vo/0.1.0 |
+| unscanny | 0.1.0 | MIT OR Apache-2.0 | https://crates.io/crates/unscanny/0.1.0 |
 | untrusted | 0.9.0 | ISC | https://crates.io/crates/untrusted/0.9.0 |
 | url | 2.5.8 | MIT OR Apache-2.0 | https://crates.io/crates/url/2.5.8 |
 | urlpattern | 0.6.0 | MIT | https://crates.io/crates/urlpattern/0.6.0 |

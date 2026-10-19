@@ -62,6 +62,7 @@ fn safe_name(name: &str) -> bool {
             .all(|s| !s.is_empty() && s != "." && s != "..")
 }
 
+#[cfg(test)]
 pub async fn typst(
     folders: &[SharedFolder],
     folder: &str,
@@ -69,15 +70,32 @@ pub async fn typst(
     source: &str,
     assets: &[Asset],
 ) -> Result<Value, String> {
+    crate::pdf_design::create(folders, folder, output, source, assets, "rename").await
+}
+
+pub struct CompiledPdf {
+    pub bytes: Vec<u8>,
+    pub warnings: String,
+    pub adjustments: Vec<String>,
+    pub source: String,
+}
+
+pub async fn compile_typst(
+    folders: &[SharedFolder],
+    folder: &str,
+    source: &str,
+    assets: &[Asset],
+) -> Result<CompiledPdf, String> {
     static SLOTS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
     let _slot = SLOTS
         .acquire()
         .await
         .map_err(|_| "Compilation indisponible")?;
-    writing::destination(folders, folder, output)?;
-    if !output.to_lowercase().ends_with(".pdf") || source.len() > 1_000_000 || assets.len() > 50 {
-        return Err("Sortie .pdf, source <= 1 Mo, maximum 50 assets".into());
+    library::select_folder(folders, folder)?;
+    if source.len() > 1_000_000 || assets.len() > 50 {
+        return Err("Source <= 1 Mo, maximum 50 assets".into());
     }
+    let (source, adjustments) = crate::pdf_design::normalize(source);
     // No registry/package downloads: dependencies must be explicit local assets.
     if source.contains("@preview/") || source.contains("@local/") {
         return Err(
@@ -86,10 +104,24 @@ pub async fn typst(
     }
     let temp = tempfile::tempdir().map_err(|e| e.to_string())?;
     let root = temp.path();
-    fs::write(root.join("main.typ"), source).map_err(|e| e.to_string())?;
+    fs::write(root.join("main.typ"), &source).map_err(|e| e.to_string())?;
     let mut total = source.len() as u64;
+    let mut names = std::collections::HashSet::new();
     for asset in assets {
-        if !safe_name(&asset.name) || ["main.typ", "output.pdf"].contains(&asset.name.as_str()) {
+        let name = asset.name.replace('\\', "/");
+        if !safe_name(&name)
+            || [
+                "main.typ",
+                "output.pdf",
+                "errors.txt",
+                "lato-regular.ttf",
+                "lato-bold.ttf",
+                "lato-italic.ttf",
+                "lato-bolditalic.ttf",
+            ]
+            .contains(&name.to_lowercase().as_str())
+            || !names.insert(name.to_lowercase())
+        {
             return Err("Nom d'asset invalide ou réservé".into());
         }
         let src = input(folders, folder, &asset.path)?;
@@ -97,7 +129,7 @@ pub async fn typst(
         if total > 50 * 1024 * 1024 {
             return Err("Assets limités à 50 Mo".into());
         }
-        let dst = root.join(&asset.name);
+        let dst = root.join(&name);
         fs::create_dir_all(dst.parent().unwrap()).map_err(|e| e.to_string())?;
         fs::copy(src, dst).map_err(|e| e.to_string())?;
     }
@@ -106,6 +138,22 @@ pub async fn typst(
         include_bytes!("../assets/fonts/Lato-Regular.ttf"),
     )
     .map_err(|e| e.to_string())?;
+    for (name, bytes) in [
+        (
+            "Lato-Bold.ttf",
+            include_bytes!("../assets/fonts/Lato-Bold.ttf").as_slice(),
+        ),
+        (
+            "Lato-Italic.ttf",
+            include_bytes!("../assets/fonts/Lato-Italic.ttf").as_slice(),
+        ),
+        (
+            "Lato-BoldItalic.ttf",
+            include_bytes!("../assets/fonts/Lato-BoldItalic.ttf").as_slice(),
+        ),
+    ] {
+        fs::write(root.join(name), bytes).map_err(|e| e.to_string())?;
+    }
     let mut command = tokio::process::Command::new(engine_path("typst.exe")?);
     command
         .args([
@@ -144,15 +192,25 @@ pub async fn typst(
             return Err("Compilation Typst interrompue après 60 secondes".into());
         }
     };
+    let errors = fs::read_to_string(root.join("errors.txt"))
+        .unwrap_or_default()
+        .replace(root.to_string_lossy().as_ref(), "<projet>");
     if !status.success() {
-        let errors = fs::read_to_string(root.join("errors.txt")).unwrap_or_default();
         return Err(format!(
             "Typst : {}",
             errors.chars().take(12000).collect::<String>()
         ));
     }
     let bytes = fs::read(root.join("output.pdf")).map_err(|e| e.to_string())?;
-    writing::commit(folders, folder, output, &bytes, None)
+    if bytes.len() > 25 * 1024 * 1024 {
+        return Err("PDF limité à 25 Mo".into());
+    }
+    Ok(CompiledPdf {
+        bytes,
+        warnings: errors.chars().take(12000).collect(),
+        adjustments,
+        source,
+    })
 }
 
 #[cfg(test)]

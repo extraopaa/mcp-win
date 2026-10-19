@@ -5,6 +5,7 @@ mod generate;
 mod library;
 mod ocr;
 mod office;
+mod pdf_design;
 mod process_job;
 mod server;
 mod tunnel;

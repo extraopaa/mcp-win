@@ -2,6 +2,10 @@
 
 Les outils simples restent disponibles. Pour un document travaillé, utiliser les outils avancés ci-dessous. Aucune API ni application Office payante n'est requise.
 
+## Choisir le dossier sans intervention humaine
+
+Appeler `list_folders` pour obtenir les identifiants et le statut `writable`. Ne pas demander ces identifiants à la personne : ils sont accessibles par MCP. Pour créer, choisir un dossier `writable:true`. Le paramètre `folder` accepte un identifiant ou un nom exact unique ; il peut être omis si un seul dossier est partagé. Plusieurs dossiers ou noms ambigus : choisir un identifiant retourné par `list_folders`. En cas d'erreur, relire cette liste et réessayer. Une autorisation d'écriture désactivée nécessite toujours une action dans l'application.
+
 ## PDF : `create_designed_pdf`
 
 Arguments : `folder`, `output_path` (nouveau `.pdf`), `source` (source Typst complète), `assets` (optionnel, liste `{path,name}`).

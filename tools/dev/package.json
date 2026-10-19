@@ -1,0 +1,7 @@
+{
+  "name": "mcp-win-native-ui-tests",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Optional development tools; no frontend build is required",
+  "devDependencies": { "playwright": "1.64.1" }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MCP Win",
+  "version": "0.1.0",
+  "identifier": "org.mcpwin.desktop",
+  "build": { "frontendDist": "ui" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [{ "title": "MCP Win", "width": 1180, "height": 820, "minWidth": 900, "minHeight": 680 }],
+    "security": { "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost" }
+  },
+  "bundle": { "active": false }
+}

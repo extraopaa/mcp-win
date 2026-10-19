@@ -1,0 +1,8 @@
+# Sur votre serveur PUBLIC. Remplacer le jeton avant démarrage.
+bindAddr = "0.0.0.0"
+bindPort = 7000
+proxyBindAddr = "127.0.0.1"
+vhostHTTPPort = 8080
+auth.method = "token"
+auth.token = "REMPLACER_PAR_UN_SECRET_ALEATOIRE_LONG"
+transport.tls.force = true

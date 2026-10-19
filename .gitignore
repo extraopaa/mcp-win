@@ -1,0 +1,23 @@
+node_modules/
+target/
+archive-node/node_modules/
+archive-egui/caddy-download/
+.ui-test-pid
+cargo-metadata.json
+dist/
+.env
+documents/*
+!documents/.gitkeep
+
+# Local prototypes, generated files and screenshots with local paths.
+/archive-node/
+/archive-egui/
+/gen/
+/preview*.png
+/third-party-licenses/
+/vendor/frp/frp_0.71.1_windows_amd64/
+/vendor/frp/*.zip
+/release-assets/
+*.log
+.env.*
+!.env.example

@@ -1,0 +1,14 @@
+# Exemple sur votre propre serveur : Caddy libre gère le certificat HTTPS.
+# Le DNS du domaine doit pointer sur ce serveur, ports 80/443 accessibles.
+{
+    admin off
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+mcp.exemple.fr {
+    handle /mcp* {
+        reverse_proxy 127.0.0.1:8080
+    }
+    handle {
+        respond "Not found" 404
+    }
+}

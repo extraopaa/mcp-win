@@ -1,9 +1,9 @@
-param([string]$Version = '0.1.0')
+param([string]$Version = '0.1.0', [string]$SourceDirectory = 'dist')
 $ErrorActionPreference = 'Stop'
 if ($Version -notmatch '^\d+\.\d+\.\d+([-.][A-Za-z0-9.-]+)?$') { throw 'Version invalide' }
 Add-Type -AssemblyName System.IO.Compression
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$source = Join-Path $projectRoot 'dist'
+$source = if ([IO.Path]::IsPathRooted($SourceDirectory)) { $SourceDirectory } else { Join-Path $projectRoot $SourceDirectory }
 $output = Join-Path $projectRoot 'release-assets'
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 $filename = "mcp-win-v$Version-windows-x64.zip"

@@ -2,7 +2,9 @@
 
 Application Windows en Rust avec une interface Tauri 2, pour donner à une application IA compatible MCP un accès **depuis Internet** aux dossiers choisis sur votre PC. Aucun abonnement, API payante ou service propriétaire de tunnel n'est intégré.
 
-## Nouveautés v0.2
+## Nouveautés v0.3
+
+**Mise en page PDF complète avec Typst**, contrôle des styles et de la mise en page Word/Excel/PowerPoint via OOXML, aperçu visuel des pages et **OCR local des images/PDF numérisés**. Voir le [guide de création avancée](docs/AUTHORING.md), également accessible aux IA avec `get_authoring_guide`.
 
 Création de vrais fichiers **PDF, DOCX, XLSX et PPTX** via MCP, lecture des formats Office, édition des textes/CSV/JSON/SVG et copies modifiées de Word, Excel et PowerPoint. Les autres formats peuvent être enregistrés à partir de leurs octets valides en base64. Voir les [outils et exemples MCP](docs/MCP-TOOLS.md).
 
@@ -51,7 +53,7 @@ Le mode **Local uniquement** est disponible pour les tests sur ce PC ; il ne pro
 | SVG | Code XML, dimensions et rendu PNG par `resvg`, sans scripts ni chargement de fichiers externes |
 | Texte UTF-8 | TXT, Markdown, CSV, TSV, JSON, XML, HTML, CSS, JS, TS, Python, Rust, YAML, TOML, logs |
 
-Les PDF scannés nécessitent un OCR, non inclus. La mise en page et les graphiques des PDF ne sont pas analysés visuellement. Les anciens formats Word `.doc` et PowerPoint `.ppt` ne sont pas interprétés. La lecture binaire générique reste disponible. Le rendu PNG d'un SVG n'aide que les modèles qui peuvent recevoir une image via MCP ; les modèles texte peuvent lire le XML.
+Les PDF scannés et images peuvent être reconnus avec `ocr_file` (Tesseract local, modèles français et anglais, rotation, modes de lecture, coordonnées et confiance des mots) ; `render_pdf_page` fournit un aperçu visuel aux IA compatibles avec les images MCP. Manuscrits, autres langues et documents dégradés ne sont pas garantis. Les anciens formats Word `.doc` et PowerPoint `.ppt` ne sont pas interprétés. La lecture binaire générique reste disponible.
 
 Limites : 25 Mo par fichier, 5 Mo par SVG à rendre, rendu limité à 1600 pixels sur le plus grand côté, 50 000 caractères par réponse, 100 entrées par liste. L'extraction PDF produit les pages avant de sélectionner la page demandée.
 
@@ -65,6 +67,7 @@ Rust stable MSVC, les outils C++ Windows et WebView2 sont nécessaires au dével
 
 ```powershell
 ./scripts/fetch-frp.ps1
+./scripts/fetch-engines.ps1
 cargo test
 cargo build --release
 # Test facultatif par le relais public, avec un fichier synthétique uniquement :
@@ -74,3 +77,5 @@ cargo test public_mcp_smoke -- --ignored --nocapture
 Le binaire est produit dans `target/release/mcp-win.exe`. `scripts/package.ps1` prépare `dist/`. `scripts/fetch-frp.ps1` permet de récupérer la version épinglée du binaire frpc en vérifiant son SHA-256. `scripts/licenses.ps1` reconstruit l'inventaire des dépendances Rust et leurs notices. Le code est sous MIT ; les bibliothèques ont leurs propres licences open source. Voir `THIRD-PARTY-NOTICES.md`, `third-party-licenses/` et `vendor/frp/`.
 
 Les binaires, documents locaux et anciens prototypes sont exclus du dépôt. Les notices complètes des dépendances sont générées lors de la préparation du paquet Windows. Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour contribuer et lancer les tests facultatifs de l'interface.
+
+Extraire et conserver le paquet complet : les moteurs Typst, Pdfium et modèles OCR sont livrés dans `engines/` à côté de l'exécutable, sans installation ni téléchargement à l'exécution. Pour un lancement release direct hors packaging, copier Typst, Pdfium et le dossier Tesseract de `vendor/engines/runtime/` dans `target/release/engines/`. Typst, Tesseract et ses modèles sont Apache-2.0, Pdfium BSD avec notices de ses dépendances ; licences et attributions sont incluses. Le script compile Tesseract depuis des sources épinglées : CMake et les outils C++ MSVC sont requis uniquement au développement.

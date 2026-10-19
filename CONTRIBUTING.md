@@ -8,12 +8,13 @@ Installer Rust stable MSVC, les outils C++ Windows et le runtime WebView2. Depui
 
 ```powershell
 ./scripts/fetch-frp.ps1
+./scripts/fetch-engines.ps1
 cargo fmt --check
 cargo test --locked
 cargo run --locked
 ```
 
-Le téléchargement frp est épinglé en version et vérifié par SHA-256. Le frontend HTML/CSS/JS ne nécessite aucun build ni dépendance npm.
+Les téléchargements frp, Typst, Pdfium et modèles OCR sont épinglés et vérifiés par SHA-256. Les moteurs OCR/PDF sont requis pour les tests avancés. Le frontend HTML/CSS/JS ne nécessite aucun build ni dépendance npm.
 
 Pour les tests facultatifs de l'interface native, installer Node.js puis `npm ci --prefix tools/dev`. Construire le paquet avec `./scripts/package.ps1`, puis lancer `./scripts/run-native-check.ps1`. Ces tests utilisent uniquement un document synthétique et restaurent les préférences précédentes. Ils ouvrent temporairement un tunnel public et nécessitent donc Internet. Les tests standard n'utilisent aucun relais public.
 

@@ -71,7 +71,7 @@ pub fn document(
     writing::commit(folders, folder, path, &bytes, None)
 }
 
-fn docx(title: &str, sections: &[Section]) -> Result<Vec<u8>, String> {
+pub(crate) fn docx(title: &str, sections: &[Section]) -> Result<Vec<u8>, String> {
     use docx_rs::{Docx, Paragraph, Run};
     let mut doc = Docx::new().add_paragraph(
         Paragraph::new()

@@ -140,7 +140,7 @@ pub fn text(
         .to_lowercase();
     if ![
         "txt", "md", "csv", "tsv", "json", "xml", "svg", "html", "css", "js", "ts", "py", "rs",
-        "yaml", "yml", "toml", "log",
+        "yaml", "yml", "toml", "typ", "log",
     ]
     .contains(&ext.as_str())
     {

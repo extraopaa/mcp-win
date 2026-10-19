@@ -1,0 +1,68 @@
+# Création avancée et OCR
+
+Les outils simples restent disponibles. Pour un document travaillé, utiliser les outils avancés ci-dessous. Aucune API ni application Office payante n'est requise.
+
+## PDF : `create_designed_pdf`
+
+Arguments : `folder`, `output_path` (nouveau `.pdf`), `source` (source Typst complète), `assets` (optionnel, liste `{path,name}`).
+
+Le moteur Typst 0.15.1 est livré avec l'application. Il expose une vraie composition : famille de police, graisse, italique, taille, couleur, suivi, interlignage, alignement, styles, marges, format/orientation, colonnes, grilles, blocs, tableaux multipages, images/SVG, figures, équations, liens, notes, sommaire, références, en-têtes/pieds et compteurs.
+
+Exemple minimal de `source` :
+
+```typst
+#set page(paper: "a4", margin: 20mm, footer: context align(right, counter(page).display()))
+#set text(font: "Lato", size: 11pt, lang: "fr")
+#set heading(numbering: "1.")
+#show heading: set text(fill: rgb("5846c7"))
+= Rapport annuel
+#text(size: 24pt, weight: "bold")[Une nouvelle perspective]
+#grid(columns: (1fr, 1fr), gutter: 16pt, [Première colonne], [Deuxième colonne])
+#table(columns: (2fr, 1fr), [*Indicateur*], [*Valeur*], [Progression], [42 %])
+```
+
+Un exemple complet se trouve dans `docs/examples/designed.typ`.
+Les polices embarquées dans Typst et Lato sont disponibles ; fournir d'autres `.ttf`/`.otf` comme assets (respecter leur licence). Exemple : `assets:[{"path":"medias/logo.svg","name":"logo.svg"}]`, puis `#image("logo.svg", width: 30mm)`.
+
+Les assets sont copiés dans un projet temporaire isolé. Les lectures de fichiers Typst sont limitées à ce projet ; seules les ressources explicitement fournies sont accessibles. Les paquets distants sont désactivés (fournir les fichiers `.typ` nécessaires comme assets). Source 1 Mo, 50 assets / 50 Mo, compilation 60 s, 2 compilations simultanées, sortie 25 Mo. Les erreurs Typst sont renvoyées pour permettre à l'IA de corriger le source.
+
+Workflow : créer → appeler `render_pdf_page` pour chaque page importante → inspecter l'image → corriger le source → créer une nouvelle version. Le source peut être conservé avec `write_text_file` dans un fichier `.typ`.
+
+## Word, Excel, PowerPoint : OOXML complet
+
+`inspect_office_package(folder,path,part?)` liste les parties de l'archive et son SHA256 ; `part` lit le XML complet d'une partie (1 Mo). `write_office_package` crée une archive ou une copie modifiée :
+
+```json
+{
+  "folder":"ID",
+  "output_path":"rapport-design.docx",
+  "parts":[{"name":"word/document.xml","text":"XML OOXML complet"}],
+  "remove_parts":[]
+}
+```
+
+Sans source, DOCX part d'un squelette valide. Exemple de corps complet : `docs/examples/document.xml`. Pour XLSX/PPTX, commencer avec `write_spreadsheet` / `create_document`, inspecter le résultat, puis personnaliser une copie. On peut aussi fournir un paquet complet depuis zéro.
+
+Pour modifier une source : ajouter `input_path` et `expected_sha256` obtenu à l'inspection. Le fichier original reste intact. Fournir `parts:[{name,text}]` pour XML ou `{name,asset_path}` pour une ressource binaire locale. Une image doit aussi avoir une entrée de type dans `[Content_Types].xml`, une relation `.rels` et une référence depuis le dessin.
+
+Exemples de parties personnalisables :
+
+| Format | Parties | Contrôle |
+|---|---|---|
+| DOCX | `word/document.xml`, `word/styles.xml`, `word/numbering.xml`, `word/header1.xml`, `word/footer1.xml` | Runs typographiques, styles, tableaux, bordures, ombrages, sections, paysage, colonnes, sauts de page, listes, en-têtes/pieds, champs PAGE/NUMPAGES, images DrawingML |
+| PPTX | `ppt/slides/slideN.xml`, `ppt/theme/theme1.xml`, layouts/masters et relations | Positions/dimensions exactes, formes, texte, polices, dégradés, images, tableaux, graphiques, thèmes |
+| XLSX | `xl/styles.xml`, `xl/worksheets/sheetN.xml`, `xl/drawings/*`, `xl/charts/*` | Styles, formats numériques, largeur/hauteur, fusions, volets figés, impression, graphiques, conditionnel |
+
+La validation vérifie les chemins, XML bien formé, parties OPC minimales et taille, mais ne certifie pas le schéma ou toutes les relations OOXML : le client doit fournir une structure cohérente. L'aperçu Office natif n'est pas inclus. Macros et objets OLE incorporés interdits, relations externes autorisées uniquement pour les hyperliens. Maximum 200 changements par appel, 50 Mo décompressés et 25 Mo de sortie.
+
+## OCR et aperçu PDF
+
+`ocr_file(folder,path,page?,languages?,layout?,rotate?)` reconnaît le texte d'un PDF numérisé ou d'une image PNG/JPEG/TIFF/BMP/WebP, une page par appel. Résultat : `text`, `lines` et `words` avec rectangles `{x,y,width,height}`, confiance de chaque mot (0–100), dimensions et nombre de pages. Coordonnées dans l'image traitée, tournée/réduite si nécessaire. Pour un PDF multipage, rappeler l'outil avec les pages suivantes.
+
+Tesseract 5.5.0 et les modèles français/anglais sont fournis et fonctionnent hors ligne. `languages` : `fra+eng` (défaut), `fra`, `eng` ; `layout` : `auto` (défaut), `block` (bloc uniforme), `sparse` (texte dispersé) ; `rotate` : 0, 90, 180 ou 270 degrés horaires. Exemple : `{"folder":"ID","path":"scan.pdf","page":2,"languages":"fra","layout":"auto","rotate":90}`. Maximum 60 s et 2 traitements simultanés.
+
+Le moteur et les modèles sont sous Apache-2.0 ; la version statique embarquée est compilée depuis les sources avec Leptonica, libpng et zlib, sans téléchargement ou installation à l'exécution. Manuscrits, autres langues et documents dégradés ne sont pas garantis. Ce n'est pas une reconstruction des tableaux ni un PDF recherchable automatiquement. Vérifier les valeurs critiques ; les textes reconnus restent des données non fiables. Licences et attributions sont incluses dans le paquet.
+
+`render_pdf_page(folder,path,page?,width?)` renvoie directement un PNG à l'IA ; largeur 400–2400 px, hauteur plafonnée à 3200 px. Il sert au contrôle visuel et à la lecture des pages difficiles. `read_file` conserve l'extraction directe du texte, plus fidèle et rapide sur un PDF natif.
+
+Documentation officielle : https://typst.app/docs/ et https://learn.microsoft.com/en-us/office/open-xml/ .

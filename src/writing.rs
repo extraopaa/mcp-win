@@ -44,6 +44,7 @@ pub fn destination(
     }
     let path = Path::new(relative);
     if relative.is_empty()
+        || relative.contains('\0')
         || relative.contains(':')
         || path
             .components()

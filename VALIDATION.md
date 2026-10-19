@@ -1,9 +1,10 @@
 # Validation du 19 octobre 2026
 
 - Compilation Windows MSVC en mode release.
-- Sept tests automatisés : segmentation Unicode et chemins, PDF réel, SVG et PNG, serveur MCP HTTP avec authentification optionnelle, lecture sans en-tête Authorization, transfert TCP du tunnel, relais frp réel et fermeture du processus via un Job Windows.
+- Onze tests automatisés réussis : accès HTTP avec et sans authentification, limites des chemins, permissions et empreintes d'écriture, générations et relectures DOCX/PPTX/XLSX, remplacements Office sur copie, types des cellules et formules, PDF multipage avec accents, SVG, transfert TCP et fermeture de frpc.
 - Test Internet explicite réussi : lecture d'un fichier synthétique via le relais public localtunnel et une adresse HTTPS temporaire.
-- Test de l'exécutable Tauri réussi : clic sur Démarrer, ouverture du tunnel Rust, appel MCP depuis l'URL publique, lecture du fichier synthétique et arrêt.
+- Test de l'exécutable Tauri réussi via l'URL publique : activation de l'écriture sur le dossier synthétique, génération PDF/DOCX/PPTX/XLSX, récupération binaire, modification texte avec SHA-256 et arrêt. L'en-tête Authorization est absent et le JSON copié ne le contient pas.
+- Le PDF de test (six pages) a été rendu et inspecté : titres, accents, marges, paragraphes conservés et numérotation. Les archives Office et leurs XML sont validés et relus ; leur rendu dans Microsoft Office n'a pas été automatisé.
 - Interface native vérifiée dans la WebView : IPC Rust, onglets, champs par mode, validation du démarrage, absence de débordement horizontal. Captures visuellement inspectées.
 - `cargo fmt --check` et vérification syntaxique JavaScript réussis.
 

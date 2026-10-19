@@ -500,6 +500,15 @@ pub fn spreadsheet(
     if cells.is_empty() || cells.len() > 10_000 {
         return Err("Fournir entre 1 et 10 000 cellules".into());
     }
+    if cells
+        .iter()
+        .map(|cell| cell.sheet.as_str())
+        .collect::<std::collections::HashSet<_>>()
+        .len()
+        > 500
+    {
+        return Err("Maximum 500 feuilles par appel".into());
+    }
     let mut book = if let Some(input) = input {
         let source = library::resolve(folders, folder, input)?;
         if source

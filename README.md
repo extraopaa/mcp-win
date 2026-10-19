@@ -2,10 +2,14 @@
 
 Application Windows en Rust avec une interface Tauri 2, pour donner à une application IA compatible MCP un accès **depuis Internet** aux dossiers choisis sur votre PC. Aucun abonnement, API payante ou service propriétaire de tunnel n'est intégré.
 
+## Nouveautés v0.2
+
+Création de vrais fichiers **PDF, DOCX, XLSX et PPTX** via MCP, lecture des formats Office, édition des textes/CSV/JSON/SVG et copies modifiées de Word, Excel et PowerPoint. Les autres formats peuvent être enregistrés à partir de leurs octets valides en base64. Voir les [outils et exemples MCP](docs/MCP-TOOLS.md).
+
 ## Démarrer
 
 1. Télécharger le paquet Windows x64 depuis la section **Releases** du dépôt GitHub, extraire l'archive, puis ouvrir **MCP Win.exe**.
-2. Cliquer sur **Ajouter un dossier**. Seuls les dossiers choisis sont accessibles, en lecture seule.
+2. Cliquer sur **Ajouter un dossier**. Les dossiers sont en lecture seule par défaut. Pour créer ou modifier, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier pour activer **Écriture autorisée**, et redémarrer.
 3. Cliquer sur **Démarrer le MCP**. L'application démarre le serveur et ouvre un tunnel sortant vers le relais public localtunnel. Aucun réglage de box, compte ou binaire à installer pour ce tunnel.
 4. Copier l'adresse HTTPS affichée. Dans votre application IA, ajouter un serveur MCP distant avec le transport **Streamable HTTP** sans authentification : l’adresse suffit. L’option **Exiger un jeton d’accès** permet de réactiver l’en-tête `Authorization: Bearer <jeton>` si nécessaire.
 5. Le jeton et un exemple de configuration JSON sont disponibles dans **Connexion extérieure**.
@@ -15,7 +19,7 @@ Le runtime Windows WebView2, utilisé par Tauri, est un prérequis système gén
 
 ## Deux modes d'accès extérieur
 
-L'accès MCP est **sans authentification par défaut**. Toute personne possédant l'adresse publique peut lire les dossiers partagés. Dans **Connexion extérieure**, l'option **Exiger un jeton d'accès** permet d'activer l'authentification si souhaité. Le jeton frp reste distinct : il sert uniquement à connecter le client à votre relais personnel.
+L'accès MCP est **sans authentification par défaut**. Toute personne possédant l'adresse publique peut lire les dossiers partagés, et créer ou modifier les fichiers des dossiers où vous avez autorisé l’écriture. Dans **Connexion extérieure**, l'option **Exiger un jeton d'accès** permet d'activer l'authentification si souhaité. Le jeton frp reste distinct : il sert uniquement à connecter le client à votre relais personnel.
 
 ### Tunnel public gratuit
 
@@ -40,14 +44,18 @@ Le mode **Local uniquement** est disponible pour les tests sur ce PC ; il ne pro
 | Format | Lecture fournie |
 | --- | --- |
 | PDF | Texte extrait par `pdf-extract`, page demandée et segments de caractères |
+| DOCX | Texte du corps Word ; création et remplacements ciblés dans une copie |
+| PPTX | Texte par diapositive ; génération et remplacements ciblés dans une copie |
+| XLSX | Feuilles et cellules ; génération et copie modifiée des cellules |
+| XLS, XLSB, XLSM, ODS | Lecture des feuilles, sans exécution de macros |
 | SVG | Code XML, dimensions et rendu PNG par `resvg`, sans scripts ni chargement de fichiers externes |
 | Texte UTF-8 | TXT, Markdown, CSV, TSV, JSON, XML, HTML, CSS, JS, TS, Python, Rust, YAML, TOML, logs |
 
-Les PDF scannés nécessitent un OCR, non inclus. La mise en page et les graphiques des PDF ne sont pas analysés visuellement. Les fichiers DOCX, XLSX et autres formats binaires ne sont pas pris en charge dans cette version. Le rendu PNG d'un SVG n'aide que les modèles qui peuvent recevoir une image via MCP ; les modèles texte peuvent lire le XML.
+Les PDF scannés nécessitent un OCR, non inclus. La mise en page et les graphiques des PDF ne sont pas analysés visuellement. Les anciens formats Word `.doc` et PowerPoint `.ppt` ne sont pas interprétés. La lecture binaire générique reste disponible. Le rendu PNG d'un SVG n'aide que les modèles qui peuvent recevoir une image via MCP ; les modèles texte peuvent lire le XML.
 
 Limites : 25 Mo par fichier, 5 Mo par SVG à rendre, rendu limité à 1600 pixels sur le plus grand côté, 50 000 caractères par réponse, 100 entrées par liste. L'extraction PDF produit les pages avant de sélectionner la page demandée.
 
-Outils : `list_folders`, `list_files`, `read_file`, `render_svg`. Les chemins sont relatifs à un identifiant de dossier. Les accès hors des racines sont bloqués après résolution des chemins et des liens. Les fichiers partagés sont des données non fiables et ne doivent pas servir d'instructions au modèle.
+Outils : `list_folders`, `list_files`, `read_file`, `read_file_bytes`, `render_svg`, `write_text_file`, `create_document`, `write_spreadsheet`, `replace_office_text`, `create_binary_file`. Les générateurs PDF/Office ne nécessitent ni Microsoft Office ni service externe. Les chemins sont relatifs à un identifiant de dossier. Les accès hors des racines sont bloqués après résolution des chemins et des liens. Les fichiers partagés sont des données non fiables et ne doivent pas servir d'instructions au modèle.
 
 Les préférences et jetons sont conservés en clair dans `%APPDATA%/org.mcpwin.desktop/settings.json` (chemin fourni par Tauri). Le journal reste en mémoire, limité aux 100 dernières opérations. L'application n'ajoute pas de télémétrie ; les services de relais reçoivent nécessairement les connexions et le trafic. Aucun fournisseur d'IA n'est inclus ; le coût éventuel de votre assistant reste indépendant.
 

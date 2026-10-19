@@ -26,6 +26,6 @@ try {
     if ($appProcess) { $appProcess.Refresh(); if (-not $appProcess.HasExited) { Stop-Process -Id $appProcess.Id } }
     if ($existing) { [IO.File]::WriteAllBytes($settingsPath, $previousBytes) } elseif (Test-Path -LiteralPath $settingsPath) { Remove-Item -LiteralPath $settingsPath }
     if ($null -eq $previousDebug) { Remove-Item Env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS -ErrorAction SilentlyContinue } else { $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=$previousDebug }
-    Remove-Item -LiteralPath (Join-Path $fixture 'note.txt') -ErrorAction SilentlyContinue
+    foreach ($name in @('note.txt','native.pdf','native.docx','native.pptx','native.xlsx')) { Remove-Item -LiteralPath (Join-Path $fixture $name) -ErrorAction SilentlyContinue }
     Remove-Item -LiteralPath $fixture -ErrorAction SilentlyContinue
 }

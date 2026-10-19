@@ -1,9 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod desktop;
+mod generate;
 mod library;
+mod office;
 mod process_job;
 mod server;
 mod tunnel;
+mod writing;
 
 use tauri::Manager;
 fn main() {
@@ -18,6 +21,7 @@ fn main() {
             desktop::snapshot,
             desktop::add_folder,
             desktop::remove_folder,
+            desktop::set_folder_writable,
             desktop::save_settings,
             desktop::start_mcp,
             desktop::stop_mcp,

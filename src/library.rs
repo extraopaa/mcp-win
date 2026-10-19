@@ -23,11 +23,70 @@ impl SharedFolder {
     }
 }
 
-pub fn resolve(folders: &[SharedFolder], folder: &str, relative: &str) -> Result<PathBuf, String> {
-    let root = folders
+pub fn select_folder<'a>(
+    folders: &'a [SharedFolder],
+    folder: &str,
+) -> Result<&'a SharedFolder, String> {
+    if let Some(found) = folders.iter().find(|f| f.id == folder) {
+        return Ok(found);
+    }
+    if folder.is_empty() && folders.len() == 1 {
+        return Ok(&folders[0]);
+    }
+    let matches: Vec<_> = folders.iter().filter(|f| f.name() == folder).collect();
+    if matches.len() == 1 {
+        return Ok(matches[0]);
+    }
+    let available: Vec<_> = folders
         .iter()
-        .find(|f| f.id == folder)
-        .ok_or("Dossier partagé inconnu")?;
+        .map(|f| json!({"id":f.id,"name":f.name(),"writable":f.writable}))
+        .collect();
+    Err(format!(
+        "Dossier inconnu ou ambigu. Appelez list_folders et relancez l'outil avec un id retourné (writable=true pour créer). Ne demandez pas cet identifiant à l'utilisateur : il est accessible par MCP. Dossiers disponibles : {}",
+        json!(available)
+    ))
+}
+
+#[cfg(test)]
+mod folder_selection_tests {
+    use super::*;
+    #[test]
+    fn discovers_single_folder_and_reports_ambiguity_without_bypassing_write_permissions() {
+        let temp = tempfile::tempdir().unwrap();
+        let folders = vec![SharedFolder {
+            id: "actual-id".into(),
+            path: temp.path().into(),
+            writable: false,
+        }];
+        assert_eq!(select_folder(&folders, "").unwrap().id, "actual-id");
+        assert_eq!(
+            select_folder(&folders, &folders[0].name()).unwrap().id,
+            "actual-id"
+        );
+        assert!(
+            crate::writing::destination(&folders, "", "report.pdf")
+                .unwrap_err()
+                .contains("désactivée")
+        );
+        let error = select_folder(&folders, "guessed-id").unwrap_err();
+        assert!(
+            error.contains("list_folders")
+                && error.contains("actual-id")
+                && error.contains("writable")
+        );
+        let mut two = folders.clone();
+        two.push(SharedFolder {
+            id: "second-id".into(),
+            ..folders[0].clone()
+        });
+        assert!(select_folder(&two, "").is_err());
+        assert!(select_folder(&two, &folders[0].name()).is_err());
+        assert_eq!(select_folder(&two, "second-id").unwrap().id, "second-id");
+    }
+}
+
+pub fn resolve(folders: &[SharedFolder], folder: &str, relative: &str) -> Result<PathBuf, String> {
+    let root = select_folder(folders, folder)?;
     let root = root
         .path
         .canonicalize()

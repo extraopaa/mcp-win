@@ -1,7 +1,7 @@
 # Validation du 19 octobre 2026
 
 - Compilation Windows MSVC en mode release.
-- Treize tests automatisés réussis : accès HTTP avec et sans authentification, découverte des nouveaux outils, limites des chemins, permissions et empreintes d'écriture, générations et relectures DOCX/PPTX/XLSX, remplacements Office sur copie, types des cellules et formules, PDF multipage avec accents, SVG, transfert TCP et fermeture de frpc.
+- Quatorze tests automatisés réussis : accès HTTP avec et sans authentification, découverte des nouveaux outils, résolution des identifiants/noms de dossiers et absence de contournement des permissions, limites des chemins, permissions et empreintes d'écriture, générations et relectures DOCX/PPTX/XLSX, remplacements Office sur copie, types des cellules et formules, PDF multipage avec accents, SVG, transfert TCP et fermeture de frpc. Le test HTTP vérifie aussi un appel sans paramètre folder lorsqu'un seul dossier est partagé.
 - v0.3 : PDF Typst avec grille, tableau, couleurs, styles et pied de page, rendu Pdfium répété, transformation en image puis PDF numérisé et reconnaissance Tesseract. L'accent français dans « identité » est explicitement vérifié. Styles/sections/tableaux OOXML, copie avec empreinte, XML invalide et chemins interdits sont testés.
 - La version statique de Tesseract est compilée depuis les sources épinglées ; ses dépendances Windows ont été inspectées : uniquement KERNEL32.dll. Modèles français et anglais livrés, aucun accès réseau à l'exécution.
 - Test Internet explicite réussi : lecture d'un fichier synthétique via le relais public localtunnel et une adresse HTTPS temporaire.

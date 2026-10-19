@@ -6,6 +6,8 @@ use std::{collections::BTreeMap, fs};
 
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct OcrArgs {
+    /// ID via list_folders ou nom exact unique. Omettre si un seul dossier est partage.
+    #[serde(default)]
     pub folder: String,
     pub path: String,
     /// Première page = 1 ; une page par appel.

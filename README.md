@@ -4,6 +4,8 @@ Application Windows en Rust avec une interface Tauri 2, pour donner à une appli
 
 ## Nouveautés v0.3
 
+Correctif v0.3.1 : les IA découvrent les dossiers avec `list_folders`, peuvent omettre `folder` lorsqu'un seul dossier est partagé, ou fournir son nom exact unique. Les erreurs indiquent les dossiers disponibles et comment réessayer, sans demander un identifiant à la personne.
+
 **Mise en page PDF complète avec Typst**, contrôle des styles et de la mise en page Word/Excel/PowerPoint via OOXML, aperçu visuel des pages et **OCR local des images/PDF numérisés**. Voir le [guide de création avancée](docs/AUTHORING.md), également accessible aux IA avec `get_authoring_guide`.
 
 Création de vrais fichiers **PDF, DOCX, XLSX et PPTX** via MCP, lecture des formats Office, édition des textes/CSV/JSON/SVG et copies modifiées de Word, Excel et PowerPoint. Les autres formats peuvent être enregistrés à partir de leurs octets valides en base64. Voir les [outils et exemples MCP](docs/MCP-TOOLS.md).

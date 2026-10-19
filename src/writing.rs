@@ -35,10 +35,7 @@ pub fn destination(
     folder: &str,
     relative: &str,
 ) -> Result<PathBuf, String> {
-    let shared = folders
-        .iter()
-        .find(|f| f.id == folder)
-        .ok_or("Dossier inconnu")?;
+    let shared = library::select_folder(folders, folder)?;
     if !shared.writable {
         return Err("Écriture désactivée : activez-la pour ce dossier dans l'application, puis redémarrez le MCP".into());
     }

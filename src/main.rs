@@ -1,7 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod advanced;
 mod desktop;
 mod generate;
 mod library;
+mod ocr;
 mod office;
 mod process_job;
 mod server;

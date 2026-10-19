@@ -1,6 +1,8 @@
 # Outils MCP et génération de fichiers
 
-MCP Win v0.2 reste accessible sans authentification par défaut. **Les dossiers sont en lecture seule à l'ajout.** Pour autoriser une génération ou une modification, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier : le bouton devient **Écriture autorisée**. Redémarrer ensuite le serveur. Cette autorisation appartient au dossier et ne peut pas être activée par un outil MCP distant.
+Pour le contrôle de typographie/mise en page et l'OCR, voir [AUTHORING.md](AUTHORING.md) ou appeler `get_authoring_guide`. Nouveaux outils v0.3 : `create_designed_pdf`, `inspect_office_package`, `write_office_package`, `render_pdf_page`, `ocr_file`.
+
+MCP Win v0.3 reste accessible sans authentification par défaut. **Les dossiers sont en lecture seule à l'ajout.** Pour autoriser une génération ou une modification, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier : le bouton devient **Écriture autorisée**. Redémarrer ensuite le serveur. Cette autorisation appartient au dossier et ne peut pas être activée par un outil MCP distant.
 
 ## Formats pris en charge
 

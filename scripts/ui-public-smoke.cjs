@@ -1,6 +1,7 @@
 const { chromium } = require('../tools/dev/node_modules/playwright');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
 let connectedBrowser;
 (async () => {
   let browser;
@@ -44,7 +45,7 @@ let connectedBrowser;
     assert(text.includes('NATIVE-TAURI-PUBLIC-OK'),text);
     async function tool(name,args){
       const response=await fetch(state.address,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream','MCP-Protocol-Version':'2025-03-26','bypass-tunnel-reminder':'true'},body:JSON.stringify({jsonrpc:'2.0',id:2,method:'tools/call',params:{name,arguments:{folder:'ui-test',...args}}}),signal:AbortSignal.timeout(30000)});
-      const payload=await response.json();assert(!payload.error,JSON.stringify(payload));assert(!payload.result.isError,JSON.stringify(payload.result));return JSON.parse(payload.result.content[0].text);
+      const payload=await response.json();assert(!payload.error,JSON.stringify(payload));assert(!payload.result.isError,JSON.stringify(payload.result));return payload.result.content[0].type==='image'?payload.result.content[0]:JSON.parse(payload.result.content[0].text);
     }
     for(const extension of ['pdf','docx','pptx']){
       await tool('create_document',{path:`native.${extension}`,title:'Validation MCP Win',sections:[{heading:'Résultats',text:'Document généré via le tunnel public.',bullets:['Création en Rust','Sans authentification']}]});
@@ -53,10 +54,17 @@ let connectedBrowser;
     }
     await tool('write_spreadsheet',{output_path:'native.xlsx',cells:[{sheet:'Sheet1',cell:'A1',kind:'text',value:'Création Excel'},{sheet:'Sheet1',cell:'B2',kind:'number',value:'42'}]});
     const workbook=await tool('read_file',{path:'native.xlsx'});assert(workbook.text.includes('42'));
+    await tool('create_designed_pdf',{output_path:'designed.pdf',source:fs.readFileSync(path.join(__dirname,'../docs/examples/designed.typ'),'utf8')});
+    const preview=await tool('render_pdf_page',{path:'designed.pdf',page:1,width:1200});
+    assert.equal(preview.mimeType,'image/png');assert(Buffer.from(preview.data,'base64').length>10000);
+    await tool('create_binary_file',{path:'scan.png',data_base64:preview.data});
+    const recognized=await tool('ocr_file',{path:'scan.png'});assert(recognized.text.includes('MCP'));assert(recognized.lines.length>3);
+    await tool('write_office_package',{output_path:'styled.docx',parts:[{name:'word/document.xml',text:fs.readFileSync(path.join(__dirname,'../docs/examples/document.xml'),'utf8')}]});
+    const styled=await tool('inspect_office_package',{path:'styled.docx',part:'word/document.xml'});assert(styled.text.includes('w:color'));
     const note=await tool('read_file',{path:'note.txt'});
     await tool('write_text_file',{path:'note.txt',content:'NATIVE-TAURI-PUBLIC-OK — modifié',expected_sha256:note.sha256});
     await page.screenshot({path:path.resolve(__dirname,'../preview-online.png')});
-    result='Native Tauri → public HTTPS MCP: PDF, DOCX, PPTX, XLSX generation, binary retrieval and text editing passed.';
+    result='Native Tauri → public HTTPS MCP: designed PDF, PNG preview, image OCR, styled DOCX, Office generation and text editing passed.';
   } finally {
     await page.evaluate(()=>window.__TAURI__.core.invoke('stop_mcp'));
     await browser.close();

@@ -105,7 +105,7 @@ pub fn read(
             .get(page.checked_sub(1).ok_or("La première page est 1")?)
             .ok_or("Page inexistante")?
             .clone();
-        metadata = json!({"page": page, "pages": pages.len(), "warning": if text.trim().is_empty() {Some("Aucun texte : OCR nécessaire pour les pages scannées. OCR non inclus.")} else {None}});
+        metadata = json!({"page": page, "pages": pages.len(), "warning": if text.trim().is_empty() {Some("Aucun texte : OCR nécessaire pour les pages scannées. Utiliser ocr_file pour reconnaître cette page.")} else {None}});
         text
     } else if ["docx", "pptx", "xlsx", "xls", "xlsb", "xlsm", "ods"].contains(&ext.as_str()) {
         let (text, meta) = crate::office::read(&target, page)?;
@@ -114,7 +114,7 @@ pub fn read(
     } else {
         if ![
             "svg", "txt", "md", "csv", "tsv", "json", "xml", "html", "css", "js", "ts", "py", "rs",
-            "log", "yaml", "yml", "toml",
+            "log", "yaml", "yml", "toml", "typ",
         ]
         .contains(&ext.as_str())
         {

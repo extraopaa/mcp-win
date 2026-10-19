@@ -1,13 +1,15 @@
 # Validation du 19 octobre 2026
 
 - Compilation Windows MSVC en mode release.
-- Onze tests automatisés réussis : accès HTTP avec et sans authentification, limites des chemins, permissions et empreintes d'écriture, générations et relectures DOCX/PPTX/XLSX, remplacements Office sur copie, types des cellules et formules, PDF multipage avec accents, SVG, transfert TCP et fermeture de frpc.
+- Treize tests automatisés réussis : accès HTTP avec et sans authentification, découverte des nouveaux outils, limites des chemins, permissions et empreintes d'écriture, générations et relectures DOCX/PPTX/XLSX, remplacements Office sur copie, types des cellules et formules, PDF multipage avec accents, SVG, transfert TCP et fermeture de frpc.
+- v0.3 : PDF Typst avec grille, tableau, couleurs, styles et pied de page, rendu Pdfium répété, transformation en image puis PDF numérisé et reconnaissance Tesseract. L'accent français dans « identité » est explicitement vérifié. Styles/sections/tableaux OOXML, copie avec empreinte, XML invalide et chemins interdits sont testés.
+- La version statique de Tesseract est compilée depuis les sources épinglées ; ses dépendances Windows ont été inspectées : uniquement KERNEL32.dll. Modèles français et anglais livrés, aucun accès réseau à l'exécution.
 - Test Internet explicite réussi : lecture d'un fichier synthétique via le relais public localtunnel et une adresse HTTPS temporaire.
-- Test de l'exécutable Tauri réussi via l'URL publique : activation de l'écriture sur le dossier synthétique, génération PDF/DOCX/PPTX/XLSX, récupération binaire, modification texte avec SHA-256 et arrêt. L'en-tête Authorization est absent et le JSON copié ne le contient pas.
-- Le PDF de test (six pages) a été rendu et inspecté : titres, accents, marges, paragraphes conservés et numérotation. Les archives Office et leurs XML sont validés et relus ; leur rendu dans Microsoft Office n'a pas été automatisé.
+- Test de l'exécutable Tauri v0.3 réussi via l'URL publique : activation de l'écriture sur le dossier synthétique, génération PDF/DOCX/PPTX/XLSX, PDF Typst conçu, aperçu PNG, OCR de l'image, Word stylé par OOXML, inspection des parties, récupération binaire, modification texte avec SHA-256 et arrêt. L'en-tête Authorization est absent et le JSON copié ne le contient pas. Le script natif exige que toute instance déjà ouverte soit fermée.
+- Le PDF de test classique (six pages) et le nouveau PDF conçu avec Typst ont été rendus et inspectés : titres, accents, marges, grilles, tableaux et numérotation. Les archives Office et leurs XML sont validés et relus ; leur rendu dans Microsoft Office n'a pas été automatisé.
 - Interface native vérifiée dans la WebView : IPC Rust, onglets, champs par mode, validation du démarrage, absence de débordement horizontal. Captures visuellement inspectées.
 - `cargo fmt --check` et vérification syntaxique JavaScript réussis.
 
 Aucun document personnel n'a été utilisé pour les tests publics. Les tunnels de test ont été fermés et les préférences précédentes restaurées. Le test frp utilise un serveur de test local ; le déploiement HTTPS d'un relais personnel sur un serveur tiers n'a pas été réalisé.
 
-La disponibilité ultérieure du relais public, la compatibilité avec chaque client IA et l'obtention d'une adresse permanente ne sont pas garanties. L'application est sans authentification par défaut, propose un jeton Bearer optionnel et ne fournit pas OAuth. Les PDF scannés nécessitent encore un OCR.
+La disponibilité ultérieure du relais public, la compatibilité avec chaque client IA et l'obtention d'une adresse permanente ne sont pas garanties. L'application est sans authentification par défaut, propose un jeton Bearer optionnel et ne fournit pas OAuth. L'OCR français/anglais est fourni ; les manuscrits, documents dégradés et autres langues ne sont pas garantis. L'édition OOXML vérifie le XML et le paquet minimal mais ne certifie pas toute la cohérence du schéma Office.

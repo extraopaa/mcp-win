@@ -18,6 +18,7 @@ documents/*
 /vendor/frp/frp_0.71.1_windows_amd64/
 /vendor/frp/*.zip
 /release-assets/
+/vendor/engines/
 *.log
 .env.*
 !.env.example

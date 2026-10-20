@@ -115,6 +115,7 @@ impl Desktop {
         desktop
     }
     pub fn stop(&self) {
+        crate::v1::jobs::pause_all();
         if let Some(running) = self.core.running.lock().unwrap().take() {
             running.cancel.cancel();
             server::log(&self.core.logs, "Arrêt du MCP et du tunnel demandé");
@@ -126,12 +127,24 @@ impl Desktop {
         let file = self.core.directory.join("settings.json");
         std::fs::write(file, data).map_err(|e| e.to_string())
     }
-    fn check_stopped(&self) -> Result<(), String> {
+    pub(crate) fn check_stopped(&self) -> Result<(), String> {
         if self.core.running.lock().unwrap().is_some() {
             Err("Arrêtez le MCP avant de modifier sa configuration".into())
         } else {
             Ok(())
         }
+    }
+    pub(crate) fn shared_folders(&self) -> Vec<SharedFolder> {
+        self.core.preferences.lock().unwrap().folders.clone()
+    }
+    pub(crate) fn workflow_lifetime(&self) -> Result<CancellationToken, String> {
+        self.core
+            .running
+            .lock()
+            .unwrap()
+            .as_ref()
+            .map(|r| r.cancel.clone())
+            .ok_or_else(|| "Démarrez le MCP avant de reprendre un workflow".into())
     }
 }
 

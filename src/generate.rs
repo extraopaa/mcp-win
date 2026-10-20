@@ -3,11 +3,13 @@ use crate::{
     office, writing,
 };
 use rmcp::schemars;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use std::{fs, io::Cursor, path::Path};
+#[cfg(test)]
+use std::path::Path;
+use std::{fs, io::Cursor};
 
-#[derive(Clone, Debug, Deserialize, schemars::JsonSchema)]
+#[derive(Clone, Debug, Deserialize, Serialize, schemars::JsonSchema)]
 pub struct Section {
     #[serde(default)]
     pub heading: String,
@@ -17,6 +19,7 @@ pub struct Section {
     pub bullets: Vec<String>,
 }
 
+#[cfg(test)]
 pub fn document(
     folders: &[SharedFolder],
     folder: &str,
@@ -100,7 +103,7 @@ pub(crate) fn docx(title: &str, sections: &[Section]) -> Result<Vec<u8>, String>
     Ok(cursor.into_inner())
 }
 
-fn simple_wrap(text: &str, _width: usize) -> Vec<String> {
+pub(crate) fn simple_wrap(text: &str, _width: usize) -> Vec<String> {
     let metrics = ttf_parser::Face::parse(include_bytes!("../assets/fonts/Lato-Regular.ttf"), 0)
         .expect("Bundled font is validated by PDF tests");
     let width = |s: &str| {
@@ -138,7 +141,7 @@ fn simple_wrap(text: &str, _width: usize) -> Vec<String> {
     }
     result
 }
-fn pptx(title: &str, sections: &[Section]) -> Result<Vec<u8>, String> {
+pub(crate) fn pptx(title: &str, sections: &[Section]) -> Result<Vec<u8>, String> {
     use ppt_rs::generator::{SlideContent, create_pptx_with_content};
     if title.chars().count() > 90 || sections.iter().any(|s| s.heading.chars().count() > 90) {
         return Err(
@@ -465,7 +468,7 @@ pub struct CellEdit {
     pub kind: CellKind,
     pub value: String,
 }
-fn valid_cell(address: &str) -> bool {
+pub(crate) fn valid_cell(address: &str) -> bool {
     let Some(split) = address.find(|c: char| c.is_ascii_digit()) else {
         return false;
     };
@@ -571,6 +574,37 @@ pub fn spreadsheet(
             CellKind::Formula => {
                 cell.set_formula(edit.value.trim_start_matches('='));
             }
+        }
+    }
+    if input.is_none() {
+        let brand = crate::v1::state::selected(None)?;
+        for edit in cells {
+            let sheet = book
+                .sheet_by_name_mut(&edit.sheet)
+                .map_err(|e| e.to_string())?;
+            let row = edit
+                .cell
+                .trim_start_matches(|c: char| c.is_ascii_alphabetic())
+                .parse::<u32>()
+                .unwrap_or(1);
+            let style = sheet.style_mut(edit.cell.as_str());
+            style.alignment_mut().set_wrap_text(true);
+            if row == 1 {
+                style.set_background_color(format!("FF{}", brand.primary));
+                style.font_mut().set_bold(true);
+                style
+                    .font_mut()
+                    .color_mut()
+                    .set_argb([255u8, 255, 255, 255]);
+            } else if row % 2 == 0 {
+                style.set_background_color("FFF7F8FC");
+            }
+            let column = edit.cell.trim_end_matches(|c: char| c.is_ascii_digit());
+            let width = (edit.value.chars().count() as f64 + 3.0).clamp(14.0, 45.0);
+            let current = sheet.column_dimension_mut(column).width();
+            sheet
+                .column_dimension_mut(column)
+                .set_width(current.max(width));
         }
     }
     let mut bytes = Vec::new();

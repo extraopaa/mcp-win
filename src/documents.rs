@@ -89,7 +89,7 @@ pub fn paths(
     files.sort_by(|a, b| a.0.cmp(&b.0));
     Ok((files, truncated))
 }
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Unit {
     pub page: usize,
     pub sheet: Option<String>,
@@ -126,6 +126,11 @@ pub fn units(folders: &[SharedFolder], folder: &str, path: &str) -> Result<Arc<V
         .unwrap_or_default()
         .to_string_lossy()
         .to_lowercase();
+    let cache_key = writing::hash(format!("{ext}:{hash}").as_bytes());
+    if let Some(data) = crate::v1::index::cached(&cache_key) {
+        let data = Arc::new(data);
+        return Ok(data);
+    }
     let mut result = Vec::new();
     if ext == "pdf" {
         let pages =
@@ -204,6 +209,7 @@ pub fn units(folders: &[SharedFolder], folder: &str, path: &str) -> Result<Arc<V
     if size > 16 * 1024 * 1024 {
         return Err("Texte extrait limité à 16 Mo par document".into());
     }
+    let _ = crate::v1::index::cache(&cache_key, &result);
     let result = Arc::new(result);
     let mut cache = cache.lock().map_err(|_| "Index indisponible")?;
     if cache.bytes + size > 64 * 1024 * 1024 || cache.entries.len() >= 512 {
@@ -317,7 +323,7 @@ pub fn search(folders: &[SharedFolder], args: SearchArgs) -> Result<Value, Strin
                         at.unit = unit_index;
                         at.line = i + 1;
                         return Ok(
-                            json!({"matches":matches,"next_cursor":serde_json::to_string(&at).unwrap(),"scanned":scanned+1,"skipped":skipped,"tree_truncated":tree_truncated,"index":"local_memory_content_hash"}),
+                            json!({"matches":matches,"next_cursor":serde_json::to_string(&at).unwrap(),"scanned":scanned+1,"skipped":skipped,"tree_truncated":tree_truncated,"index":"local_memory_and_disk_content_hash"}),
                         );
                     }
                 }
@@ -329,7 +335,7 @@ pub fn search(folders: &[SharedFolder], args: SearchArgs) -> Result<Value, Strin
         scanned += 1;
     }
     Ok(
-        json!({"matches":matches,"next_cursor":if at.file<files.len(){Some(serde_json::to_string(&at).unwrap())}else{None},"scanned":scanned,"skipped":skipped,"tree_truncated":tree_truncated,"index":"local_memory_content_hash"}),
+        json!({"matches":matches,"next_cursor":if at.file<files.len(){Some(serde_json::to_string(&at).unwrap())}else{None},"scanned":scanned,"skipped":skipped,"tree_truncated":tree_truncated,"index":"local_memory_and_disk_content_hash"}),
     )
 }
 pub fn line_excerpt(line: &str, pattern: Option<&regex::Regex>) -> String {

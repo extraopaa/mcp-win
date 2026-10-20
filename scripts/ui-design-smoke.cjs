@@ -10,7 +10,7 @@ const csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 's
 const server = http.createServer((req, res) => {
   if (req.url === '/favicon.ico') {res.writeHead(204).end(); return;}
   const name = req.url === '/' ? 'index.html' : req.url.slice(1);
-  if (!['index.html','style.css','icons.js','app.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
+  if (!['index.html','style.css','icons.js','app.js','studio.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
   res.writeHead(200, {'Content-Type':name.endsWith('.png')?'image/png':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8','Content-Security-Policy':csp});
   res.end(fs.readFileSync(path.join(root, name)));
 });
@@ -25,6 +25,7 @@ const server = http.createServer((req, res) => {
     page.on('console', m => {if (m.type() === 'error') errors.push(m.text());});
     await page.addInitScript(() => {
       window.calls = [];
+      window.testWorkspace={brands:{selected:'default',profiles:[{id:'default',name:'Professionnel',primary:'6366F1',secondary:'3B82F6',font:'Lato',organization:'',contact:'',footer:'',logo_base64:''}]},indexes:[{folder:'work',status:{documents:0}}],workflows:{jobs:[{id:'job-test',name:'Dossier de livraison',status:'paused',completed:1,steps:3,progress:33}]},reviews:{revisions:[{id:'revision-test',label:'Correction du tarif',path:'devis.docx',output_path:'devis.docx',status:'pending',diff:'- 100 euros\n+ 125 euros'}]}};
       window.testState = {
         connection:{mode:'cloudflare',port:8787,require_auth:true,token:'0123456789abcdef0123456789abcdef',relay:'',frp_server:'',frp_port:7000,frp_token:'',public_url:'',frp_ca_pem:'',frp_tls_name:''},
         running:true,ready:true,address:'https://documents-test.trycloudflare.com/mcp',
@@ -36,6 +37,11 @@ const server = http.createServer((req, res) => {
         window.calls.push({name,args});
         const s = window.testState;
         if (name === 'snapshot') return structuredClone(s);
+        if (name === 'v1_workspace') return structuredClone(window.testWorkspace);
+        if (name === 'save_brand_profiles') {window.testWorkspace.brands=structuredClone(args.profiles);return;}
+        if (name === 'build_local_index') {window.testWorkspace.indexes[0].status.documents=1;return {indexed:1,unchanged:0,next_offset:null};}
+        if (name === 'revision_action') {window.testWorkspace.reviews.revisions[0].status=args.action==='apply'?'applied':args.action==='undo'?'undone':'rejected';return;}
+        if (name === 'workflow_action') {window.testWorkspace.workflows.jobs[0].status=args.action==='resume'?'running':args.action==='pause'?'paused':args.action==='undo'?'undone':'cancelled';return;}
         if (window.failCommand === name) throw 'Erreur synthétique de vérification';
         if (name === 'stop_mcp') {s.running=false;s.ready=false;s.address=null;}
         else if (name === 'start_mcp') {s.running=true;s.ready=true;s.address='https://documents-test.trycloudflare.com/mcp';}
@@ -68,9 +74,9 @@ const server = http.createServer((req, res) => {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, tab);
       await page.screenshot({path:path.join(output,`${tab}.png`), fullPage:true});
     }
-    assert.equal(await page.locator('.tool-card').count(),8);
+    assert.equal(await page.locator('.tool-card').count(),9);
     await page.locator('.tool-card').first().click();
-    assert.equal(await page.locator('#help-dialog code').count(),6);
+    assert.equal(await page.locator('#help-dialog code').count(),9);
     await page.keyboard.press('Escape');
     await page.locator('[data-tab=connection]').click();
     await page.locator('#copy-config').click();
@@ -114,6 +120,33 @@ const server = http.createServer((req, res) => {
     assert.equal(await page.evaluate(()=>window.copied),'Bearer 0123456789abcdef0123456789abcdef','Un brouillon de jeton ne remplace pas le jeton actif');
     await page.locator('#save-settings').click();
     await page.waitForFunction(()=>window.testState.connection.token===document.getElementById('token').value);
+    await page.locator('[data-tab=studio]').click();
+    await page.waitForFunction(()=>document.getElementById('brand-name').value==='Professionnel');
+    await page.locator('#brand-name').fill('Identité de démonstration');
+    await page.locator('#brand-logo').setInputFiles(path.join(root,'brand/favicon.png'));
+    await page.waitForFunction(()=>!document.getElementById('brand-logo-preview').hidden);
+    await page.locator('#save-brands').click();
+    await page.waitForFunction(()=>window.testWorkspace.brands.profiles[0].name==='Identité de démonstration');
+    await page.screenshot({path:path.join(output,'studio-brands.png'),fullPage:true});
+    await page.locator('[data-studio=index]').click();
+    await page.locator('#studio-indexes button').first().click();
+    await page.waitForFunction(()=>window.testWorkspace.indexes[0].status.documents===1);
+    await page.locator('[data-studio=reviews]').click();
+    await page.locator('.compare-revision').click();
+    assert((await page.locator('.revision-diff').textContent()).includes('125 euros'));
+    await page.keyboard.press('Escape');
+    await page.locator('[data-revision-action=apply]').click();
+    await page.waitForFunction(()=>window.testWorkspace.reviews.revisions[0].status==='applied');
+    await page.locator('[data-revision-action=undo]').click();
+    await page.waitForFunction(()=>window.testWorkspace.reviews.revisions[0].status==='undone');
+    await page.locator('[data-studio=workflows]').click();
+    assert(await page.locator('[data-workflow-action=resume]').isDisabled());
+    await page.locator('[data-workflow-action=undo]').click();
+    await page.waitForFunction(()=>window.testWorkspace.workflows.jobs[0].status==='undone');
+    await page.evaluate(async()=>{window.testState.running=true;window.testState.ready=true;await refresh();});
+    await page.locator('[data-studio=brands]').click();
+    assert(await page.locator('#save-brands').isDisabled());
+    await page.evaluate(async()=>{window.testState.running=false;window.testState.ready=false;await refresh();});
     await page.locator('[data-tab=activity]').click();
     await page.locator('[data-filter=write]').click();
     assert.equal(await page.locator('.log-line').count(),1);
@@ -129,7 +162,7 @@ const server = http.createServer((req, res) => {
     assert.equal(await page.locator('#folders img').count(),0);
     for (const width of [1180,900]) {
       await page.setViewportSize({width,height:820});
-      for (const tab of tabs) {
+      for (const tab of [...tabs,'studio']) {
         await page.locator(`[data-tab="${tab}"]`).click();
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${tab} à ${width}px`);
       }
@@ -144,7 +177,7 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(()=>document.getElementById('toast-text').textContent.includes('Erreur synthétique'));
     assert.equal(await page.locator('#toggle-server').isDisabled(),false);
     assert.deepEqual(errors,[]);
-    console.log('UI maquettes : 5 vues, CSP strict, navigation, IPC, permissions, réglages, presse-papiers, aperçu, restauration, filtres, états vides/erreurs et largeurs 900/1180/1440 validés.');
+    console.log('UI maquettes et Studio : 6 vues, CSP strict, navigation, IPC, permissions, réglages, presse-papiers, aperçu, restauration, filtres, états vides/erreurs et largeurs 900/1180/1440 validés.');
     console.log('Captures : target/ui-design/');
   } finally {await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

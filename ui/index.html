@@ -4,12 +4,12 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MCP Win</title>
 <link rel="icon" type="image/png" href="brand/favicon.png">
-<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script>
+<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
- <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">DESKTOP · V0.4.0</div></div></div>
+ <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">DESKTOP · V1.0.0</div></div></div>
  <div class="nav-label">ESPACE DE TRAVAIL</div>
  <nav aria-label="Navigation">
   <button class="nav nav-item active" data-tab="overview" title="Vue d'ensemble"><span class="icon" data-icon="layout-dashboard"></span><span>Vue d'ensemble</span></button>
@@ -18,13 +18,13 @@
   <button class="nav nav-item" data-tab="activity" title="Journal d'activité"><span class="icon" data-icon="activity"></span><span>Journal d'activité</span></button>
  </nav>
  <div class="nav-divider"></div><div class="nav-label">RESSOURCES</div>
- <nav><button class="nav nav-item" data-tab="tools" title="Catalogue des outils"><span class="icon" data-icon="blocks"></span><span>Catalogue des outils</span></button></nav>
+ <nav><button class="nav nav-item" data-tab="studio" title="Studio documentaire"><span class="icon" data-icon="sparkles"></span><span>Studio documentaire</span></button><button class="nav nav-item" data-tab="tools" title="Catalogue des outils"><span class="icon" data-icon="blocks"></span><span>Catalogue des outils</span></button></nav>
  <div class="sidebar-bottom">
   <div class="sidelabel">STATUT DE L'APPLICATION</div>
   <div class="connection-mini"><div class="live-orbit offline"><span class="icon" data-icon="radio"></span></div><div><div class="mini-title" id="sidebar-status">Chargement…</div><div class="mini-sub" id="sidebar-sub">Initialisation locale</div></div></div>
   <a href="https://github.com/extraopaa/mcp-win" data-external="repository" target="_blank" rel="noreferrer" class="sidebar-link"><span class="icon" data-icon="github"></span><span>GitHub &amp; code source</span><span class="reference-style-2 icon" data-icon="arrow-up-right"></span></a>
   <a class="sidebar-link" href="https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Home.md" data-external="documentation" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="book-open"></span><span>Documentation</span></a>
-  <div class="sidebar-foot">V0.4.0 · LIBRE ET GRATUIT</div>
+  <div class="sidebar-foot">V1.0.0 · LIBRE ET GRATUIT</div>
  </div>
 </aside>
 <div class="main">
@@ -40,7 +40,7 @@
    </div>
    <div class="metric-grid">
     <div class="card metric"><div><div class="tiny-label">DOSSIERS AUTORISÉS</div><div class="metric-num" id="folders-number">00</div><div class="metric-sub">Contrôle de chaque accès</div></div><div class="metric-icon"><span class="icon" data-icon="folder-open"></span></div></div>
-    <div class="card metric"><div><div class="tiny-label">OUTILS MCP</div><div class="metric-num">32</div><div class="metric-sub">Lecture, création, OCR &amp; plus</div></div><div class="metric-icon"><span class="icon" data-icon="blocks"></span></div></div>
+    <div class="card metric"><div><div class="tiny-label">OUTILS MCP</div><div class="metric-num">42</div><div class="metric-sub">Lecture, création, OCR &amp; plus</div></div><div class="metric-icon"><span class="icon" data-icon="blocks"></span></div></div>
     <div class="card metric"><div><div class="tiny-label">SÉCURITÉ</div><div class="reference-style-6 metric-num">Active</div><div class="metric-sub">Authentification requise</div></div><div class="metric-icon"><span class="icon" data-icon="shield-check"></span></div></div>
    </div>
    <div class="section-heading"><div><h2>Votre espace de travail</h2><p>Retrouvez vos dossiers et préparez votre assistant IA.</p></div><button class="btn quiet" data-go="shared-folders">Gérer les dossiers <span class="icon" data-icon="arrow-right"></span></button></div>
@@ -105,14 +105,26 @@
   </section>
   <section class="page" id="tools">
    <div class="eyebrow">Capacités du serveur</div>
-   <div class="page-header"><div><h1 class="page-title">Catalogue des outils MCP</h1><p class="page-sub">Toutes les capacités offertes par MCP Win v0.4, organisées par usage.</p></div><a class="btn secondary" href="https://github.com/extraopaa/mcp-win/blob/main/docs/MCP-TOOLS.md" data-external="tools-reference" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="external-link"></span> Documentation technique</a></div>
-   <div class="tool-hero"><div><strong>Une boîte à outils pour vos fichiers</strong><p>Recherche, OCR, documents Office, PDF, archives, bases locales et modèles : tous les traitements se font sur votre PC.</p></div><div class="number">32<span>outils</span></div></div>
+   <div class="page-header"><div><h1 class="page-title">Catalogue des outils MCP</h1><p class="page-sub">Toutes les capacités offertes par MCP Win v1.0, organisées par usage.</p></div><a class="btn secondary" href="https://github.com/extraopaa/mcp-win/blob/main/docs/MCP-TOOLS.md" data-external="tools-reference" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="external-link"></span> Documentation technique</a></div>
+   <div class="tool-hero"><div><strong>Une boîte à outils pour vos fichiers</strong><p>Recherche, OCR, documents Office, PDF, archives, bases locales et modèles : tous les traitements se font sur votre PC.</p></div><div class="number">42<span>outils</span></div></div>
    <div class="tools-grid" id="tools-grid"></div><div class="callout"><span class="icon" data-icon="info"></span><span>Cette page présente les outils documentés dans le dépôt. Il ne s'agit pas d'un exécuteur d'outils : ces fonctions sont appelées par l'assistant IA via le protocole MCP.</span></div>
+  </section>
+  <section class="page" id="studio" hidden>
+   <div class="eyebrow">Des documents soignés, par défaut</div><div class="page-header"><div><h1 class="page-title">Studio documentaire</h1><p class="page-sub">Votre identité, vos sources et vos livrables, réunis dans un espace local.</p></div><span class="pill purple">Mise en page professionnelle activée</span></div>
+   <div class="studio-tabs seg-tabs" role="tablist" aria-label="Studio documentaire"><button data-studio="brands" class="selected" role="tab" aria-selected="true">Identité visuelle</button><button data-studio="index" role="tab" aria-selected="false">Index local</button><button data-studio="workflows" role="tab" aria-selected="false">Workflows IA</button><button data-studio="reviews" role="tab" aria-selected="false">Révisions</button></div>
+   <div id="studio-loading" class="callout" role="status" hidden>Chargement de votre espace…</div>
+   <div data-studio-panel="brands">
+    <div class="studio-grid"><article class="card card-pad"><div class="section-heading studio-heading"><div><h2>Identités visuelles</h2><p>Un profil par entreprise, projet ou usage.</p></div><button id="new-brand" class="btn secondary small">+ Nouveau</button></div><label class="field">Profil à modifier<select id="brand-select"></select></label><div class="brand-preview"><img id="brand-logo-preview" alt="Logo du profil" hidden><div><strong id="brand-preview-name">Votre identité</strong><p>PDF · Word · Excel · PowerPoint</p></div><span id="brand-swatch"></span></div><button id="set-default-brand" class="btn secondary small">Utiliser par défaut</button><p id="brand-default-status" class="form-helper"></p><button id="delete-brand" class="btn quiet">Supprimer ce profil</button></article>
+    <article class="card card-pad"><h2>Personnaliser les documents</h2><div class="field-grid brand-fields"><label class="field">Nom du profil<input id="brand-name" maxlength="100"></label><label class="field">Organisation<input id="brand-organization" maxlength="200"></label></div><div class="field-grid brand-fields"><label class="field">Couleur principale<input id="brand-primary" type="color" value="#6366f1"></label><label class="field">Couleur secondaire<input id="brand-secondary" type="color" value="#3b82f6"></label></div><label class="field">Police intégrée<select id="brand-font"><option>Lato</option><option>Libertinus Serif</option><option>DejaVu Sans Mono</option></select></label><label class="field">Coordonnées<textarea id="brand-contact" rows="2" maxlength="1000"></textarea></label><label class="field">Pied de page<input id="brand-footer" maxlength="250"></label><label class="field">Logo PNG ou JPEG · 2 Mio maximum<input id="brand-logo" type="file" accept="image/png,image/jpeg"></label><div class="form-actions"><button id="save-brands" class="btn primary">Enregistrer les profils</button><button id="remove-brand-logo" class="btn secondary">Retirer le logo</button></div><p class="form-helper">Le profil par défaut s’applique automatiquement aux nouveaux documents. L’IA peut choisir un autre profil. Arrêtez le MCP pour modifier ces réglages.</p></article></div>
+   </div>
+   <div data-studio-panel="index" hidden><article class="card card-pad"><h2>Une recherche qui se souvient</h2><p class="form-helper">L’index conserve localement le texte extrait pour éviter de recommencer à chaque conversation. Les résultats citent leurs fichiers, pages et empreintes. Les scans demandent encore un OCR explicite.</p><div id="studio-indexes"></div><div class="callout">L’IA utilise index_folder et search_index. Actualisez l’index après ajout ou modification de documents. Le contenu de l’index reste dans les données privées de l’application.</div></article></div>
+   <div data-studio-panel="workflows" hidden><article class="card card-pad"><div class="section-heading studio-heading"><div><h2>Les tâches de votre assistant</h2><p>Suivez la génération de plusieurs livrables et reprenez une tâche interrompue.</p></div><button id="refresh-workflows" class="btn secondary small">Actualiser</button></div><div id="studio-jobs"></div><div class="callout">L’IA prépare les étapes avec start_workflow. Arrêter le MCP suspend les tâches. Pour reprendre, redémarrez le MCP ; pour annuler leurs fichiers, arrêtez-le. Les fichiers modifiés depuis la tâche sont protégés.</div></article></div>
+   <div data-studio-panel="reviews" hidden><article class="card card-pad"><div class="section-heading studio-heading"><div><h2>Propositions de modification</h2><p>Comparez les changements avant de les appliquer.</p></div><button id="refresh-reviews" class="btn secondary small">Actualiser</button></div><div id="studio-revisions"></div><div class="callout">Les propositions ne changent aucun fichier partagé. Arrêtez le MCP pour appliquer, refuser ou annuler une révision. L’empreinte source est revérifiée au moment de l’application.</div></article></div>
   </section>
  </main>
 </div></div>
 <dialog id="preview"><div class="dialog-heading"><div><div class="eyebrow">APERÇU LOCAL</div><h2>Ce que votre IA peut lire</h2></div><button class="btn secondary small" id="close-preview">Fermer</button></div><p class="form-helper">Première page ou premier segment. Cet aperçu n’envoie aucune donnée à un assistant.</p><img id="preview-image" alt="Aperçu du fichier" hidden><pre id="preview-text"></pre></dialog>
 <dialog id="history-dialog"><div class="dialog-heading"><div><div class="eyebrow">SAUVEGARDES LOCALES</div><h2>Restaurer l’état précédent</h2></div><button class="btn secondary small" id="close-history">Fermer</button></div><p class="form-helper">Arrêtez le MCP avant de restaurer. Chaque écrasement conserve une copie ; la restauration sauvegarde aussi l’état remplacé. Les copies Office conservent déjà leur original.</p><div id="history-versions"></div></dialog>
-<dialog id="help-dialog"><div class="dialog-heading"><div><div class="eyebrow">MCP WIN · V0.4.0</div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
+<dialog id="help-dialog"><div class="dialog-heading"><div><div class="eyebrow">MCP WIN · V1.0.0</div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span class="icon" data-icon="info"></span><span id="toast-text"></span><button id="dismiss-toast" aria-label="Fermer la notification">×</button></div>
 </body></html>

@@ -55,3 +55,8 @@ Le programme traite localement la génération et l'OCR. Lorsqu'un assistant app
 ---
 
 [Installer →](./Installation.md) · [Sommaire](./_Sidebar.md)
+
+
+## Studio documentaire v1
+
+[Mise en page professionnelle par défaut, profils, index persistant, workflows, OCR structuré et révisions](../V1.md). La v1 est préparée localement, sans nouvelle publication GitHub.

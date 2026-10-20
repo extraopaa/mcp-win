@@ -73,12 +73,14 @@ pub fn commit(
     bytes: &[u8],
     expected_hash: Option<&str>,
 ) -> Result<Value, String> {
+    crate::v1::jobs::check_write()?;
     if bytes.len() > 25 * 1024 * 1024 {
         return Err("La sortie dépasse 25 Mo".into());
     }
     let _lock = WRITE_LOCK
         .lock()
         .map_err(|_| "Verrou d'écriture indisponible")?;
+    crate::v1::jobs::check_write()?;
     let target = destination(folders, folder, relative)?;
     let existed = target.exists();
     if existed {
@@ -122,8 +124,17 @@ pub fn commit(
                 .canonicalize()
                 .map_err(|e| e.to_string())?;
             backup = Some(crate::history::snapshot(&root, relative, &previous)?);
+            crate::v1::jobs::journal_intent(
+                folders,
+                folder,
+                relative,
+                &hash(bytes),
+                expected_hash,
+                backup.as_deref(),
+            )?;
             fs::rename(&temporary, &target).map_err(|e| e.to_string())?;
         } else {
+            crate::v1::jobs::journal_intent(folders, folder, relative, &hash(bytes), None, None)?;
             create_without_replace(&temporary, &target)
                 .map_err(|e| format!("Création impossible sans écrasement : {e}"))?;
         }
@@ -133,6 +144,31 @@ pub fn commit(
     })();
     let _ = fs::remove_file(temporary);
     outcome
+}
+
+pub fn remove_created(
+    folders: &[SharedFolder],
+    folder: &str,
+    path: &str,
+    expected: &str,
+) -> Result<Value, String> {
+    let _lock = WRITE_LOCK.lock().map_err(|_| "Écriture occupée")?;
+    let target = destination(folders, folder, path)?;
+    let metadata = fs::symlink_metadata(&target).map_err(|e| e.to_string())?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err("Annulation : fichier ordinaire requis".into());
+    }
+    let bytes = fs::read(&target).map_err(|e| e.to_string())?;
+    if hash(&bytes) != expected {
+        return Err("Le fichier a changé : annulation refusée".into());
+    }
+    let root = library::select_folder(folders, folder)?
+        .path
+        .canonicalize()
+        .map_err(|e| e.to_string())?;
+    let backup = crate::history::snapshot(&root, path, &bytes)?;
+    fs::remove_file(&target).map_err(|e| e.to_string())?;
+    Ok(json!({"path":path,"removed":true,"previous_version":backup}))
 }
 
 pub fn text(

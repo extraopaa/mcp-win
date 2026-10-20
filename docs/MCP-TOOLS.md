@@ -1,15 +1,16 @@
 # Outils MCP et génération de fichiers
 
-Préversion v0.4 : [nouveaux outils et exemples](V0.4.md). Recherche, lectures ciblées, PDF, archives, SQL, modèles, patchs et historique. Les en-têtes sécurisés se copient séparément de l’adresse du serveur.
+Base v0.4 : [nouveaux outils et exemples](V0.4.md). Recherche, lectures ciblées, PDF, archives, SQL, modèles, patchs et historique. Les en-têtes sécurisés se copient séparément de l’adresse du serveur.
 
 Pour le contrôle de typographie/mise en page et l'OCR, voir [AUTHORING.md](AUTHORING.md) ou appeler `get_authoring_guide`. Création avancée : `validate_designed_pdf`, `create_designed_pdf`, `inspect_office_package`, `write_office_package`, `render_pdf_page`, `ocr_file`. Valider le source avant création pour corriger les erreurs Typst sans échouer lors de l'enregistrement. En cas de nom occupé, la création PDF ajoute un suffixe ; toujours relire le `path` retourné.
 
 **Le jeton Bearer est obligatoire dans tous les modes en v0.4.** **Les dossiers sont en lecture seule à l'ajout.** Pour autoriser une génération ou une modification, arrêter le MCP puis cliquer sur **Lecture seule** à côté du dossier : le bouton devient **Écriture autorisée**. Redémarrer ensuite le serveur. Cette autorisation appartient au dossier et ne peut pas être activée par un outil MCP distant.
 
-## Catalogue des 32 outils v0.4
+## Catalogue des 42 outils v1
 
 | Usage | Outils |
 | --- | --- |
+| Studio v1 | `list_brand_profiles`, `index_folder`, `search_index`, `inspect_document_elements`, `edit_document_elements`, `start_workflow`, `workflow_status`, `control_workflow`, `extract_document_layout`, `review_document` |
 | Découverte et lecture | `list_folders`, `list_files`, `search_files`, `get_document_outline`, `read_file`, `read_file_bytes` |
 | Aperçu et OCR | `render_svg`, `render_pdf_page`, `ocr_file` |
 | Création et modification | `write_text_file`, `create_document`, `write_spreadsheet`, `replace_office_text`, `create_binary_file`, `apply_file_patch` |
@@ -20,6 +21,8 @@ Pour le contrôle de typographie/mise en page et l'OCR, voir [AUTHORING.md](AUTH
 | Modèles | `list_templates`, `inspect_template`, `create_from_template` |
 
 Les schémas du serveur donnent les paramètres exacts. Voir [V0.4](V0.4.md) pour les exemples et limites. Commencer par une recherche ou un plan puis lire les extraits utiles. L’OCR renvoie du texte simple par défaut ; `plain_text_only:false` active les métadonnées détaillées.
+
+Voir [les exemples et limites v1](V1.md). `create_document` utilise une mise en page professionnelle par défaut ; `raw:true` est réservé à une demande explicite.
 
 ## Formats pris en charge
 

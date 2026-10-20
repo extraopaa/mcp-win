@@ -1,6 +1,6 @@
 # Création avancée et OCR
 
-Les outils simples restent disponibles. Pour un document travaillé, utiliser les outils avancés ci-dessous. Aucune API ni application Office payante n'est requise.
+**Règle v1 : toute demande de PDF, Word, PowerPoint ou Excel reçoit une présentation professionnelle par défaut.** Ne pas attendre une demande explicite de mise en forme. Utiliser `create_document` avec des blocs structurés et le profil visuel actif, ou `write_spreadsheet`. Réserver `raw:true` au texte brut explicitement demandé. Après génération, appeler `review_document` et examiner les pages PDF avant livraison. Pour une composition sur mesure, utiliser les outils avancés ci-dessous. [Studio, workflows, citations et révisions](V1.md). Aucune API ni application Office payante n'est requise.
 
 ## Choisir le dossier sans intervention humaine
 

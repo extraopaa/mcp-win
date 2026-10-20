@@ -1,3 +1,17 @@
+# Validation locale v1.0.0 — 20 octobre 2026
+
+- 42 outils MCP, dont 10 nouveaux outils du Studio documentaire.
+- Suite Rust : 37 tests réussis, 0 échec ; 1 test Internet Cloudflare séparé non relancé pour la v1.
+- Interface : six vues sous CSP strict, profils/logo, index, workflows, comparaison et actions de révision ; largeurs 900/1180/1440 vérifiées.
+- Tauri natif release et vrai MCP HTTP local authentifié : création professionnelle, rapport qualité et aperçu PDF, indexation/recherche, inspection des éléments, proposition refusée à l’application tant que le serveur tourne, validation/annulation locale, workflow avec référence de résultat et annulation groupée.
+- Cas vérifiés : index périmé exclu, stockage privé non partagé, styles OOXML conservés, types numériques XLSX conservés, chaînes commençant par = restant du texte, conflit de source, sauvegarde/restauration, reprise de workflow sans rejeu, OCR tabulaire avec confiance.
+- PDF professionnel rendu en PNG et inspecté visuellement : titres, accents, tableau pleine largeur, encadré et pagination. Office : contrôle structurel et relecture ; pas de validation visuelle dans Microsoft Office ou LibreOffice.
+- Paquet Windows x64 local : `dist-v1/MCP Win.exe` avec les moteurs libres. Aucun push ni publication v1 effectué.
+
+[Fonctionnement et limites v1](docs/V1.md). Les contrôles qualité ne garantissent pas l’absence de tout défaut graphique ; les tests de sécurité restent ciblés.
+
+---
+
 # Validation locale v0.4.0 — 19 octobre 2026
 
 - `cargo fmt --check` : réussi.

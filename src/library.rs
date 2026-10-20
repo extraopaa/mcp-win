@@ -122,6 +122,7 @@ pub fn resolve(folders: &[SharedFolder], folder: &str, relative: &str) -> Result
     }
     let relative = Path::new(relative);
     if crate::history::reserved(relative)
+        || crate::history::reserved(&root)
         || root
             .file_name()
             .is_some_and(|n| n.eq_ignore_ascii_case(crate::history::DIRECTORY))

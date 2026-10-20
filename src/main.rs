@@ -19,6 +19,7 @@ mod process_job;
 mod server;
 mod sqlite;
 mod templates;
+mod v1;
 mod worker;
 mod writing;
 
@@ -34,6 +35,7 @@ fn main() {
         .setup(|app| {
             let folder = app.path().app_data_dir()?;
             std::fs::create_dir_all(&folder)?;
+            v1::state::initialize(&folder);
             app.manage(desktop::Desktop::new(folder));
             Ok(())
         })
@@ -48,7 +50,13 @@ fn main() {
             desktop::list_history,
             desktop::restore_version,
             desktop::preview_file,
-            external_links::open_external_link
+            external_links::open_external_link,
+            v1::desktop::v1_workspace,
+            v1::desktop::save_brand_profiles,
+            v1::desktop::build_local_index,
+            v1::desktop::revision_action,
+            v1::desktop::preview_revision,
+            v1::desktop::workflow_action
         ])
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::Destroyed) {

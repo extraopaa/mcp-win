@@ -8,7 +8,13 @@ Par exemple : « Recherche les factures, extrais les montants, puis crée un rap
 
 L’application regroupe une interface Rust/Tauri 2, le serveur MCP, le tunnel et les moteurs. Aucun abonnement ni API payante obligatoire ; aucun fournisseur d’IA inclus. Windows x64 et WebView2 sont requis. Le PC et l’application doivent rester allumés.
 
-[Guide utilisateur](docs/wiki/Home.md) · [32 outils MCP](docs/MCP-TOOLS.md) · [Création avancée](docs/AUTHORING.md) · [Fonctions et limites v0.4](docs/V0.4.md)
+[Guide utilisateur](docs/wiki/Home.md) · [42 outils MCP](docs/MCP-TOOLS.md) · [Création avancée](docs/AUTHORING.md) · [Nouveautés v1](docs/V1.md)
+
+## Version 1.0.0 — développement local
+
+**La v1 ajoute le Studio documentaire et des documents professionnels par défaut.** PDF/Word/PowerPoint composés, classeurs mis en forme, profils visuels avec logo, contrôle qualité, index persistant, citations vérifiées, OCR structuré, workflows durables et corrections soumises à validation avec annulation. [Fonctionnement et limites](docs/V1.md).
+
+La v1 est préparée localement ; la dernière version publiée reste la v0.4.0.
 
 ## Version 0.4.0
 

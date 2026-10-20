@@ -16,6 +16,9 @@ pub fn reserved(path: &Path) -> bool {
         c.as_os_str()
             .to_string_lossy()
             .eq_ignore_ascii_case(DIRECTORY)
+            || c.as_os_str()
+                .to_string_lossy()
+                .eq_ignore_ascii_case(".mcp-private")
     })
 }
 fn directory(root: &Path, create: bool) -> Result<PathBuf, String> {

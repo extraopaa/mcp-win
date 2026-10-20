@@ -96,6 +96,16 @@ pub async fn compile_typst_with_data(
     assets: &[Asset],
     data: Option<&Value>,
 ) -> Result<CompiledPdf, String> {
+    compile_typst_with_inline(folders, folder, source, assets, data, &[]).await
+}
+pub async fn compile_typst_with_inline(
+    folders: &[SharedFolder],
+    folder: &str,
+    source: &str,
+    assets: &[Asset],
+    data: Option<&Value>,
+    inline: &[(String, Vec<u8>)],
+) -> Result<CompiledPdf, String> {
     static SLOTS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
     let _slot = SLOTS
         .acquire()
@@ -124,6 +134,17 @@ pub async fn compile_typst_with_data(
     fs::write(root.join("main.typ"), &source).map_err(|e| e.to_string())?;
     let mut total = source.len() as u64;
     let mut names = std::collections::HashSet::new();
+    for (name, bytes) in inline {
+        if !safe_name(name)
+            || !name.starts_with("brand-")
+            || bytes.len() > 2 * 1024 * 1024
+            || !names.insert(name.to_lowercase())
+        {
+            return Err("Ressource visuelle intégrée invalide".into());
+        }
+        total += bytes.len() as u64;
+        fs::write(root.join(name), bytes).map_err(|e| e.to_string())?;
+    }
     for asset in assets {
         let name = asset.name.replace('\\', "/");
         if !safe_name(&name)

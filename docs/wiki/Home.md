@@ -2,7 +2,7 @@
 
 **MCP Win** est une application Windows libre et gratuite permettant à un assistant IA compatible **Model Context Protocol (MCP)** de lire des fichiers et de créer des documents dans les dossiers que vous autorisez sur votre ordinateur.
 
-Ce wiki documente la **version 0.3.2** du dépôt. Pour les changements récents, consultez également le [README principal](../../README.md) et les [versions publiées](https://github.com/extraopaa/mcp-win/releases).
+Ce wiki documente **MCP Win V1 — Orbite**. Pour les changements récents, consultez également le [README principal](../../README.md) et les [versions publiées](https://github.com/extraopaa/mcp-win/releases).
 
 > **À savoir avant de commencer :** une connexion extérieure est **protégée par un jeton Bearer obligatoire**. L’URL seule ne suffit pas ; gardez le jeton secret et ne partagez que les dossiers nécessaires.
 
@@ -59,4 +59,4 @@ Le programme traite localement la génération et l'OCR. Lorsqu'un assistant app
 
 ## Studio documentaire v1
 
-[Mise en page professionnelle par défaut, profils, index persistant, workflows, OCR structuré et révisions](../V1.md). La v1 est préparée localement, sans nouvelle publication GitHub.
+[Mise en page professionnelle par défaut, profils, index persistant, workflows, OCR structuré et révisions](../V1.md). Consultez également les [mises à jour signées](../UPDATES.md) et le [changelog](../../CHANGELOG.md).

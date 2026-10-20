@@ -24,3 +24,7 @@ documents/*
 !.env.example
 
 /dist-*/
+
+# Release signing secrets (the public key is intentionally tracked).
+*.key
+*.pem

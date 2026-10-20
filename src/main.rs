@@ -19,6 +19,7 @@ mod process_job;
 mod server;
 mod sqlite;
 mod templates;
+mod updater;
 mod v1;
 mod worker;
 mod writing;
@@ -28,14 +29,19 @@ mod v04_tests;
 
 use tauri::Manager;
 fn main() {
+    if updater::helper_main() {
+        return;
+    }
     if worker::worker_main() {
         return;
     }
     tauri::Builder::default()
+        .manage(updater::Updater::default())
         .setup(|app| {
             let folder = app.path().app_data_dir()?;
             std::fs::create_dir_all(&folder)?;
             v1::state::initialize(&folder);
+            updater::cleanup();
             app.manage(desktop::Desktop::new(folder));
             Ok(())
         })
@@ -56,7 +62,11 @@ fn main() {
             v1::desktop::build_local_index,
             v1::desktop::revision_action,
             v1::desktop::preview_revision,
-            v1::desktop::workflow_action
+            v1::desktop::workflow_action,
+            updater::update_status,
+            updater::check_update,
+            updater::download_update,
+            updater::install_update
         ])
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::Destroyed) {

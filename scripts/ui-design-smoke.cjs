@@ -10,7 +10,7 @@ const csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 's
 const server = http.createServer((req, res) => {
   if (req.url === '/favicon.ico') {res.writeHead(204).end(); return;}
   const name = req.url === '/' ? 'index.html' : req.url.slice(1);
-  if (!['index.html','style.css','icons.js','app.js','studio.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
+  if (!['index.html','style.css','icons.js','app.js','studio.js','updater.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
   res.writeHead(200, {'Content-Type':name.endsWith('.png')?'image/png':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8','Content-Security-Policy':csp});
   res.end(fs.readFileSync(path.join(root, name)));
 });
@@ -25,6 +25,7 @@ const server = http.createServer((req, res) => {
     page.on('console', m => {if (m.type() === 'error') errors.push(m.text());});
     await page.addInitScript(() => {
       window.calls = [];
+      window.testUpdate={status:'available',version:'1.1.0',current_version:'1.0.0',progress:0,error:null};
       window.testWorkspace={brands:{selected:'default',profiles:[{id:'default',name:'Professionnel',primary:'6366F1',secondary:'3B82F6',font:'Lato',organization:'',contact:'',footer:'',logo_base64:''}]},indexes:[{folder:'work',status:{documents:0}}],workflows:{jobs:[{id:'job-test',name:'Dossier de livraison',status:'paused',completed:1,steps:3,progress:33}]},reviews:{revisions:[{id:'revision-test',label:'Correction du tarif',path:'devis.docx',output_path:'devis.docx',status:'pending',diff:'- 100 euros\n+ 125 euros'}]}};
       window.testState = {
         connection:{mode:'cloudflare',port:8787,require_auth:true,token:'0123456789abcdef0123456789abcdef',relay:'',frp_server:'',frp_port:7000,frp_token:'',public_url:'',frp_ca_pem:'',frp_tls_name:''},
@@ -36,6 +37,9 @@ const server = http.createServer((req, res) => {
       window.__TAURI__ = {core:{invoke:async (name,args) => {
         window.calls.push({name,args});
         const s = window.testState;
+        if (name === 'check_update' || name === 'update_status') return structuredClone(window.testUpdate);
+        if (name === 'download_update') {window.testUpdate.status='ready';return structuredClone(window.testUpdate);}
+        if (name === 'install_update') return;
         if (name === 'snapshot') return structuredClone(s);
         if (name === 'v1_workspace') return structuredClone(window.testWorkspace);
         if (name === 'save_brand_profiles') {window.testWorkspace.brands=structuredClone(args.profiles);return;}
@@ -176,6 +180,18 @@ const server = http.createServer((req, res) => {
     await page.locator('#toggle-server').click();
     await page.waitForFunction(()=>document.getElementById('toast-text').textContent.includes('Erreur synthétique'));
     assert.equal(await page.locator('#toggle-server').isDisabled(),false);
+    await page.locator('#open-updates').click();
+    await page.waitForFunction(()=>document.getElementById('update-message').textContent.includes('1.1.0'));
+    await page.evaluate(async()=>{window.testState.running=true;await refresh();});
+    await page.waitForFunction(()=>document.getElementById('install-update').disabled);
+    await page.evaluate(async()=>{window.testState.running=false;await refresh();});
+    await page.waitForFunction(()=>!document.getElementById('install-update').disabled);
+    await page.locator('#install-update').click();
+    await page.waitForFunction(()=>window.calls.some(c=>c.name==='install_update'));
+    await page.evaluate(()=>{window.testUpdate.status='error';window.testUpdate.error='Signature de mise à jour invalide';renderUpdate(window.testUpdate)});
+    assert(await page.locator('#install-update').isHidden());
+    assert((await page.locator('#update-message').textContent()).includes('Signature'));
+    await page.locator('#close-updates').click();
     assert.deepEqual(errors,[]);
     console.log('UI maquettes et Studio : 6 vues, CSP strict, navigation, IPC, permissions, réglages, presse-papiers, aperçu, restauration, filtres, états vides/erreurs et largeurs 900/1180/1440 validés.');
     console.log('Captures : target/ui-design/');

@@ -1,69 +1,91 @@
-# MCP Win
+<p align="center">
+  <img src="assets/brand/icon-original.png" width="120" alt="Logo MCP Win">
+</p>
+
+<h1 align="center">MCP Win</h1>
 
 **MCP Win est une application Windows gratuite et open source qui permet à votre assistant IA de lire, rechercher, créer et modifier les documents dans les dossiers de votre ordinateur que vous choisissez de partager.**
 
-Vous ajoutez un dossier, démarrez le serveur puis copiez son adresse et ses en-têtes sécurisés dans votre assistant IA. Celui-ci peut travailler à distance sur vos PDF, Word, Excel, PowerPoint, images et fichiers texte. Le client doit accepter MCP distant (Streamable HTTP) et un en-tête Authorization.
+Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’URL MCP et son jeton. Il peut alors travailler sur vos PDF, Word, Excel, PowerPoint, images et fichiers texte, même à distance. L’assistant doit prendre en charge **MCP distant / Streamable HTTP** et l’en-tête **Authorization**.
 
-Par exemple : « Recherche les factures, extrais les montants, puis crée un rapport PDF mis en page et un tableau Excel. » L’OCR et les moteurs documentaires fonctionnent sur votre PC ; les contenus demandés sont transmis à l’assistant.
+<p align="center">
+  <a href="https://github.com/extraopaa/mcp-win/releases/tag/v1.0.0"><strong>Télécharger la V1 — Orbite · Windows x64</strong></a>
+  &nbsp;·&nbsp; <a href="docs/wiki/Home.md">Guide utilisateur</a>
+  &nbsp;·&nbsp; <a href="CHANGELOG.md">Changelog</a>
+</p>
 
-L’application regroupe une interface Rust/Tauri 2, le serveur MCP, le tunnel et les moteurs. Aucun abonnement ni API payante obligatoire ; aucun fournisseur d’IA inclus. Windows x64 et WebView2 sont requis. Le PC et l’application doivent rester allumés.
+![Vue d’ensemble de MCP Win](docs/images/overview.png)
 
-[Guide utilisateur](docs/wiki/Home.md) · [42 outils MCP](docs/MCP-TOOLS.md) · [Création avancée](docs/AUTHORING.md) · [Nouveautés v1](docs/V1.md)
+## Ce que votre IA peut faire
 
-## Version 1.0.0 — développement local
+| Usage | Fonctionnalités |
+| --- | --- |
+| Trouver l’information | Recherche récursive, filtres glob, index local persistant, extraits, plans et références avec page ou feuille et empreinte du fichier. |
+| Produire des documents | PDF, DOCX et PPTX avec mise en page professionnelle par défaut ; nouveaux classeurs XLSX mis en forme. |
+| Respecter votre identité | Profils avec logo, couleurs, police, coordonnées et pied de page ; modèles Typst et Office. |
+| Lire des scans | OCR français/anglais local, blocs, champs et tableaux estimés, export CSV/XLSX. |
+| Corriger précisément | Éléments identifiés, modifications ciblées, propositions à comparer et valider, sauvegardes et annulation. |
+| Enchaîner les tâches | Workflows avec progression, pause, reprise et annulation groupée des fichiers produits. |
+| Traiter les fichiers existants | Fusion et extraction de pages PDF, formulaires, archives ZIP/TAR/7z et requêtes SQLite/DuckDB en lecture seule. |
+| Vérifier le résultat | Contrôles qualité, rendu des pages PDF et aperçus pour l’assistant. |
 
-**La v1 ajoute le Studio documentaire et des documents professionnels par défaut.** PDF/Word/PowerPoint composés, classeurs mis en forme, profils visuels avec logo, contrôle qualité, index persistant, citations vérifiées, OCR structuré, workflows durables et corrections soumises à validation avec annulation. [Fonctionnement et limites](docs/V1.md).
+**42 outils MCP**, regroupés dans une application Rust/Tauri avec les moteurs embarqués. Microsoft Office et une API d’IA payante ne sont pas nécessaires. Vous utilisez votre propre assistant IA ; aucun modèle n’est inclus.
 
-La v1 est préparée localement ; la dernière version publiée reste la v0.4.0.
+> Exemple : « Retrouve les devis du projet, compare les montants en citant tes sources, puis crée un rapport PDF et un tableau Excel. »
 
-## Version 0.4.0
+## Installer et connecter
 
-**[Télécharger MCP Win v0.4.0 pour Windows x64](https://github.com/extraopaa/mcp-win/releases/tag/v0.4.0)**. Extraire toute l’archive avant de lancer l’application. Les anciennes archives v0.3.2 et antérieures ne contiennent pas les protections v0.4.
+1. [Téléchargez le paquet Windows x64](https://github.com/extraopaa/mcp-win/releases/download/v1.0.0/mcp-win-v1.0.0-windows-x64.zip) et **extrayez toute l’archive**. Gardez le dossier `engines` à côté de `MCP Win.exe`.
+2. Ouvrez l’application et ajoutez un dossier. Il est en **lecture seule par défaut** ; arrêtez le serveur pour autoriser l’écriture avec le bouton **Droits**.
+3. Choisissez **Tunnel simple** pour Cloudflare sans compte, **Mon propre relais** pour frp, ou **Local uniquement**.
+4. Démarrez le serveur. Dans votre assistant, ajoutez l’URL MCP et collez le contenu de **Copier les headers JSON** dans les en-têtes sécurisés.
 
-- Recherche récursive, expressions régulières, filtres glob, pagination, extraits et cache local.
-- Plans des documents, lectures ciblées et aperçus compacts des tableurs.
-- PDF avancés avec Typst : typographie, tableaux, images, colonnes, pagination et modèles.
-- Création et modification DOCX/XLSX/PPTX, contrôle OOXML et modèles Word/PowerPoint/Excel.
-- Fusion et extraction de pages PDF, inspection et remplissage AcroForm.
-- Inspection, extraction sélective et création ZIP/TAR/7z.
-- Requêtes SQLite/DuckDB en lecture seule, sans exporter toute la base.
-- OCR français/anglais local, texte seul par défaut.
-- Patchs, sauvegarde avant écrasement texte et restauration depuis l’interface.
+```json
+{"Authorization":"Bearer <votre jeton>"}
+```
 
-Microsoft Office n’est pas nécessaire. Les anciens DOC/PPT ne sont pas interprétés. L’enregistrement binaire d’autres formats exige leurs octets valides ; aucune conversion universelle n’est promise.
+Le bouton **Copier Bearer + jeton** fournit la valeur complète pour un champ Authorization. Le PC et l’application doivent rester allumés. Arrêter le serveur coupe l’accès.
 
-## Démarrer
+**Prérequis :** Windows x64 et Microsoft Edge WebView2. Le paquet est portable : aucun installateur ou compte MCP Win à créer.
 
-1. Télécharger et extraire le paquet v0.4.0, puis ouvrir **MCP Win.exe** en conservant engines à côté.
-2. Ajouter un dossier, en lecture seule par défaut. Arrêter le MCP pour activer l’écriture dans l’interface.
-3. Choisir **Tunnel simple** pour Cloudflare gratuit sans compte, **Mon propre relais** pour frp, ou le mode local.
-4. Démarrer le MCP et copier son URL dans le client IA.
-5. Coller **Copier la configuration JSON** dans « Headers sécurisés (JSON) » : `{"Authorization":"Bearer <jeton>"}`. **Copier Bearer + jeton** fournit la valeur complète pour un champ Authorization.
-6. Arrêter le MCP ou fermer l’application pour couper l’accès.
+## V1 — Orbite
 
-Le jeton est obligatoire dans tous les modes. OAuth n’est pas fourni. Le bouton **Historique** restaure une version locale lorsque le MCP est arrêté.
+La première version majeure réunit le nouveau **Studio documentaire**, la mise en page professionnelle par défaut, les profils visuels, la recherche persistante, l’OCR structuré, les workflows et les révisions contrôlées.
+
+La recherche de **mises à jour** est automatique au démarrage et toutes les six heures. L’installation se lance depuis l’application, serveur arrêté, avec signature Ed25519 et vérification du paquet avant remplacement. Les préférences sont conservées. Les anciennes versions sans updater nécessitent une première installation manuelle.
+
+[Détail de la V1 et limites](docs/V1.md) · [Mises à jour signées](docs/UPDATES.md) · [Historique des versions](CHANGELOG.md) · [Noms des versions majeures](docs/RELEASES.md)
 
 ## Sécurité et confidentialité
 
-L’ancien tunnel localtunnel non chiffré est supprimé. Les anciennes préférences migrent vers le mode local ; les anciens jetons sont renouvelés au premier démarrage v0.4.
+- **Jeton Bearer obligatoire** dans tous les modes. L’URL seule ne donne pas accès aux dossiers.
+- Les connexions extérieures utilisent HTTPS et un tunnel chiffré. **Le relais peut lire les données qu’il transmet** ; ce n’est pas du chiffrement de bout en bout jusqu’à l’assistant.
+- Seuls les dossiers choisis sont accessibles. L’écriture est une autorisation distincte, modifiable depuis l’application lorsque le serveur est arrêté.
+- L’OCR et la génération s’exécutent sur votre PC. Les contenus lus sont transmis à votre assistant IA.
+- Préférences, jetons, index et propositions sont stockés localement, sans chiffrement au repos. Le stockage privé et l’historique sont exclus des outils MCP distants.
+- La recherche de mises à jour contacte GitHub, sans transmettre vos documents ou votre jeton MCP.
 
-Les deux segments Internet sont chiffrés : IA → relais en HTTPS ; PC → relais par Cloudflare Tunnel ou frp avec certificat et nom TLS vérifiés. **Le relais peut lire le contenu.** Le client cloudflared est libre ; son réseau est un service tiers gratuit. Quick Tunnel fournit une adresse temporaire sans garantie de disponibilité ni SSE ; MCP Win utilise des réponses JSON.
+Le code et les moteurs sont libres. Le client `cloudflared` est open source ; **le réseau Cloudflare reste un service tiers gratuit**, avec adresse temporaire et sans garantie de disponibilité. Un [relais personnel](relay/README.md) est également pris en charge.
 
-Seuls les dossiers choisis sont partagés. Les contrôles portent sur les chemins, permissions, empreintes, authentification, tailles, délais, concurrence et sous-processus. L’historique n’est pas exposé aux outils distants. Les documents restent des données non fiables, jamais des instructions pour le modèle.
+[Rapport de sécurité](docs/SECURITY-V04.md) · [Vérifications effectuées](VALIDATION.md)
 
-Les préférences et jetons sont en clair dans `%APPDATA%/org.mcpwin.desktop/settings.json`. Le journal conserve 100 opérations en mémoire. Aucune télémétrie applicative n’est ajoutée. Les essais ciblés ne garantissent pas l’absence de toute vulnérabilité.
+## Limites à connaître
 
-[Rapport de sécurité](docs/SECURITY-V04.md) · [Validations](VALIDATION.md) · [Relais personnel](relay/README.md)
+Les documents sont limités à **25 Mio**. Les lectures, recherches et listes sont paginées pour limiter le contexte de l’IA. L’OCR structuré reste une estimation à vérifier, notamment sur les tableaux complexes et les scans dégradés. Les formules Excel sont stockées sans recalcul automatique.
 
-## Limites
+Les PDF peuvent être rendus et contrôlés visuellement. Les contrôles Office portent sur la structure ; le rendu final dépend du lecteur. Les anciens formats DOC/PPT ne sont pas interprétés, et aucune conversion universelle n’est promise.
 
-Documents : 25 Mio ; SVG à rendre : 5 Mio ; rendu : 1 600 pixels sur le plus grand côté. Lecture : 8 000 caractères par défaut, 50 000 maximum. Listes paginées : 500 entrées maximum. Bases SQLite/DuckDB : limite distincte de 4 Gio et résultats bornés. Voir [les limites détaillées](docs/V0.4.md).
+## Documentation
 
-L’OCR n’est pas garanti sur les manuscrits ou scans dégradés. Les formules Excel sont stockées sans recalcul. Vérifier les fichiers produits avec les outils de rendu et votre lecteur habituel.
+- [Premiers pas et connexion IA](docs/wiki/Home.md)
+- [Les 42 outils et leurs formats](docs/MCP-TOOLS.md)
+- [Composition avancée, Typst et OCR](docs/AUTHORING.md)
+- [Studio, index, workflows et révisions](docs/V1.md)
+- [Compilation et contribution](CONTRIBUTING.md)
 
-## Compilation et paquet Windows
+## Compiler
 
-Installer Rust stable MSVC, les outils C++ Windows, CMake et WebView2. Aucun build frontend ni npm n’est nécessaire pour l’application.
+Installer Rust stable MSVC, les outils C++ Windows, CMake et WebView2, puis :
 
 ```powershell
 ./scripts/fetch-frp.ps1
@@ -71,12 +93,12 @@ Installer Rust stable MSVC, les outils C++ Windows, CMake et WebView2. Aucun bui
 ./scripts/fetch-cloudflared.ps1
 ./scripts/fetch-duckdb.ps1
 cargo fmt --check
-cargo test --no-default-features --locked
+cargo test --locked
 ./scripts/package.ps1
 ```
 
-Les scripts récupèrent les moteurs épinglés et vérifient leurs empreintes. Le paquet complet est dans dist ; un exécutable isolé ne suffit pas. Seul WebView2 reste un prérequis sur le PC utilisateur.
+Aucun build frontend ni npm n’est requis pour l’application. Le paquet complet est généré dans `dist/`. Les moteurs téléchargés sont épinglés et leurs empreintes sont vérifiées.
 
-Le code est sous MIT ; les bibliothèques et moteurs ont leurs propres licences libres. Le réseau Cloudflare est un service tiers. Les exécutables, préférences et documents privés sont exclus du dépôt. Les notices complètes sont générées lors du packaging.
+## Licence
 
-[Contribuer et tester](CONTRIBUTING.md) · [Licences tierces](THIRD-PARTY-NOTICES.md) · [Licence](LICENSE)
+Le code de MCP Win est sous [licence MIT](LICENSE). Les dépendances et moteurs conservent leurs licences respectives : [notices tierces](THIRD-PARTY-NOTICES.md). Les documents privés, préférences, exécutables générés et clés de signature ne sont pas versionnés.

@@ -31,3 +31,7 @@ Pour une pull request, décrire le problème, le changement et les vérification
 Après les tests Rust et un build release : `./scripts/check-v04-workers.ps1` vérifie les vrais sous-processus de production sur la fixture AcroForm de target/qa-v04. Les sorties sont isolées dans un nouveau sous-dossier de test. `./scripts/package.ps1 -OutputDirectory dist-v04` prépare le paquet local complet, sans publication.
 
 Les exécutables et moteurs sont distribués séparément des sources ; ne pas les ajouter aux commits.
+
+## Versions et mises à jour signées
+
+Les versions majeures suivent la [convention de nommage](docs/RELEASES.md). Chaque publication met à jour le [changelog](CHANGELOG.md). La procédure de signature est décrite dans [UPDATES.md](docs/UPDATES.md) ; aucune clé privée ne doit entrer dans le dépôt. Les vérifications locales de l’updater utilisent `./scripts/check-updater.ps1` avec une fixture synthétique et la clé locale du mainteneur.

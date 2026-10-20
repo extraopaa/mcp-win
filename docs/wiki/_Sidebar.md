@@ -7,6 +7,8 @@
   - [Connexion à une IA](./Connexion-IA.md)
   - [Dossiers et permissions](./Dossiers-et-permissions.md)
 - **Fonctionnalités**
+  - [Studio documentaire v1](../V1.md)
+  - [Mises à jour](../UPDATES.md)
   - [Outils MCP et formats](./Outils-MCP-et-formats.md)
   - [Création de documents](./Creation-de-documents.md)
   - [OCR et aperçus](./OCR-et-apercus.md)
@@ -17,5 +19,6 @@
 - **Projet**
   - [Développement](./Developpement.md)
   - [FAQ](./FAQ.md)
+  - [Changelog](../../CHANGELOG.md)
 
 [Retour au dépôt](https://github.com/extraopaa/mcp-win)

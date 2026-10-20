@@ -24,6 +24,7 @@ let browser;
  async function rpc(method,params){const r=await fetch(state.address,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream','MCP-Protocol-Version':'2025-03-26',Authorization:`Bearer ${state.connection.token}`},body:JSON.stringify({jsonrpc:'2.0',id:++rpcId,method,params}),signal:AbortSignal.timeout(60000)});assert.equal(r.status,200);const p=await r.json();assert(!p.error,JSON.stringify(p));return p.result}
  async function tool(name,args={}){const r=await rpc('tools/call',{name,arguments:{folder:'ui-test',...args}});assert(!r.isError,JSON.stringify(r));return {value:JSON.parse(r.content[0].text),content:r.content}}
  assert.equal((await rpc('tools/list',{})).tools.length,42);
+ await assert.rejects(()=>invoke('install_update'));
  assert.equal((await fetch(state.address,{method:'POST',body:'{}'})).status,401);
  const doc=(await tool('create_document',{path:'native-v1.pdf',title:'Rapport professionnel',blocks:[{id:'summary',kind:'heading',level:1,text:'Synthèse'},{id:'body',kind:'paragraph',text:'La v1 produit des documents soignés par défaut.'},{id:'table',kind:'table',columns:['Indicateur','Valeur'],rows:[['Dossiers','125']]}]})).value;
  assert.equal(doc.design.mode,'professional');assert(doc.quality.passed);
@@ -42,6 +43,12 @@ let browser;
  await invoke('workflow_action',{id:job.id,action:'undo'});
  const workspace=await invoke('v1_workspace');assert(workspace.reviews.revisions.some(r=>r.id===proposal.revision_id&&r.status==='undone'));
  await page.locator('[data-tab=studio]').click();await page.screenshot({path:'target/qa-v1/native-studio.png'});
+ await page.locator('#open-updates').click();
+ let updates=await invoke('check_update',{force:true});
+ for(let i=0;i<100&&updates.status==='checking';i++){await new Promise(r=>setTimeout(r,400));updates=await invoke('update_status')}
+ assert(['current','available','error'].includes(updates.status),JSON.stringify(updates));
+ await page.screenshot({path:'target/qa-v1/native-updates.png'});
+ await page.locator('#close-updates').click();
  assert.deepEqual(errors,[]);fs.writeFileSync('target/qa-v1/native-validation.json',JSON.stringify({tools:42,default_design:true,quality:true,index:true,revisions:true,workflow:true,auth:true},null,2));
  console.log('Tauri v1 : 42 outils, PDF professionnel, aperçu, index, révision validée/annulée, workflow et annulation groupée, authentification et six vues validés.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close()});

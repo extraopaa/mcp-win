@@ -1,12 +1,15 @@
 # Validation locale v1.0.0 — 20 octobre 2026
 
 - 42 outils MCP, dont 10 nouveaux outils du Studio documentaire.
-- Suite Rust : 37 tests réussis, 0 échec ; 1 test Internet Cloudflare séparé non relancé pour la v1.
+- Suite Rust : 40 tests réussis, 0 échec ; 1 test Internet Cloudflare séparé non relancé pour la v1.
 - Interface : six vues sous CSP strict, profils/logo, index, workflows, comparaison et actions de révision ; largeurs 900/1180/1440 vérifiées.
 - Tauri natif release et vrai MCP HTTP local authentifié : création professionnelle, rapport qualité et aperçu PDF, indexation/recherche, inspection des éléments, proposition refusée à l’application tant que le serveur tourne, validation/annulation locale, workflow avec référence de résultat et annulation groupée.
 - Cas vérifiés : index périmé exclu, stockage privé non partagé, styles OOXML conservés, types numériques XLSX conservés, chaînes commençant par = restant du texte, conflit de source, sauvegarde/restauration, reprise de workflow sans rejeu, OCR tabulaire avec confiance.
 - PDF professionnel rendu en PNG et inspecté visuellement : titres, accents, tableau pleine largeur, encadré et pagination. Office : contrôle structurel et relecture ; pas de validation visuelle dans Microsoft Office ou LibreOffice.
-- Paquet Windows x64 local : `dist-v1/MCP Win.exe` avec les moteurs libres. Aucun push ni publication v1 effectué.
+- Updater : signature falsifiée, mauvaise clé, mauvaise origine, préversion, downgrade, traversée ZIP, noms réservés et doublons refusés. Échec d’installation avec restauration testé.
+- Installation native synthétique : vrai processus helper, manifeste signé par la clé locale, SHA-256, remplacement du paquet portable, conservation d’un fichier de préférences et relance du nouvel exécutable validés, sans publication ni téléchargement de release.
+- Interface updater : recherche, disponibilité, blocage pendant l’activité MCP, téléchargement/installation simulés et affichage d’erreur de signature vérifiés sous CSP strict.
+- Paquet Windows x64 local : `dist-v1/MCP Win.exe` avec les moteurs libres. Release V1 — Orbite préparée avec manifeste signé et paquet complet.
 
 [Fonctionnement et limites v1](docs/V1.md). Les contrôles qualité ne garantissent pas l’absence de tout défaut graphique ; les tests de sécurité restent ciblés.
 

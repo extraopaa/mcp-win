@@ -20,7 +20,9 @@ try {
         try { Copy-Item -LiteralPath 'target\release\mcp-win.exe' -Destination (Join-Path $dist 'MCP Win.exe'); break }
         catch { if ($attempt -eq 5) { throw }; Start-Sleep -Seconds 1 }
     }
-    Copy-Item -LiteralPath 'README.md','LICENSE','THIRD-PARTY-NOTICES.md','VALIDATION.md' -Destination $dist
+    Copy-Item -LiteralPath 'README.md','CHANGELOG.md','LICENSE','THIRD-PARTY-NOTICES.md','VALIDATION.md' -Destination $dist
+    New-Item -ItemType Directory -Force (Join-Path $dist 'assets/brand') | Out-Null
+    Copy-Item -LiteralPath 'assets/brand/icon-original.png' -Destination (Join-Path $dist 'assets/brand')
     Copy-Item -LiteralPath 'third-party-licenses','relay' -Destination $dist -Recurse -Force
     Copy-Item -LiteralPath 'docs' -Destination $dist -Recurse -Force
     Copy-Item -LiteralPath 'vendor\frp\frp_0.71.1_windows_amd64\LICENSE' -Destination (Join-Path $dist 'LICENSE-frp.txt')

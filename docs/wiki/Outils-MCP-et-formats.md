@@ -2,11 +2,15 @@
 
 Les outils sont exposés au client IA connecté par **Streamable HTTP**. Leur disponibilité et leur description exacte proviennent du serveur de la version installée.
 
+## Studio documentaire v1
+
+Index persistant, profils visuels, contrôle qualité, édition par éléments, OCR structuré et workflows complètent les outils existants. Voir [la référence complète](../MCP-TOOLS.md).
+
 ## Outils ajoutés en v0.4
 
 `search_files`, `get_document_outline`, `merge_pdfs`, `split_pdf`, `inspect_pdf_form`, `fill_pdf_form`, `inspect_archive`, `extract_archive`, `create_archive`, `query_sqlite`, `query_duckdb`, `apply_file_patch`, `list_templates`, `inspect_template`, `create_from_template`.
 
-La version expose **32 outils**. Voir [le catalogue](../MCP-TOOLS.md) et [les exemples v0.4](../V0.4.md). Lectures ciblées, listes compactes et OCR texte seul réduisent le volume transmis au modèle.
+La V1 expose **42 outils**. Voir [le catalogue](../MCP-TOOLS.md) et [le Studio documentaire v1](../V1.md). Lectures ciblées, listes compactes et OCR texte seul réduisent le volume transmis au modèle.
 
 ## Outils documentaires existants
 

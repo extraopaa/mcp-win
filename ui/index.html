@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MCP Win</title>
 <link rel="icon" type="image/png" href="brand/favicon.png">
-<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script>
+<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script><script src="updater.js" defer></script>
 </head>
 <body>
 <div class="app">
@@ -19,6 +19,7 @@
  </nav>
  <div class="nav-divider"></div><div class="nav-label">RESSOURCES</div>
  <nav><button class="nav nav-item" data-tab="studio" title="Studio documentaire"><span class="icon" data-icon="sparkles"></span><span>Studio documentaire</span></button><button class="nav nav-item" data-tab="tools" title="Catalogue des outils"><span class="icon" data-icon="blocks"></span><span>Catalogue des outils</span></button></nav>
+<button class="nav-item update-link" id="open-updates" title="Mises à jour"><span class="icon" data-icon="refresh-cw"></span><span id="update-label">Mises à jour</span></button>
  <div class="sidebar-bottom">
 
   <div class="connection-mini"><div class="live-orbit offline"><span class="icon" data-icon="radio"></span></div><div><div class="mini-title" id="sidebar-status">Chargement…</div><div class="mini-sub" id="sidebar-sub">Initialisation locale</div></div></div>
@@ -125,5 +126,6 @@
 <dialog id="preview"><div class="dialog-heading"><div><h2>Aperçu du fichier</h2></div><button class="btn secondary small" id="close-preview">Fermer</button></div><p class="form-helper">Première page ou premier segment. Cet aperçu n’envoie aucune donnée à un assistant.</p><img id="preview-image" alt="Aperçu du fichier" hidden><pre id="preview-text"></pre></dialog>
 <dialog id="history-dialog"><div class="dialog-heading"><div><h2>Restaurer l’état précédent</h2></div><button class="btn secondary small" id="close-history">Fermer</button></div><p class="form-helper">Arrêtez le serveur pour restaurer une version. L’état remplacé sera sauvegardé.</p><div id="history-versions"></div></dialog>
 <dialog id="help-dialog"><div class="dialog-heading"><div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
+<dialog id="update-dialog"><div class="dialog-heading"><h2>Mises à jour</h2><button class="btn secondary small" id="close-updates">Fermer</button></div><p class="form-helper" id="update-current"></p><p id="update-message" role="status">Recherche automatique au démarrage.</p><progress id="update-progress" max="100" value="0" aria-label="Téléchargement" hidden></progress><div class="form-actions"><button class="btn secondary" id="check-update">Rechercher</button><button class="btn primary" id="install-update" hidden>Installer et redémarrer</button></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span class="icon" data-icon="info"></span><span id="toast-text"></span><button id="dismiss-toast" aria-label="Fermer la notification">×</button></div>
 </body></html>

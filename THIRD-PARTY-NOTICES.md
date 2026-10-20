@@ -84,6 +84,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | console_log | 1.1.0 | MIT/Apache-2.0 | https://crates.io/crates/console_log/1.1.0 |
 | constant_time_eq | 0.1.5 | CC0-1.0 | https://crates.io/crates/constant_time_eq/0.1.5 |
 | const-oid | 0.10.2 | Apache-2.0 OR MIT | https://crates.io/crates/const-oid/0.10.2 |
+| const-oid | 0.9.6 | Apache-2.0 OR MIT | https://crates.io/crates/const-oid/0.9.6 |
 | cookie | 0.18.2 | MIT OR Apache-2.0 | https://crates.io/crates/cookie/0.18.2 |
 | core_detect | 1.0.0 | MIT/Apache-2.0 | https://crates.io/crates/core_detect/1.0.0 |
 | core-foundation | 0.10.1 | MIT OR Apache-2.0 | https://crates.io/crates/core-foundation/0.10.1 |
@@ -109,6 +110,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | csv-core | 0.1.13 | Unlicense/MIT | https://crates.io/crates/csv-core/0.1.13 |
 | ctor | 1.0.13 | Apache-2.0 OR MIT | https://crates.io/crates/ctor/1.0.13 |
 | ctutils | 0.4.3 | Apache-2.0 OR MIT | https://crates.io/crates/ctutils/0.4.3 |
+| curve25519-dalek | 4.1.3 | BSD-3-Clause | https://crates.io/crates/curve25519-dalek/4.1.3 |
+| curve25519-dalek-derive | 0.1.1 | MIT/Apache-2.0 | https://crates.io/crates/curve25519-dalek-derive/0.1.1 |
 | darling | 0.24.1 | MIT | https://crates.io/crates/darling/0.24.1 |
 | darling_core | 0.24.1 | MIT | https://crates.io/crates/darling_core/0.24.1 |
 | darling_macro | 0.24.1 | MIT | https://crates.io/crates/darling_macro/0.24.1 |
@@ -118,6 +121,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | defmt | 1.2.0 | MIT OR Apache-2.0 | https://crates.io/crates/defmt/1.2.0 |
 | defmt-macros | 1.2.0 | MIT OR Apache-2.0 | https://crates.io/crates/defmt-macros/1.2.0 |
 | defmt-parser | 1.1.0 | MIT OR Apache-2.0 | https://crates.io/crates/defmt-parser/1.1.0 |
+| der | 0.7.10 | Apache-2.0 OR MIT | https://crates.io/crates/der/0.7.10 |
 | deranged | 0.5.9 | MIT OR Apache-2.0 | https://crates.io/crates/deranged/0.5.9 |
 | derive_more | 2.1.1 | MIT | https://crates.io/crates/derive_more/2.1.1 |
 | derive_more-impl | 2.1.1 | MIT | https://crates.io/crates/derive_more-impl/2.1.1 |
@@ -142,6 +146,8 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | ecb | 0.1.2 | MIT | https://crates.io/crates/ecb/0.1.2 |
 | ecb | 0.2.1 | MIT OR Apache-2.0 | https://crates.io/crates/ecb/0.2.1 |
 | ecow | 0.2.6 | MIT OR Apache-2.0 | https://crates.io/crates/ecow/0.2.6 |
+| ed25519 | 2.2.3 | Apache-2.0 OR MIT | https://crates.io/crates/ed25519/2.2.3 |
+| ed25519-dalek | 2.2.0 | BSD-3-Clause | https://crates.io/crates/ed25519-dalek/2.2.0 |
 | either | 1.19.0 | MIT OR Apache-2.0 | https://crates.io/crates/either/1.19.0 |
 | embed_plist | 1.2.2 | MIT OR Apache-2.0 | https://crates.io/crates/embed_plist/1.2.2 |
 | embed-resource | 3.0.12 | MIT | https://crates.io/crates/embed-resource/3.0.12 |
@@ -161,6 +167,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | fastrand | 2.5.0 | Apache-2.0 OR MIT | https://crates.io/crates/fastrand/2.5.0 |
 | fax | 0.2.7 | MIT | https://crates.io/crates/fax/0.2.7 |
 | fdeflate | 0.3.7 | MIT OR Apache-2.0 | https://crates.io/crates/fdeflate/0.3.7 |
+| fiat-crypto | 0.2.9 | MIT OR Apache-2.0 OR BSD-1-Clause | https://crates.io/crates/fiat-crypto/0.2.9 |
 | field-offset | 0.3.6 | MIT OR Apache-2.0 | https://crates.io/crates/field-offset/0.3.6 |
 | filetime | 0.2.29 | MIT/Apache-2.0 | https://crates.io/crates/filetime/0.2.29 |
 | filetime_creation | 0.2.0 | MIT/Apache-2.0 | https://crates.io/crates/filetime_creation/0.2.0 |
@@ -365,6 +372,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | pico-args | 0.5.0 | MIT | https://crates.io/crates/pico-args/0.5.0 |
 | pin-project-lite | 0.2.17 | Apache-2.0 OR MIT | https://crates.io/crates/pin-project-lite/0.2.17 |
 | piston-float | 1.0.1 | MIT | https://crates.io/crates/piston-float/1.0.1 |
+| pkcs8 | 0.10.2 | Apache-2.0 OR MIT | https://crates.io/crates/pkcs8/0.10.2 |
 | pkg-config | 0.3.34 | MIT OR Apache-2.0 | https://crates.io/crates/pkg-config/0.3.34 |
 | plist | 1.10.1 | MIT | https://crates.io/crates/plist/1.10.1 |
 | png | 0.17.16 | MIT OR Apache-2.0 | https://crates.io/crates/png/0.17.16 |
@@ -467,6 +475,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | sha2 | 0.11.1 | MIT OR Apache-2.0 | https://crates.io/crates/sha2/0.11.1 |
 | shlex | 2.0.1 | MIT OR Apache-2.0 | https://crates.io/crates/shlex/2.0.1 |
 | signal-hook-registry | 1.4.8 | MIT OR Apache-2.0 | https://crates.io/crates/signal-hook-registry/1.4.8 |
+| signature | 2.2.0 | Apache-2.0 OR MIT | https://crates.io/crates/signature/2.2.0 |
 | simd-adler32 | 0.3.10 | MIT | https://crates.io/crates/simd-adler32/0.3.10 |
 | simdutf8 | 0.1.5 | MIT OR Apache-2.0 | https://crates.io/crates/simdutf8/0.1.5 |
 | simplecss | 0.2.2 | Apache-2.0 OR MIT | https://crates.io/crates/simplecss/0.2.2 |
@@ -480,6 +489,7 @@ Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilat
 | softbuffer | 0.4.8 | MIT OR Apache-2.0 | https://crates.io/crates/softbuffer/0.4.8 |
 | soup3 | 0.5.0 | MIT | https://crates.io/crates/soup3/0.5.0 |
 | soup3-sys | 0.5.0 | MIT | https://crates.io/crates/soup3-sys/0.5.0 |
+| spki | 0.7.3 | Apache-2.0 OR MIT | https://crates.io/crates/spki/0.7.3 |
 | sqlite-wasm-rs | 0.5.5 | MIT | https://crates.io/crates/sqlite-wasm-rs/0.5.5 |
 | sse-stream | 0.2.6 | MIT OR Apache-2.0 | https://crates.io/crates/sse-stream/0.2.6 |
 | stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 | https://crates.io/crates/stable_deref_trait/1.2.1 |

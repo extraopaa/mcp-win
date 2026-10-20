@@ -2,6 +2,10 @@
 
 Les versions stables et leurs changements sont consignés ici. Les préversions et les travaux non publiés ne constituent pas des versions finales.
 
+## À venir
+
+- Compilation OCR : conservation de l’argument CMake `CMAKE_POLICY_VERSION_MINIMUM=3.5` sous PowerShell 7, pour les constructions GitHub Actions.
+
 ## [1.0.0 — Orbite](https://github.com/extraopaa/mcp-win/releases/tag/v1.0.0) · 20 octobre 2026
 
 ### Ajouts

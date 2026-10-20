@@ -26,7 +26,7 @@ foreach ($package in $packages) {
 $prefix = (Join-Path $root 'native').Replace('\','/')
 function Configure($source,$build,$options) {
     $ErrorActionPreference = 'Continue'
-    & $cmake -S (Join-Path $root "source/$source") -B (Join-Path $root $build) -A x64 "-DCMAKE_INSTALL_PREFIX=$prefix" "-DCMAKE_PREFIX_PATH=$prefix" -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded @options
+    & $cmake -S (Join-Path $root "source/$source") -B (Join-Path $root $build) -A x64 "-DCMAKE_INSTALL_PREFIX=$prefix" "-DCMAKE_PREFIX_PATH=$prefix" '-DCMAKE_POLICY_DEFAULT_CMP0091=NEW' '-DCMAKE_POLICY_VERSION_MINIMUM=3.5' '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' @options
     if ($LASTEXITCODE -ne 0) { throw "Configuration échouée : $source" }
 }
 function Build($build,$target) {

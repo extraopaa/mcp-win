@@ -6,17 +6,17 @@
 
 **MCP Win est une application Windows gratuite et open source qui permet à votre assistant IA de lire, rechercher, créer et modifier les documents dans les dossiers de votre ordinateur que vous choisissez de partager.**
 
-Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’URL MCP et son jeton. Il peut alors travailler sur vos PDF, Word, Excel, PowerPoint, images et fichiers texte, même à distance. L’assistant doit prendre en charge **MCP distant / Streamable HTTP** et l’en-tête **Authorization**.
+Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’URL MCP et le mode de connexion choisi. Il peut alors travailler sur vos PDF, Word, Excel, PowerPoint, images et fichiers texte, même à distance. L’assistant doit prendre en charge **MCP distant / Streamable HTTP** avec **OAuth** ou un en-tête **Authorization**, selon le mode choisi.
 
 <p align="center">
-  <a href="https://github.com/extraopaa/mcp-win/releases/tag/v1.0.0"><strong>Télécharger la V1 — Orbite · Windows x64</strong></a>
+  <a href="https://github.com/extraopaa/mcp-win/releases/tag/v1.0.1"><strong>Télécharger la V1.0.1 — Orbite · Windows x64</strong></a>
   &nbsp;·&nbsp; <a href="docs/wiki/Home.md">Guide utilisateur</a>
   &nbsp;·&nbsp; <a href="CHANGELOG.md">Changelog</a>
 </p>
 
 ![Vue d’ensemble de MCP Win](docs/images/overview.png)
 
-> **Développement local :** la [v1.0.1](docs/V1.0.1.md) ajoute OAuth en option, des fichiers plus volumineux et des réponses plus compactes. Le téléchargement stable ci-dessus reste la v1.0.0.
+> **Nouveautés 1.0.1 :** [OAuth au choix, fichiers jusqu’à 100 Mio, logos jusqu’à 20 Mio, OCR et réponses compactes](docs/V1.0.1.md).
 
 ## Ce que votre IA peut faire
 
@@ -37,10 +37,10 @@ Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’U
 
 ## Installer et connecter
 
-1. [Téléchargez le paquet Windows x64](https://github.com/extraopaa/mcp-win/releases/download/v1.0.0/mcp-win-v1.0.0-windows-x64.zip) et **extrayez toute l’archive**. Gardez le dossier `engines` à côté de `MCP Win.exe`.
+1. [Téléchargez le paquet Windows x64](https://github.com/extraopaa/mcp-win/releases/download/v1.0.1/mcp-win-v1.0.1-windows-x64.zip) et **extrayez toute l’archive**. Gardez le dossier `engines` à côté de `MCP Win.exe`.
 2. Ouvrez l’application et ajoutez un dossier. Il est en **lecture seule par défaut** ; arrêtez le serveur pour autoriser l’écriture avec le bouton **Droits**.
 3. Choisissez **Tunnel simple** pour Cloudflare sans compte, **Mon propre relais** pour frp, ou **Local uniquement**.
-4. Démarrez le serveur. Dans votre assistant, ajoutez l’URL MCP et collez le contenu de **Copier les headers JSON** dans les en-têtes sécurisés.
+4. Choisissez **Jeton** ou **OAuth**, puis démarrez le serveur. En OAuth, renseignez l’URL MCP dans votre assistant et validez la demande dans MCP Win. En mode Jeton : Dans votre assistant, ajoutez l’URL MCP et collez le contenu de **Copier les headers JSON** dans les en-têtes sécurisés.
 
 ```json
 {"Authorization":"Bearer <votre jeton>"}
@@ -60,7 +60,7 @@ La recherche de **mises à jour** est automatique au démarrage et toutes les si
 
 ## Sécurité et confidentialité
 
-- **Jeton Bearer obligatoire** dans tous les modes. L’URL seule ne donne pas accès aux dossiers.
+- **Authentification obligatoire : jeton manuel ou OAuth avec consentement local.** L’URL seule ne donne pas accès aux dossiers.
 - Les connexions extérieures utilisent HTTPS et un tunnel chiffré. **Le relais peut lire les données qu’il transmet** ; ce n’est pas du chiffrement de bout en bout jusqu’à l’assistant.
 - Seuls les dossiers choisis sont accessibles. L’écriture est une autorisation distincte, modifiable depuis l’application lorsque le serveur est arrêté.
 - L’OCR et la génération s’exécutent sur votre PC. Les contenus lus sont transmis à votre assistant IA.
@@ -73,7 +73,7 @@ Le code et les moteurs sont libres. Le client `cloudflared` est open source ; **
 
 ## Limites à connaître
 
-Les documents sont limités à **25 Mio**. Les lectures, recherches et listes sont paginées pour limiter le contexte de l’IA. L’OCR structuré reste une estimation à vérifier, notamment sur les tableaux complexes et les scans dégradés. Les formules Excel sont stockées sans recalcul automatique.
+Les documents sont limités à **100 Mio**. Les lectures, recherches et listes sont paginées pour limiter le contexte de l’IA. L’OCR structuré reste une estimation à vérifier, notamment sur les tableaux complexes et les scans dégradés. Les formules Excel sont stockées sans recalcul automatique.
 
 Les PDF peuvent être rendus et contrôlés visuellement. Les contrôles Office portent sur la structure ; le rendu final dépend du lecteur. Les anciens formats DOC/PPT ne sont pas interprétés, et aucune conversion universelle n’est promise.
 

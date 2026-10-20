@@ -14,7 +14,7 @@ Uniquement si l'application prend en charge un **serveur MCP** avec transport **
 
 ### Est-ce que l'assistant peut lire tout mon PC ?
 
-Non : seuls les dossiers ajoutés sont partagés. Toute personne disposant du jeton peut utiliser les droits des dossiers partagés ; le jeton est obligatoire. Voir [Sécurité](./Securite-et-confidentialite.md).
+Non : seuls les dossiers ajoutés sont partagés. Toute personne disposant du jeton peut utiliser les droits des dossiers partagés ; l’authentification est obligatoire. Voir [Sécurité](./Securite-et-confidentialite.md).
 
 ### L'IA peut-elle décider d'activer l'écriture ?
 

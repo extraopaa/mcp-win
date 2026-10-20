@@ -26,7 +26,7 @@ Le serveur et le tunnel s'arrêtent lorsque vous cliquez sur **Arrêter le MCP**
 
 ## 4. Ajouter le serveur à votre assistant IA
 
-Votre application IA doit prendre en charge les **serveurs MCP distants** avec transport **Streamable HTTP**. Ajoutez l'URL copiée et le jeton Bearer obligatoire. Les réglages varient d'un client à l'autre ; voir [Connexion à une IA](./Connexion-IA.md).
+Votre application IA doit prendre en charge les **serveurs MCP distants** avec transport **Streamable HTTP**. Ajoutez l'URL copiée et le jeton manuel ou OAuth. Les réglages varient d'un client à l'autre ; voir [Connexion à une IA](./Connexion-IA.md).
 
 ## 5. Tester
 

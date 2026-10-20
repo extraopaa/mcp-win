@@ -4,7 +4,7 @@
 
 Ce wiki documente **MCP Win V1 — Orbite**. Pour les changements récents, consultez également le [README principal](../../README.md) et les [versions publiées](https://github.com/extraopaa/mcp-win/releases).
 
-> **À savoir avant de commencer :** une connexion extérieure est **protégée par un jeton Bearer obligatoire**. L’URL seule ne suffit pas ; gardez le jeton secret et ne partagez que les dossiers nécessaires.
+> **À savoir avant de commencer :** une connexion extérieure est **protégée par un jeton manuel ou OAuth**. L’URL seule ne suffit pas ; gardez le jeton secret et ne partagez que les dossiers nécessaires.
 
 ## Démarrage en trois étapes
 

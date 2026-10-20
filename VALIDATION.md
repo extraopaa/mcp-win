@@ -6,7 +6,7 @@
 - Interface : six vues, états OAuth/jeton, progression de mise à jour, presse-papiers, permissions, CSP, absence de débordement à 900/1180/1440 pixels.
 - Tauri release : 42 outils, création PDF professionnelle, aperçu, index/recherche, révision et annulation, workflows, import d’un grand logo ; parcours OAuth réel HTTP avec validation dans l’interface et révocation immédiate vérifié.
 - Updater : installation native synthétique signée, vérification du paquet, remplacement portable, conservation des préférences et redémarrage réussis.
-- PDF professionnel et écran OAuth inspectés visuellement. Aucune validation avec un assistant tiers réel ; aucune publication v1.0.1 effectuée.
+- PDF professionnel et écran OAuth inspectés visuellement. Aucune validation avec un assistant tiers réel .
 
 [Changements et limites 1.0.1](docs/V1.0.1.md).
 

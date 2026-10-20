@@ -10,7 +10,7 @@ MCP Win expose un serveur **Model Context Protocol**, transport **Streamable HTT
 | URL du serveur | L'adresse copiée depuis MCP Win, terminée par `/mcp` |
 | Authentification | Obligatoire : `Authorization: Bearer VOTRE_JETON` |
 
-Renseignez l’URL séparément. **Copier la configuration JSON** copie `{"Authorization":"Bearer <jeton>"}` pour **Headers sécurisés (JSON)**. **Copier Bearer + jeton** fournit la valeur complète d’Authorization. Un client exigeant OAuth sans accepter ces headers n’est pas compatible.
+Renseignez l’URL séparément. **Copier la configuration JSON** copie `{"Authorization":"Bearer <jeton>"}` pour **Headers sécurisés (JSON)**. **Copier Bearer + jeton** fournit la valeur complète d’Authorization. Pour un client OAuth, choisir ce mode dans MCP Win, renseigner l’URL et valider la demande dans l’application.
 
 ## Ordre de travail recommandé pour l'assistant
 

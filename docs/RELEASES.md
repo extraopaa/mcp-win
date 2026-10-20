@@ -4,7 +4,7 @@ Chaque version majeure reçoit un nom court, inspiré de l’univers visuel de M
 
 | Version | Nom | Statut |
 | --- | --- | --- |
-| V1 | **Orbite** | Version 1.0.0, publiée le 20 octobre 2026 |
+| V1 | **Orbite** | Version 1.0.1, publiée le 21 octobre 2026 |
 | V2 | **Prisme** | Nom réservé |
 | V3 | **Atlas** | Nom réservé |
 | V4 | **Horizon** | Nom réservé |

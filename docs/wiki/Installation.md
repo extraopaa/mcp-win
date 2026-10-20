@@ -4,7 +4,7 @@ MCP Win est destiné à **Windows x64**. La distribution est portable : vous ext
 
 ## V1 — Orbite
 
-Télécharger [la V1 — Orbite pour Windows x64](https://github.com/extraopaa/mcp-win/releases/tag/v1.0.0), extraire toute l’archive, puis ouvrir **MCP Win.exe** en conservant tous les fichiers et engines à côté. Rust, Node.js, Python et Office ne sont pas nécessaires sur le PC utilisateur.
+Télécharger [la V1 — Orbite pour Windows x64](https://github.com/extraopaa/mcp-win/releases/tag/v1.0.1), extraire toute l’archive, puis ouvrir **MCP Win.exe** en conservant tous les fichiers et engines à côté. Rust, Node.js, Python et Office ne sont pas nécessaires sur le PC utilisateur.
 
 Pour passer de v0.x à la V1, extraire le paquet complet dans un nouveau dossier ; les préférences locales seront conservées. Les prochaines versions signées seront proposées dans « Mises à jour ». Pour compiler depuis les sources, voir [Développement](Developpement.md).
 
@@ -21,7 +21,7 @@ Aucune API d'IA payante n'est requise par MCP Win. Votre assistant IA reste un s
 
 ## Premiers réglages utiles
 
-Avant de démarrer un partage distant, consultez **Connexion extérieure** et utilisez le jeton Bearer obligatoire. Un dossier nouvellement ajouté est en **lecture seule** : il n'autorise pas la création de fichiers tant que vous n'avez pas explicitement activé l'écriture.
+Avant de démarrer un partage distant, consultez **Connexion extérieure** et utilisez le jeton manuel ou OAuth. Un dossier nouvellement ajouté est en **lecture seule** : il n'autorise pas la création de fichiers tant que vous n'avez pas explicitement activé l'écriture.
 
 Pour compiler l'application depuis les sources, voir [Développement](./Developpement.md).
 

@@ -2,9 +2,9 @@
 
 | Mode | Usage | Protection |
 | --- | --- | --- |
-| Tunnel simple | Cloudflare Quick Tunnel sans compte, URL temporaire | HTTPS et tunnel chiffré, jeton obligatoire |
+| Tunnel simple | Cloudflare Quick Tunnel sans compte, URL temporaire | HTTPS et tunnel chiffré, authentification obligatoire |
 | Mon propre relais | Votre infrastructure frp/Caddy | HTTPS public, TLS frp avec CA et nom vérifiés, jeton MCP distinct |
-| Local uniquement | Même PC, généralement http://127.0.0.1:8787/mcp | Écoute loopback et jeton obligatoire |
+| Local uniquement | Même PC, généralement http://127.0.0.1:8787/mcp | Écoute loopback et authentification obligatoire |
 
 Le client cloudflared est libre ; le réseau Cloudflare est un service tiers gratuit qui peut lire le trafic. L’adresse est temporaire, sans garantie de disponibilité ni SSE. MCP Win utilise les réponses JSON. Localtunnel est supprimé sans repli automatique.
 

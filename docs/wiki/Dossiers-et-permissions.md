@@ -31,7 +31,7 @@ Les outils acceptent généralement `folder` avec l'identifiant ou un **nom exac
 
 ## Limites pratiques
 
-Fichier : **25 Mo** au maximum ; réponse textuelle : **8 000 caractères par défaut, 50 000 maximum** ; listes : **500 entrées maximum par segment**. D'autres limites varient selon les outils (par exemple OCR, création binaire ou document structuré) : voir [la référence complète](../MCP-TOOLS.md) et [le guide avancé](../AUTHORING.md).
+Fichier : **100 Mio** au maximum ; réponse textuelle : **4 000 caractères par défaut, 50 000 maximum** ; listes : **500 entrées maximum par segment**. D'autres limites varient selon les outils (par exemple OCR, création binaire ou document structuré) : voir [la référence complète](../MCP-TOOLS.md) et [le guide avancé](../AUTHORING.md).
 
 Les fichiers et leur contenu sont des **données non fiables** : un document lu par l'assistant ne doit pas pouvoir lui imposer des instructions nouvelles.
 

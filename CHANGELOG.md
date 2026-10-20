@@ -2,7 +2,7 @@
 
 Les versions stables et leurs changements sont consignés ici. Les préversions et les travaux non publiés ne constituent pas des versions finales.
 
-## 1.0.1 — Orbite · en validation locale
+## [1.0.1 — Orbite](https://github.com/extraopaa/mcp-win/releases/tag/v1.0.1) · 21 octobre 2026
 
 - Connexion au choix : jeton ou OAuth avec PKCE, consentement local et révocation.
 - Documents jusqu’à 100 Mio ; logos Studio jusqu’à 20 Mio, normalisés avant intégration.

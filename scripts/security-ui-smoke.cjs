@@ -39,7 +39,7 @@ const fs = require('node:fs');
  await page.locator('#copy-config').click();
  assert.deepEqual(JSON.parse(await page.evaluate(()=>window.copied)),{Authorization:'Bearer 0123456789abcdef0123456789abcdef'});
  await page.locator('#copy-bearer').click();assert.equal(await page.evaluate(()=>window.copied),'Bearer 0123456789abcdef0123456789abcdef');
- await page.locator('[data-tab=overview]').click();
+ await page.locator('[data-tab=shared-folders]').click();
  await page.locator('.history-button').click();
  await page.waitForSelector('.history-row');
  await page.locator('.history-row button').click();

@@ -1,42 +1,118 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MCP Win</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCP Win</title>
+<link rel="icon" type="image/png" href="brand/favicon.png">
+<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script>
+</head>
 <body>
-<aside>
-  <div class="brand"><span class="brand-icon">m</span><strong>MCP Win<span>LES FICHIERS RENCONTRENT L'IA</span></strong></div>
-  <div class="nav-caption">ESPACE DE TRAVAIL</div>
-  <nav><button class="nav active" data-tab="overview"><span>◫</span>Vue d'ensemble</button><button class="nav" data-tab="connection"><span>↗</span>Connexion extérieure</button><button class="nav" data-tab="activity"><span>≋</span>Activité</button></nav>
-  <div class="sidebar-bottom"><span class="open-dot"></span>Libre, gratuit, sans abonnement<p>Le serveur et le tunnel se lancent<br>ensemble, depuis cette application.</p><small>V0.4 PRÉVERSION · RUST + TAURI</small></div>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">DESKTOP · V0.4.0</div></div></div>
+ <div class="nav-label">ESPACE DE TRAVAIL</div>
+ <nav aria-label="Navigation">
+  <button class="nav nav-item active" data-tab="overview" title="Vue d'ensemble"><span class="icon" data-icon="layout-dashboard"></span><span>Vue d'ensemble</span></button>
+  <button class="nav nav-item" data-tab="shared-folders" title="Dossiers partagés"><span class="icon" data-icon="folder-open"></span><span>Dossiers partagés</span></button>
+  <button class="nav nav-item" data-tab="connection" title="Connexion IA"><span class="icon" data-icon="plug"></span><span>Connexion IA</span></button>
+  <button class="nav nav-item" data-tab="activity" title="Journal d'activité"><span class="icon" data-icon="activity"></span><span>Journal d'activité</span></button>
+ </nav>
+ <div class="nav-divider"></div><div class="nav-label">RESSOURCES</div>
+ <nav><button class="nav nav-item" data-tab="tools" title="Catalogue des outils"><span class="icon" data-icon="blocks"></span><span>Catalogue des outils</span></button></nav>
+ <div class="sidebar-bottom">
+  <div class="sidelabel">STATUT DE L'APPLICATION</div>
+  <div class="connection-mini"><div class="live-orbit offline"><span class="icon" data-icon="radio"></span></div><div><div class="mini-title" id="sidebar-status">Chargement…</div><div class="mini-sub" id="sidebar-sub">Initialisation locale</div></div></div>
+  <a href="https://github.com/extraopaa/mcp-win" data-external="repository" target="_blank" rel="noreferrer" class="sidebar-link"><span class="icon" data-icon="github"></span><span>GitHub &amp; code source</span><span class="reference-style-2 icon" data-icon="arrow-up-right"></span></a>
+  <a class="sidebar-link" href="https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Home.md" data-external="documentation" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="book-open"></span><span>Documentation</span></a>
+  <div class="sidebar-foot">V0.4.0 · LIBRE ET GRATUIT</div>
+ </div>
 </aside>
-<main>
-  <header><span id="breadcrumb">Espace de travail / Vue d'ensemble</span><span class="tag">100 % open source</span></header>
-  <div id="toast" role="status" hidden></div>
-  <section id="overview" class="page">
-    <div class="eyebrow">VOTRE PASSERELLE VERS L'EXTÉRIEUR</div>
-    <h1>Vos fichiers. Votre IA.<span class="purple"> Connectés.</span></h1>
-    <p class="subtitle">Partagez vos documents avec votre assistant, même à distance.</p>
-    <article class="server-card">
-      <div class="server-heading"><div class="server-symbol">↗</div><div><div class="status-label"><i id="status-dot"></i><span id="status-badge">HORS LIGNE</span></div><h2 id="status-title">Prêt à ouvrir la connexion</h2><p id="status-description">Un clic pour démarrer le MCP et votre tunnel public.</p></div><button id="toggle-server" class="primary">Démarrer le MCP <span>→</span></button></div>
-      <div class="endpoint"><div><label>ADRESSE PUBLIQUE DU MCP</label><code id="public-address">Votre adresse HTTPS apparaîtra ici</code></div><button id="copy-address" class="secondary" disabled>Copier l'adresse</button></div>
-      <div class="server-footer"><span id="mode-label">◉ Tunnel public gratuit</span><span>Streamable HTTP</span><span id="auth-label">Accès par jeton</span></div>
-    </article>
-    <div class="section-heading"><div><h2>Dossiers partagés <span id="folder-count" class="count">0</span></h2><p>Vous choisissez ce que l’IA peut lire et créer.</p></div><button id="add-folder" class="secondary">+ Ajouter un dossier</button></div>
-    <div id="folders"></div><p class="hint">Lecture seule par défaut. Le bouton « Lecture seule » active l’écriture pour le dossier. Le jeton donne accès aux dossiers sélectionnés. Arrêtez le MCP pour changer les autorisations.</p>
-    <div class="bottom-grid"><article class="small-card"><span class="step">01 — CONNECTER</span><h3>Ajoutez le MCP à votre assistant</h3><p>Démarrez le serveur, puis copiez l'adresse publique dans les réglages MCP de votre application IA.</p><button class="text-button" id="go-connection">Voir la connexion <span>↗</span></button></article><article class="small-card formats"><span class="step">02 — EXPLORER</span><h3>Des formats que votre IA comprend</h3><div class="chips"><span>PDF</span><span>DOCX</span><span>XLSX</span><span>PPTX</span><span>SVG</span></div><p>Recherche dans les documents, modèles, archives et bases locales. PDF avancés et OCR local, sans outil payant.</p></article></div>
-    <p class="footnote">Les fichiers restent sur votre ordinateur. Leur contenu est transmis à l'assistant lorsqu'il le demande.</p>
+<div class="main">
+ <header class="topbar"><div class="crumb">MCP Win <span class="reference-style-3">/</span> <strong id="breadcrumb">Vue d'ensemble</strong></div><div class="top-actions"><div class="demo-indicator"><i></i> ESPACE MCP SÉCURISÉ</div><button class="icon-btn" id="help-button" title="Aide et démarrage"><span class="icon" data-icon="circle-help"></span></button></div></header>
+ <main>
+  <section class="page active" id="overview">
+   <div class="eyebrow">Bienvenue sur votre espace MCP</div>
+   <div class="page-header"><div><h1 class="page-title">Vos fichiers. Votre IA.<br><span class="reference-style-4">Connectés, simplement.</span></h1><p class="page-sub">Pilotez votre passerelle sécurisée entre votre PC et votre assistant IA.</p></div><div class="page-header-actions"><a class="btn secondary" href="https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Premiers-pas.md" data-external="getting-started" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="book-open"></span> Guide de démarrage</a></div></div>
+   <div class="server-panel">
+    <div class="server-main"><div class="server-intro"><div class="server-icon"><span class="icon" data-icon="monitor-up"></span></div><div><div class="pill amber" id="big-status-pill"><span class="dot" id="status-dot"></span><span id="status-badge">CHARGEMENT</span></div><h2 class="server-title" id="status-title">Connexion à l’application…</h2><p class="server-desc" id="status-description">Lecture de l’état du serveur et de vos dossiers partagés.</p></div></div><button class="btn primary" id="toggle-server" disabled><span class="icon" data-icon="power"></span><span>Chargement…</span></button></div>
+    <div class="server-link-row"><div class="reference-style-5"><div class="tiny-label">Adresse du serveur MCP</div><div class="endpoint-url" id="public-address">Démarrez le serveur pour afficher l’adresse</div></div><button class="btn secondary small" id="copy-address" disabled><span class="icon" data-icon="copy"></span> Copier l'URL</button></div>
+    <div class="server-meta"><div><span class="icon" data-icon="globe"></span> <span id="mode-label">Tunnel simple · Cloudflare</span></div><div><span class="icon" data-icon="shield-check"></span> <span id="auth-label">Jeton Bearer obligatoire</span></div><div><span class="icon" data-icon="workflow"></span> Streamable HTTP</div></div>
+   </div>
+   <div class="metric-grid">
+    <div class="card metric"><div><div class="tiny-label">DOSSIERS AUTORISÉS</div><div class="metric-num" id="folders-number">00</div><div class="metric-sub">Contrôle de chaque accès</div></div><div class="metric-icon"><span class="icon" data-icon="folder-open"></span></div></div>
+    <div class="card metric"><div><div class="tiny-label">OUTILS MCP</div><div class="metric-num">32</div><div class="metric-sub">Lecture, création, OCR &amp; plus</div></div><div class="metric-icon"><span class="icon" data-icon="blocks"></span></div></div>
+    <div class="card metric"><div><div class="tiny-label">SÉCURITÉ</div><div class="reference-style-6 metric-num">Active</div><div class="metric-sub">Authentification requise</div></div><div class="metric-icon"><span class="icon" data-icon="shield-check"></span></div></div>
+   </div>
+   <div class="section-heading"><div><h2>Votre espace de travail</h2><p>Retrouvez vos dossiers et préparez votre assistant IA.</p></div><button class="btn quiet" data-go="shared-folders">Gérer les dossiers <span class="icon" data-icon="arrow-right"></span></button></div>
+   <div class="overview-bottom"><div class="card folder-overview" id="overview-folders"></div><div class="card next-card"><span class="pill purple"><span class="reference-style-7 icon" data-icon="sparkles"></span> DÉMARRAGE RAPIDE</span><div class="next-title">Connecter votre assistant</div><p class="next-desc">3 petites étapes pour relier votre IA aux documents de votre PC.</p><div class="next-step"><span class="step-num">1</span> Ajouter un dossier partagé</div><div class="next-step"><span class="step-num">2</span> Démarrer le serveur sécurisé</div><div class="next-step"><span class="step-num">3</span> Copier l'URL et les en-têtes</div><button class="btn primary" id="go-connection" data-go="connection">Configurer la connexion <span class="icon" data-icon="arrow-up-right"></span></button></div></div>
+   <div class="footer-note">Vos fichiers restent sur votre PC. Les contenus demandés sont transmis à votre assistant IA.</div>
   </section>
-  <section id="connection" class="page" hidden>
-    <div class="eyebrow">UNE ADRESSE ACCESSIBLE DE PARTOUT</div><h1>Connexion extérieure</h1><p class="subtitle">Choisissez votre tunnel. L'application s'occupe du démarrage.</p>
-    <article class="settings-card"><h2>Mode de connexion</h2><div class="mode-options"><label><input type="radio" name="mode" value="cloudflare" checked><strong>Tunnel simple</strong><span>Cloudflare gratuit, sans compte. Accès par jeton.</span></label><label><input type="radio" name="mode" value="frp"><strong>Mon propre relais</strong><span>frpc intégré, connecté à votre serveur frps.</span></label><label><input type="radio" name="mode" value="local"><strong>Local uniquement</strong><span>Pour tester sur cet ordinateur.</span></label></div>
-      <div id="lt-settings" class="mode-settings"><input id="relay" type="hidden"><p class="hint">Cloudflare Quick Tunnel est intégré : aucune installation ni connexion à un compte. Les deux segments Internet sont chiffrés. Cloudflare peut voir le contenu transmis. Adresse temporaire, disponibilité non garantie, réponses MCP JSON ; SSE indisponibles.</p></div>
-      <div id="frp-settings" class="mode-settings" hidden><div class="field-grid"><label class="field">Adresse du serveur frps<input id="frp-server" placeholder="relais.exemple.fr"></label><label class="field">Port de contrôle frps<input id="frp-port" type="number" min="1" max="65535" value="7000"></label></div><label class="field">Jeton du relais personnel<input id="frp-token" type="password" autocomplete="off"></label><label class="field">Nom TLS du certificat frps<input id="frp-tls-name" placeholder="relais.exemple.fr"></label><label class="field">Certificat CA du relais (PEM)<textarea id="frp-ca" rows="5" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----"></textarea></label><label class="field">Adresse publique HTTPS<input id="public-url" placeholder="https://mcp.exemple.fr" type="url"></label><p class="hint">frpc est livré avec l'application. Votre serveur frps doit router le domaine vers ce client, avec HTTPS sur le relais. Les exemples de déploiement sont fournis dans le dossier relay/.</p></div>
-      <label class="field"><span><input id="require-auth" type="checkbox" checked disabled> Exiger un jeton d’accès</span></label><p class="hint">Jeton obligatoire : l’adresse seule ne permet pas de lire les fichiers.</p><div class="field-grid"><label class="field">Port MCP local<input id="port" type="number" min="1" max="65535" value="8787"></label><label class="field" id="token-field" hidden>Jeton d'accès au MCP<div class="input-action"><input id="token" type="password" autocomplete="off"><button id="show-token" class="icon-button" title="Afficher ou masquer le jeton">◉</button></div></label></div>
-      <div class="settings-actions"><button id="save-settings" class="primary">Enregistrer les réglages</button><button id="new-token" class="secondary">Nouveau jeton</button></div><p class="hint">Le jeton est enregistré dans vos préférences locales. Arrêtez le MCP avant de modifier les réglages.</p>
-    </article>
-    <article class="settings-card"><h2>Dans votre application IA</h2><p>Ajoutez un serveur MCP distant avec le transport <strong>Streamable HTTP</strong>.</p><div class="connection-row"><span>Adresse</span><code id="connection-address">Démarrez le MCP pour obtenir l'adresse</code></div><div class="connection-row"><span>Authentification</span><code id="auth-description">Authorization: Bearer &lt;jeton&gt;</code></div><div class="settings-actions"><button id="copy-token" class="secondary">Copier le jeton</button><button id="copy-bearer" class="secondary">Copier Bearer + jeton</button><button id="copy-config" class="secondary">Copier la configuration JSON</button></div><p class="hint">Collez la configuration JSON dans « Headers sécurisés (JSON) ». Elle contient uniquement Authorization avec Bearer et votre jeton. Renseignez l’adresse du serveur séparément et conservez le jeton privé. Certains clients ne permettent pas les en-têtes personnalisés ou exigent OAuth : leur compatibilité dépend du client.</p></article>
+  <section class="page" id="shared-folders">
+   <div class="eyebrow">Accès et autorisations</div>
+   <div class="page-header"><div><h1 class="page-title">Dossiers partagés</h1><p class="page-sub">Vous décidez exactement ce que l'assistant peut lire ou modifier.</p></div><button class="btn primary" id="add-folder" disabled><span class="icon" data-icon="plus"></span> Ajouter un dossier</button></div>
+   <div class="folders-grid"><div><div class="card"><div class="folder-card-top"><h2>Mes dossiers <span id="folder-count" class="reference-style-8 pill purple">00</span></h2><span class="pill green"><span class="dot"></span> Accès contrôlé</span></div><div class="folder-list-card" id="folders"></div></div><div class="callout warning"><span class="icon" data-icon="lock"></span><span>Pour changer les permissions, arrêtez d'abord le serveur. Les nouveaux dossiers sont en <strong>lecture seule par défaut</strong>.</span></div></div><div class="card side-info"><div class="security-illustration"><span class="icon" data-icon="shield-check"></span></div><h3>Vos données, vos règles.</h3><p>Seuls les dossiers sélectionnés sont exposés aux outils MCP. L'écriture est une autorisation distincte.</p><div class="information-list"><div><span class="icon" data-icon="check"></span><span>Lecture seule à l'ajout</span></div><div><span class="icon" data-icon="check"></span><span>Changements de droits uniquement à l'arrêt</span></div><div><span class="icon" data-icon="check"></span><span>Historique local des versions modifiées</span></div><div><span class="icon" data-icon="check"></span><span>Le contenu lu par l'IA lui est transmis</span></div></div><button class="reference-style-9 btn secondary" data-go="connection">Voir la sécurité de connexion</button></div></div>
+   <div class="footer-note">Vous gardez le contrôle des dossiers et de leurs autorisations.</div>
   </section>
-  <section id="activity" class="page" hidden><div class="eyebrow">CE QUI SE PASSE</div><h1>Activité du serveur</h1><p class="subtitle">Les 100 dernières opérations, sans enregistrer le contenu de vos fichiers.</p><article class="settings-card"><div id="logs"></div></article></section>
-</main>
-<dialog id="preview"><div class="dialog-heading"><div><span class="eyebrow">APERÇU LOCAL</span><h2>Ce que votre IA peut lire</h2></div><button id="close-preview" class="secondary">Fermer</button></div><p class="hint">Première page ou premier segment. Aucune donnée envoyée à un assistant pour cet aperçu.</p><img id="preview-image" alt="Rendu PNG du SVG" hidden><pre id="preview-text"></pre></dialog>
-<dialog id="history-dialog"><div class="dialog-heading"><div><span class="eyebrow">SAUVEGARDES LOCALES</span><h2>Restaurer l’état précédent</h2></div><button id="close-history" class="secondary">Fermer</button></div><p class="hint">Arrêtez le MCP avant de restaurer. Chaque modification écrasante conserve une copie ; une restauration sauvegarde aussi l’état actuel. Les copies de sortie Office conservent déjà leur original.</p><div id="history-versions"></div></dialog>
+  <section class="page" id="connection">
+   <div class="eyebrow">Passerelle distante et authentification</div>
+   <div class="page-header"><div><h1 class="page-title">Connexion à votre IA</h1><p class="page-sub">Choisissez comment votre assistant se connecte à MCP Win.</p></div><div class="secure-tag"><span class="icon" data-icon="shield-check"></span> Jeton sécurisé obligatoire</div></div>
+   <div class="reference-style-10 section-heading"><div><h2>Mode de connexion</h2><p>Trois modes adaptés à votre environnement.</p></div></div>
+   <div class="mode-grid mode-options">
+    <label class="mode-card"><input type="radio" name="mode" value="cloudflare" checked><span class="icon" data-icon="cloud"></span><strong>Tunnel simple</strong><small>Cloudflare gratuit et sans compte, avec URL temporaire.</small></label>
+    <label class="mode-card"><input type="radio" name="mode" value="frp"><span class="icon" data-icon="network"></span><strong>Mon propre relais</strong><small>Utilisez votre serveur frps avec vérification TLS.</small></label>
+    <label class="mode-card"><input type="radio" name="mode" value="local"><span class="icon" data-icon="monitor"></span><strong>Local uniquement</strong><small>Pour les tests et les connexions sur ce PC.</small></label>
+   </div>
+   <div class="conn-grid">
+    <div class="card conn-block">
+     <h2>Informations de connexion</h2><p>Renseignez séparément l’adresse et l’en-tête Authorization dans votre application IA.</p>
+     <label class="form-label">ADRESSE DU SERVEUR MCP</label>
+     <div class="faux-input"><span class="mono endpoint-text" id="connection-address">Démarrez le MCP pour obtenir l’adresse</span><button class="btn secondary small" id="copy-connection-address"><span class="icon" data-icon="copy"></span> Copier</button></div>
+     <div class="form-helper">L’adresse est disponible lorsque le serveur est démarré.</div>
+     <label class="form-label" for="token">AUTHENTIFICATION · HEADER SÉCURISÉ</label>
+     <div id="token-field" class="faux-input token-input"><span class="mono">Authorization: Bearer</span><input id="token" type="password" autocomplete="off" spellcheck="false" aria-label="Jeton d’accès au MCP"><button id="show-token" class="icon-btn" title="Afficher le jeton" aria-label="Afficher le jeton" aria-pressed="false"><span class="icon" data-icon="eye"></span></button></div>
+     <span id="auth-description" class="sr-only">Authorization: Bearer &lt;votre jeton&gt;</span>
+     <div class="form-helper">Le jeton est confidentiel et enregistré dans vos préférences locales.</div>
+     <div class="form-actions"><button id="copy-config" class="btn primary"><span class="icon" data-icon="copy"></span> Copier les headers JSON</button><button id="copy-bearer" class="btn secondary">Copier Bearer + jeton</button><button id="new-token" class="btn secondary"><span class="icon" data-icon="refresh-cw"></span> Régénérer</button></div>
+     <div id="frp-settings" class="mode-settings" hidden>
+      <div class="field-grid"><label class="field">Adresse du serveur frps<input id="frp-server" placeholder="relais.exemple.fr" autocomplete="off"></label><label class="field">Port de contrôle<input id="frp-port" type="number" min="1" max="65535" value="7000"></label></div>
+      <label class="field">Jeton du relais personnel<input id="frp-token" type="password" autocomplete="off"></label>
+      <label class="field">Nom TLS du certificat frps<input id="frp-tls-name" placeholder="relais.exemple.fr" autocomplete="off"></label>
+      <label class="field">Certificat CA du relais (PEM)<textarea id="frp-ca" rows="5" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----"></textarea></label>
+      <label class="field">Adresse publique HTTPS<input id="public-url" type="url" placeholder="https://mcp.exemple.fr"></label>
+      <p class="form-helper">frpc est intégré. Votre serveur frps doit router ce domaine avec HTTPS, un certificat CA et un nom TLS vérifiés. Les exemples sont fournis dans relay/.</p>
+     </div>
+     <details class="advanced-settings"><summary>Réglages de connexion</summary><label class="field">Port MCP local<input id="port" type="number" min="1" max="65535" value="8787"></label><label class="auth-setting"><input id="require-auth" type="checkbox" checked disabled> Jeton d’accès obligatoire</label><button id="copy-token" class="btn secondary small">Copier le jeton seul</button></details>
+     <div class="save-row"><button id="save-settings" class="btn secondary"><span class="icon" data-icon="check"></span> Enregistrer les réglages</button><span id="settings-state" class="form-helper" role="status">Réglages enregistrés</span></div>
+     <input id="relay" type="hidden">
+     <div class="callout" id="lt-settings"><span class="icon" data-icon="info"></span><span>Cloudflare Quick Tunnel est intégré, gratuit et sans compte. Les deux segments Internet sont chiffrés ; le relais peut voir le contenu. Adresse temporaire, disponibilité non garantie, réponses JSON ; SSE indisponibles.</span></div>
+     <div class="callout" id="connection-security"><span class="icon" data-icon="shield-check"></span><span>Le jeton Bearer est obligatoire. Votre relais personnel peut voir le contenu transmis. Arrêtez le serveur avant de modifier les réglages.</span></div>
+    </div>
+    <div class="card steps-card"><h2>Configuration dans votre IA</h2><p>Votre assistant doit prendre en charge MCP distant (Streamable HTTP) et les en-têtes personnalisés.</p>
+     <div class="connect-step"><span class="step-num">1</span><div><strong>Ajouter un serveur MCP</strong><p>Ouvrez les réglages MCP de votre assistant.</p></div></div>
+     <div class="connect-step"><span class="step-num">2</span><div><strong>Coller l’adresse du serveur</strong><p>Utilisez l’URL affichée à gauche.</p></div></div>
+     <div class="connect-step"><span class="step-num">3</span><div><strong>Ajouter l’authentification</strong><p>Insérez Authorization dans les headers sécurisés (JSON).</p></div></div>
+     <div class="settings-preview"><span class="icon" data-icon="check-circle-2"></span> Transport : Streamable HTTP<br>En-tête : Authorization / Bearer<br>Authentification : obligatoire</div>
+     <a class="btn quiet" href="https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Connexion-IA.md" data-external="connection-guide" target="_blank" rel="noopener noreferrer">Consulter le guide de connexion <span class="icon" data-icon="arrow-up-right"></span></a>
+    </div>
+   </div>
+   <div class="footer-note">Conservez votre jeton privé. L’adresse seule ne donne pas accès aux dossiers partagés.</div>
+  </section>
+  <section class="page" id="activity">
+   <div class="eyebrow">Traçabilité locale</div>
+   <div class="page-header"><div><h1 class="page-title">Journal d'activité</h1><p class="page-sub">Surveillez les opérations du serveur sans exposer le contenu de vos documents.</p></div><span class="pill purple"><span class="reference-style-7 icon" data-icon="history"></span> 100 dernières opérations en mémoire</span></div>
+   <div class="card"><div class="activity-head"><div class="seg-tabs" id="activity-filters"><button class="selected" data-filter="all">Tout</button><button data-filter="read">Lectures</button><button data-filter="write">Écritures</button><button data-filter="system">Système</button></div><input class="search-mini" placeholder="Rechercher une opération..." id="activity-search" aria-label="Rechercher une opération"></div><div class="activity-list" id="logs"></div></div>
+   <div class="callout"><span class="icon" data-icon="info"></span><span>Le journal conserve au maximum 100 opérations en mémoire, sans sauvegarder le contenu de vos fichiers. Les heures sont celles du journal, en UTC.</span></div>
+  </section>
+  <section class="page" id="tools">
+   <div class="eyebrow">Capacités du serveur</div>
+   <div class="page-header"><div><h1 class="page-title">Catalogue des outils MCP</h1><p class="page-sub">Toutes les capacités offertes par MCP Win v0.4, organisées par usage.</p></div><a class="btn secondary" href="https://github.com/extraopaa/mcp-win/blob/main/docs/MCP-TOOLS.md" data-external="tools-reference" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="external-link"></span> Documentation technique</a></div>
+   <div class="tool-hero"><div><strong>Une boîte à outils pour vos fichiers</strong><p>Recherche, OCR, documents Office, PDF, archives, bases locales et modèles : tous les traitements se font sur votre PC.</p></div><div class="number">32<span>outils</span></div></div>
+   <div class="tools-grid" id="tools-grid"></div><div class="callout"><span class="icon" data-icon="info"></span><span>Cette page présente les outils documentés dans le dépôt. Il ne s'agit pas d'un exécuteur d'outils : ces fonctions sont appelées par l'assistant IA via le protocole MCP.</span></div>
+  </section>
+ </main>
+</div></div>
+<dialog id="preview"><div class="dialog-heading"><div><div class="eyebrow">APERÇU LOCAL</div><h2>Ce que votre IA peut lire</h2></div><button class="btn secondary small" id="close-preview">Fermer</button></div><p class="form-helper">Première page ou premier segment. Cet aperçu n’envoie aucune donnée à un assistant.</p><img id="preview-image" alt="Aperçu du fichier" hidden><pre id="preview-text"></pre></dialog>
+<dialog id="history-dialog"><div class="dialog-heading"><div><div class="eyebrow">SAUVEGARDES LOCALES</div><h2>Restaurer l’état précédent</h2></div><button class="btn secondary small" id="close-history">Fermer</button></div><p class="form-helper">Arrêtez le MCP avant de restaurer. Chaque écrasement conserve une copie ; la restauration sauvegarde aussi l’état remplacé. Les copies Office conservent déjà leur original.</p><div id="history-versions"></div></dialog>
+<dialog id="help-dialog"><div class="dialog-heading"><div><div class="eyebrow">MCP WIN · V0.4.0</div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span class="icon" data-icon="info"></span><span id="toast-text"></span><button id="dismiss-toast" aria-label="Fermer la notification">×</button></div>
 </body></html>

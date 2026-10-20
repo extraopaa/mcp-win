@@ -5,6 +5,7 @@ mod cloudflare;
 mod desktop;
 mod documents;
 mod duckdb;
+mod external_links;
 mod generate;
 mod history;
 mod library;
@@ -46,7 +47,8 @@ fn main() {
             desktop::stop_mcp,
             desktop::list_history,
             desktop::restore_version,
-            desktop::preview_file
+            desktop::preview_file,
+            external_links::open_external_link
         ])
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::Destroyed) {

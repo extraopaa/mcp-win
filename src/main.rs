@@ -9,6 +9,8 @@ mod external_links;
 mod generate;
 mod history;
 mod library;
+mod limits;
+mod oauth;
 mod ocr;
 mod office;
 mod patching;
@@ -63,6 +65,8 @@ fn main() {
             v1::desktop::revision_action,
             v1::desktop::preview_revision,
             v1::desktop::workflow_action,
+            oauth::oauth_status,
+            oauth::oauth_decision,
             updater::update_status,
             updater::check_update,
             updater::download_update,

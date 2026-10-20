@@ -8,6 +8,10 @@ pub struct ReviewArgs {
     pub folder: String,
     pub path: String,
     pub pages: Option<Vec<usize>>,
+    pub detailed: Option<bool>,
+}
+pub fn compact(report: &Value) -> Value {
+    json!({"passed":report["passed"],"errors":report["errors"],"warnings":report["warnings"],"page_count":report["pages"].as_array().map_or(0,Vec::len),"visual_review_required":true})
 }
 pub fn inspect_bytes(bytes: &[u8], ext: &str) -> Result<Value, String> {
     let mut errors = vec![];

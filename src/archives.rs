@@ -12,8 +12,8 @@ use std::{
     io::{Cursor, Read, Write},
     path::{Path, PathBuf},
 };
-const TOTAL: u64 = 100 * 1024 * 1024;
-const FILE: u64 = 25 * 1024 * 1024;
+const TOTAL: u64 = 500 * 1024 * 1024;
+const FILE: u64 = crate::limits::DOCUMENT_BYTES;
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct InspectArgs {
     #[serde(default)]

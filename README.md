@@ -16,6 +16,8 @@ Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’U
 
 ![Vue d’ensemble de MCP Win](docs/images/overview.png)
 
+> **Développement local :** la [v1.0.1](docs/V1.0.1.md) ajoute OAuth en option, des fichiers plus volumineux et des réponses plus compactes. Le téléchargement stable ci-dessus reste la v1.0.0.
+
 ## Ce que votre IA peut faire
 
 | Usage | Fonctionnalités |

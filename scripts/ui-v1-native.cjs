@@ -2,6 +2,7 @@
 const {chromium}=require('../tools/dev/node_modules/playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const crypto=require('node:crypto');
 let browser;
 (async()=>{
  for(let i=0;i<80;i++){try{browser=await chromium.connectOverCDP('http://127.0.0.1:9223');break}catch{await new Promise(r=>setTimeout(r,250))}}
@@ -43,12 +44,39 @@ let browser;
  await invoke('workflow_action',{id:job.id,action:'undo'});
  const workspace=await invoke('v1_workspace');assert(workspace.reviews.revisions.some(r=>r.id===proposal.revision_id&&r.status==='undone'));
  await page.locator('[data-tab=studio]').click();await page.screenshot({path:'target/qa-v1/native-studio.png'});
+ // Import a logo larger than the old 2 MiB cap, then check persisted normalization.
+ await page.locator('#new-brand').click();await page.locator('#brand-name').fill('Validation 1.0.1');
+ await page.locator('#brand-body_size_pt').fill('12');await page.locator('#brand-margin_mm').fill('24');
+ await page.locator('#brand-logo').setInputFiles('target/qa-v101/large-logo.png');
+ await page.waitForFunction(()=>!document.getElementById('brand-logo-preview').hidden);
+ await page.locator('#save-brands').click();
+ await page.waitForFunction(async()=> (await window.__TAURI__.core.invoke('v1_workspace')).brands.profiles.some(p=>p.name==='Validation 1.0.1'&&p.body_size_pt===12));
+ const saved=(await invoke('v1_workspace')).brands.profiles.find(p=>p.name==='Validation 1.0.1');assert(Buffer.from(saved.logo_base64,'base64').length<=2*1024*1024);assert.equal(saved.margin_mm,24);
+ // Real OAuth exchange, approved through the native UI rather than the public endpoint.
+ await page.locator('[data-tab=connection]').click();await page.locator('#auth-mode').selectOption('oauth');await page.locator('#save-settings').click();
+ await page.waitForFunction(async()=> (await window.__TAURI__.core.invoke('snapshot')).connection.auth_mode==='oauth');
+ await page.locator('[data-tab=overview]').click();await page.locator('#toggle-server').click();await page.waitForFunction(async()=> (await window.__TAURI__.core.invoke('snapshot')).ready);
+ const oauthState=await invoke('snapshot'),base=oauthState.address.replace(/\/mcp$/,'');
+ const registration=await (await fetch(base+'/oauth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_name:'Client de validation',redirect_uris:['https://client.example/callback'],token_endpoint_auth_method:'none'})})).json();
+ assert(registration.client_id);const verifier=crypto.randomBytes(48).toString('base64url'),challenge=crypto.createHash('sha256').update(verifier).digest('base64url');
+ const query=new URLSearchParams({client_id:registration.client_id,redirect_uri:'https://client.example/callback',response_type:'code',code_challenge:challenge,code_challenge_method:'S256',resource:oauthState.address,state:'native-state'});
+ const auth=await fetch(base+'/oauth/authorize?'+query),html=await auth.text();assert.equal(auth.status,200);
+ const poll=html.split('2;url=')[1].split('"')[0];assert.equal((await fetch(base+poll,{redirect:'manual'})).status,200);
+ await page.locator('[data-tab=connection]').click();await page.locator('#oauth-requests button').filter({hasText:'Autoriser'}).click();
+ await page.waitForFunction(async()=> (await window.__TAURI__.core.invoke('oauth_status')).clients.length===1);
+ const redirect=await fetch(base+poll,{redirect:'manual'});assert.equal(redirect.status,303);const code=new URL(redirect.headers.get('location')).searchParams.get('code');
+ const tokens=await (await fetch(base+'/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',client_id:registration.client_id,code,code_verifier:verifier,redirect_uri:'https://client.example/callback',resource:oauthState.address})})).json();assert(tokens.access_token);
+ const oauthCall=()=>fetch(oauthState.address,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream',Authorization:'Bearer '+tokens.access_token},body:JSON.stringify({jsonrpc:'2.0',id:20,method:'tools/list'})});
+ assert.equal((await oauthCall()).status,200);await page.screenshot({path:'target/qa-v1/native-oauth.png'});
+ await page.locator('#oauth-clients button').filter({hasText:'Révoquer'}).click();await page.waitForFunction(async()=> !(await window.__TAURI__.core.invoke('oauth_status')).clients.length);
+ assert.equal((await oauthCall()).status,401);
+ await page.locator('[data-tab=overview]').click();await page.locator('#toggle-server').click();await page.waitForFunction(async()=> !(await window.__TAURI__.core.invoke('snapshot')).running);
  await page.locator('#open-updates').click();
  let updates=await invoke('check_update',{force:true});
  for(let i=0;i<100&&updates.status==='checking';i++){await new Promise(r=>setTimeout(r,400));updates=await invoke('update_status')}
  assert(['current','available','error'].includes(updates.status),JSON.stringify(updates));
  await page.screenshot({path:'target/qa-v1/native-updates.png'});
  await page.locator('#close-updates').click();
- assert.deepEqual(errors,[]);fs.writeFileSync('target/qa-v1/native-validation.json',JSON.stringify({tools:42,default_design:true,quality:true,index:true,revisions:true,workflow:true,auth:true},null,2));
- console.log('Tauri v1 : 42 outils, PDF professionnel, aperçu, index, révision validée/annulée, workflow et annulation groupée, authentification et six vues validés.');
+ assert.deepEqual(errors,[]);fs.writeFileSync('target/qa-v1/native-validation.json',JSON.stringify({tools:42,default_design:true,quality:true,index:true,revisions:true,workflow:true,auth:true,oauth:true,large_logo:true},null,2));
+ console.log('Tauri v1.0.1 : 42 outils, OAuth avec accord local/révocation, logo de plus de 2 Mio, PDF professionnel, aperçu, index, révision validée/annulée, workflow et annulation groupée, authentification et six vues validés.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close()});

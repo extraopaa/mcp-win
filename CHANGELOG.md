@@ -2,7 +2,18 @@
 
 Les versions stables et leurs changements sont consignés ici. Les préversions et les travaux non publiés ne constituent pas des versions finales.
 
-## À venir
+## 1.0.1 — Orbite · en validation locale
+
+- Connexion au choix : jeton ou OAuth avec PKCE, consentement local et révocation.
+- Documents jusqu’à 100 Mio ; logos Studio jusqu’à 20 Mio, normalisés avant intégration.
+- Réglages de typographie, marges, format et largeur du logo pour PDF/Word.
+- Réponses compactes, pagination et cache OCR pour limiter les tokens.
+- OCR avec prétraitement, nouvelles tentatives et rotations automatiques.
+- Interface de mise à jour avec progression et étapes distinctes.
+- Suppression du contrôle « Token obligatoire » redondant.
+
+[Détails et limites](docs/V1.0.1.md).
+
 
 - Compilation OCR : conservation de l’argument CMake `CMAKE_POLICY_VERSION_MINIMUM=3.5` sous PowerShell 7, pour les constructions GitHub Actions.
 

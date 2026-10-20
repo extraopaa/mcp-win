@@ -219,7 +219,7 @@ async fn execute(
  "create_document"=>design::create(&folders,serde_json::from_value(args).map_err(|e|e.to_string())?).await,
  "write_text_file"=>writing::text(&folders,args["folder"].as_str().unwrap_or(""),args["path"].as_str().ok_or("path requis")?,args["content"].as_str().ok_or("content requis")?,args["expected_sha256"].as_str()),
  "write_spreadsheet"=>{let cells:Vec<crate::generate::CellEdit>=serde_json::from_value(args["cells"].clone()).map_err(|e|e.to_string())?;crate::generate::spreadsheet(&folders,args["folder"].as_str().unwrap_or(""),args["output_path"].as_str().ok_or("output_path requis")?,args["input_path"].as_str(),args["expected_sha256"].as_str(),&cells)},
- "read_file"=>library::extract(&folders,args["folder"].as_str().unwrap_or(""),args["path"].as_str().ok_or("path requis")?,args["page"].as_u64().unwrap_or(1)as usize).map(|mut v|{if let Some(text)=v["text"].as_str(){v["text"]=json!(text.chars().take(8000).collect::<String>())}v}),
+ "read_file"=>library::extract(&folders,args["folder"].as_str().unwrap_or(""),args["path"].as_str().ok_or("path requis")?,args["page"].as_u64().unwrap_or(1)as usize).map(|mut v|{if let Some(text)=v["text"].as_str(){v["text"]=json!(text.chars().take(crate::limits::DEFAULT_TEXT_CHARS).collect::<String>())}v}),
  "index_folder"=>index::build(&folders,serde_json::from_value(args).map_err(|e|e.to_string())?),
  "search_index"=>index::query(&folders,serde_json::from_value(args).map_err(|e|e.to_string())?),
  "ocr_file"=>crate::ocr::recognize(folders,serde_json::from_value(args).map_err(|e|e.to_string())?).await,

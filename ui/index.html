@@ -4,17 +4,17 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MCP Win</title>
 <link rel="icon" type="image/png" href="brand/favicon.png">
-<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script><script src="updater.js" defer></script>
+<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script><script src="updater.js" defer></script><script src="oauth.js" defer></script>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
- <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">v1.0.0</div></div></div>
+ <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">v1.0.1</div></div></div>
  <div class="nav-label">ESPACE DE TRAVAIL</div>
  <nav aria-label="Navigation">
   <button class="nav nav-item active" data-tab="overview" title="Vue d'ensemble"><span class="icon" data-icon="layout-dashboard"></span><span>Vue d'ensemble</span></button>
   <button class="nav nav-item" data-tab="shared-folders" title="Dossiers partagés"><span class="icon" data-icon="folder-open"></span><span>Dossiers partagés</span></button>
-  <button class="nav nav-item" data-tab="connection" title="Connexion IA"><span class="icon" data-icon="plug"></span><span>Connexion IA</span></button>
+  <button class="nav nav-item" data-tab="connection" title="Connexion IA"><span class="icon" data-icon="plug"></span><span>Connexion IA</span><span id="oauth-badge" class="pill purple" hidden></span></button>
   <button class="nav nav-item" data-tab="activity" title="Journal d'activité"><span class="icon" data-icon="activity"></span><span>Journal d'activité</span></button>
  </nav>
  <div class="nav-divider"></div><div class="nav-label">RESSOURCES</div>
@@ -37,7 +37,7 @@
    <div class="server-panel">
     <div class="server-main"><div class="server-intro"><div class="server-icon"><span class="icon" data-icon="monitor-up"></span></div><div><div class="pill amber" id="big-status-pill"><span class="dot" id="status-dot"></span><span id="status-badge">CHARGEMENT</span></div><h2 class="server-title" id="status-title">Connexion à l’application…</h2><p class="server-desc" id="status-description">Lecture de l’état du serveur et de vos dossiers partagés.</p></div></div><button class="btn primary" id="toggle-server" disabled><span class="icon" data-icon="power"></span><span>Chargement…</span></button></div>
     <div class="server-link-row"><div class="reference-style-5"><div class="tiny-label">Adresse du serveur MCP</div><div class="endpoint-url" id="public-address">Démarrez le serveur pour afficher l’adresse</div></div><button class="btn secondary small" id="copy-address" disabled><span class="icon" data-icon="copy"></span> Copier l'URL</button></div>
-    <div class="server-meta"><div><span class="icon" data-icon="globe"></span> <span id="mode-label">Tunnel simple · Cloudflare</span></div><div><span class="icon" data-icon="shield-check"></span> <span id="auth-label">Jeton Bearer obligatoire</span></div><div><span class="icon" data-icon="workflow"></span> Streamable HTTP</div></div>
+    <div class="server-meta"><div><span class="icon" data-icon="globe"></span> <span id="mode-label">Tunnel simple · Cloudflare</span></div><div><span class="icon" data-icon="shield-check"></span> <span id="auth-label">Jeton d’accès</span></div><div><span class="icon" data-icon="workflow"></span> Streamable HTTP</div></div>
    </div>
    <div class="metric-grid">
     <div class="card metric"><div><div class="tiny-label">DOSSIERS AUTORISÉS</div><div class="metric-num" id="folders-number">00</div></div><div class="metric-icon"><span class="icon" data-icon="folder-open"></span></div></div>
@@ -55,7 +55,7 @@
   </section>
   <section class="page" id="connection">
 
-   <div class="page-header"><div><h1 class="page-title">Connexion à votre IA</h1></div><div class="secure-tag"><span class="icon" data-icon="shield-check"></span> Jeton obligatoire</div></div>
+   <div class="page-header"><div><h1 class="page-title">Connexion à votre IA</h1></div></div>
    <div class="reference-style-10 section-heading"><div><h2>Mode de connexion</h2></div></div>
    <div class="mode-grid mode-options">
     <label class="mode-card"><input type="radio" name="mode" value="cloudflare" checked><span class="icon" data-icon="cloud"></span><strong>Tunnel simple</strong><small>Cloudflare gratuit et sans compte, avec URL temporaire.</small></label>
@@ -64,15 +64,19 @@
    </div>
    <div class="conn-grid">
     <div class="card conn-block">
-     <h2>Informations de connexion</h2><p>Renseignez séparément l’adresse et l’en-tête Authorization dans votre application IA.</p>
+     <h2>Informations de connexion</h2><p id="connection-intro">Renseignez séparément l’adresse et l’en-tête Authorization dans votre application IA.</p>
      <label class="form-label">ADRESSE DU SERVEUR MCP</label>
      <div class="faux-input"><span class="mono endpoint-text" id="connection-address">Démarrez le MCP pour obtenir l’adresse</span><button class="btn secondary small" id="copy-connection-address"><span class="icon" data-icon="copy"></span> Copier</button></div>
 
+     <label class="field">Authentification<select id="auth-mode"><option value="token">Jeton</option><option value="oauth">OAuth</option></select></label>
+     <div id="token-settings">
      <label class="form-label" for="token">AUTHENTIFICATION · HEADER SÉCURISÉ</label>
      <div id="token-field" class="faux-input token-input"><span class="mono">Authorization: Bearer</span><input id="token" type="password" autocomplete="off" spellcheck="false" aria-label="Jeton d’accès au MCP"><button id="show-token" class="icon-btn" title="Afficher le jeton" aria-label="Afficher le jeton" aria-pressed="false"><span class="icon" data-icon="eye"></span></button></div>
      <span id="auth-description" class="sr-only">Authorization: Bearer &lt;votre jeton&gt;</span>
      <div class="form-helper">Ne partagez pas votre jeton.</div>
      <div class="form-actions"><button id="copy-config" class="btn primary"><span class="icon" data-icon="copy"></span> Copier les headers JSON</button><button id="copy-bearer" class="btn secondary">Copier Bearer + jeton</button><button id="new-token" class="btn secondary"><span class="icon" data-icon="refresh-cw"></span> Régénérer</button></div>
+     </div>
+     <div id="oauth-panel" hidden><p class="form-helper">Ajoutez l’URL dans votre assistant, choisissez OAuth et validez la demande ici. L’accès respecte les droits de vos dossiers partagés.</p><h3>Demandes de connexion</h3><div id="oauth-requests"></div><h3>Assistants autorisés</h3><div id="oauth-clients"></div></div>
      <div id="frp-settings" class="mode-settings" hidden>
       <div class="field-grid"><label class="field">Adresse du serveur frps<input id="frp-server" placeholder="relais.exemple.fr" autocomplete="off"></label><label class="field">Port de contrôle<input id="frp-port" type="number" min="1" max="65535" value="7000"></label></div>
       <label class="field">Jeton du relais personnel<input id="frp-token" type="password" autocomplete="off"></label>
@@ -81,16 +85,16 @@
       <label class="field">Adresse publique HTTPS<input id="public-url" type="url" placeholder="https://mcp.exemple.fr"></label>
       <p class="form-helper">frpc est intégré. Votre serveur frps doit router ce domaine avec HTTPS, un certificat CA et un nom TLS vérifiés. Les exemples sont fournis dans relay/.</p>
      </div>
-     <details class="advanced-settings"><summary>Réglages de connexion</summary><label class="field">Port MCP local<input id="port" type="number" min="1" max="65535" value="8787"></label><label class="auth-setting"><input id="require-auth" type="checkbox" checked disabled> Jeton d’accès obligatoire</label><button id="copy-token" class="btn secondary small">Copier le jeton seul</button></details>
+     <details class="advanced-settings"><summary>Réglages de connexion</summary><label class="field">Port MCP local<input id="port" type="number" min="1" max="65535" value="8787"></label><button id="copy-token" class="btn secondary small">Copier le jeton seul</button></details>
      <div class="save-row"><button id="save-settings" class="btn secondary"><span class="icon" data-icon="check"></span> Enregistrer les réglages</button><span id="settings-state" class="form-helper" role="status">Réglages enregistrés</span></div>
      <input id="relay" type="hidden">
      <div class="callout" id="lt-settings"><span class="icon" data-icon="info"></span><span>Connexion chiffrée, adresse temporaire. Cloudflare peut lire les données transmises.</span></div>
      <div class="callout" id="connection-security"><span class="icon" data-icon="shield-check"></span><span>Arrêtez le serveur pour modifier les réglages. Le relais peut lire les données transmises.</span></div>
     </div>
-    <div class="card steps-card"><h2>Configuration dans votre IA</h2><p>Votre assistant doit prendre en charge MCP distant (Streamable HTTP) et les en-têtes personnalisés.</p>
+    <div class="card steps-card"><h2>Configuration dans votre IA</h2><p>Votre assistant doit prendre en charge MCP distant (Streamable HTTP) et le mode de connexion choisi.</p>
      <div class="connect-step"><span class="step-num">1</span><div><strong>Ajouter un serveur MCP</strong><p>Ouvrez les réglages MCP de votre assistant.</p></div></div>
      <div class="connect-step"><span class="step-num">2</span><div><strong>Coller l’adresse du serveur</strong><p>Utilisez l’URL affichée à gauche.</p></div></div>
-     <div class="connect-step"><span class="step-num">3</span><div><strong>Ajouter l’authentification</strong><p>Insérez Authorization dans les headers sécurisés (JSON).</p></div></div>
+     <div class="connect-step"><span class="step-num">3</span><div><strong>Ajouter l’authentification</strong><p id="connection-auth-instructions">Insérez Authorization dans les headers sécurisés (JSON).</p></div></div>
 
      <a class="btn quiet" href="https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Connexion-IA.md" data-external="connection-guide" target="_blank" rel="noopener noreferrer">Consulter le guide de connexion <span class="icon" data-icon="arrow-up-right"></span></a>
     </div>
@@ -115,7 +119,7 @@
    <div id="studio-loading" class="callout" role="status" hidden>Chargement de votre espace…</div>
    <div data-studio-panel="brands">
     <div class="studio-grid"><article class="card card-pad"><div class="section-heading studio-heading"><div><h2>Identités visuelles</h2></div><button id="new-brand" class="btn secondary small">+ Nouveau</button></div><label class="field">Profil à modifier<select id="brand-select"></select></label><div class="brand-preview"><img id="brand-logo-preview" alt="Logo du profil" hidden><div><strong id="brand-preview-name">Votre identité</strong><p>PDF · Word · Excel · PowerPoint</p></div><span id="brand-swatch"></span></div><button id="set-default-brand" class="btn secondary small">Utiliser par défaut</button><p id="brand-default-status" class="form-helper"></p><button id="delete-brand" class="btn quiet">Supprimer ce profil</button></article>
-    <article class="card card-pad"><h2>Personnaliser les documents</h2><div class="field-grid brand-fields"><label class="field">Nom du profil<input id="brand-name" maxlength="100"></label><label class="field">Organisation<input id="brand-organization" maxlength="200"></label></div><div class="field-grid brand-fields"><label class="field">Couleur principale<input id="brand-primary" type="color" value="#6366f1"></label><label class="field">Couleur secondaire<input id="brand-secondary" type="color" value="#3b82f6"></label></div><label class="field">Police intégrée<select id="brand-font"><option>Lato</option><option>Libertinus Serif</option><option>DejaVu Sans Mono</option></select></label><label class="field">Coordonnées<textarea id="brand-contact" rows="2" maxlength="1000"></textarea></label><label class="field">Pied de page<input id="brand-footer" maxlength="250"></label><label class="field">Logo PNG ou JPEG · 2 Mio maximum<input id="brand-logo" type="file" accept="image/png,image/jpeg"></label><div class="form-actions"><button id="save-brands" class="btn primary">Enregistrer les profils</button><button id="remove-brand-logo" class="btn secondary">Retirer le logo</button></div><p class="form-helper">Arrêtez le serveur pour modifier les profils.</p></article></div>
+    <article class="card card-pad"><h2>Personnaliser les documents</h2><div class="field-grid brand-fields"><label class="field">Nom du profil<input id="brand-name" maxlength="100"></label><label class="field">Organisation<input id="brand-organization" maxlength="200"></label></div><div class="field-grid brand-fields"><label class="field">Couleur principale<input id="brand-primary" type="color" value="#6366f1"></label><label class="field">Couleur secondaire<input id="brand-secondary" type="color" value="#3b82f6"></label></div><label class="field">Police intégrée<select id="brand-font"><option>Lato</option><option>Libertinus Serif</option><option>DejaVu Sans Mono</option></select></label><div class="field-grid brand-fields"><label class="field">Corps du texte (pt)<input id="brand-body_size_pt" type="number" min="9" max="16" value="11"></label><label class="field">Marges (mm)<input id="brand-margin_mm" type="number" min="12" max="35" value="21"></label><label class="field">Format de page<select id="brand-page_size"><option value="a4">A4</option><option value="us-letter">Letter</option></select></label><label class="field">Largeur du logo (mm)<input id="brand-logo_width_mm" type="number" min="20" max="80" value="36"></label></div><label class="field">Coordonnées<textarea id="brand-contact" rows="2" maxlength="1000"></textarea></label><label class="field">Pied de page<input id="brand-footer" maxlength="250"></label><label class="field">Logo PNG ou JPEG · 20 Mio maximum<input id="brand-logo" type="file" accept="image/png,image/jpeg"></label><div class="form-actions"><button id="save-brands" class="btn primary">Enregistrer les profils</button><button id="remove-brand-logo" class="btn secondary">Retirer le logo</button></div><p class="form-helper">Arrêtez le serveur pour modifier les profils.</p></article></div>
    </div>
    <div data-studio-panel="index" hidden><article class="card card-pad"><h2>Index des documents</h2><p class="form-helper">Actualisez l’index après l’ajout ou la modification de fichiers. Les scans nécessitent un OCR.</p><div id="studio-indexes"></div></article></div>
    <div data-studio-panel="workflows" hidden><article class="card card-pad"><div class="section-heading studio-heading"><div><h2>Tâches</h2></div><button id="refresh-workflows" class="btn secondary small">Actualiser</button></div><div id="studio-jobs"></div><div class="callout">L’arrêt du serveur suspend les tâches. Redémarrez-le pour reprendre ; arrêtez-le pour annuler les fichiers.</div></article></div>
@@ -126,6 +130,6 @@
 <dialog id="preview"><div class="dialog-heading"><div><h2>Aperçu du fichier</h2></div><button class="btn secondary small" id="close-preview">Fermer</button></div><p class="form-helper">Première page ou premier segment. Cet aperçu n’envoie aucune donnée à un assistant.</p><img id="preview-image" alt="Aperçu du fichier" hidden><pre id="preview-text"></pre></dialog>
 <dialog id="history-dialog"><div class="dialog-heading"><div><h2>Restaurer l’état précédent</h2></div><button class="btn secondary small" id="close-history">Fermer</button></div><p class="form-helper">Arrêtez le serveur pour restaurer une version. L’état remplacé sera sauvegardé.</p><div id="history-versions"></div></dialog>
 <dialog id="help-dialog"><div class="dialog-heading"><div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
-<dialog id="update-dialog"><div class="dialog-heading"><h2>Mises à jour</h2><button class="btn secondary small" id="close-updates">Fermer</button></div><p class="form-helper" id="update-current"></p><p id="update-message" role="status">Recherche automatique au démarrage.</p><progress id="update-progress" max="100" value="0" aria-label="Téléchargement" hidden></progress><div class="form-actions"><button class="btn secondary" id="check-update">Rechercher</button><button class="btn primary" id="install-update" hidden>Installer et redémarrer</button></div></dialog>
+<dialog id="update-dialog"><div class="dialog-heading"><h2>Mises à jour</h2><button class="btn secondary small" id="close-updates">Fermer</button></div><div class="update-version"><p id="update-current"></p><strong id="update-latest" hidden></strong></div><p id="update-message" role="status">Recherche automatique au démarrage.</p><progress id="update-progress" max="100" value="0" aria-label="Téléchargement" hidden></progress><p id="update-transfer" class="form-helper" hidden></p><ol class="update-steps" id="update-steps" hidden><li>Téléchargement</li><li>Vérification</li><li>Redémarrage</li></ol><p id="update-hint" class="form-helper"></p><div class="form-actions"><button class="btn secondary" id="check-update">Rechercher</button><button class="btn primary" id="download-update" hidden>Télécharger</button><button class="btn primary" id="install-update" hidden>Installer et redémarrer</button></div><div class="update-footer"><span id="update-last-check"></span><a href="https://github.com/extraopaa/mcp-win/releases" data-external="releases" target="_blank" rel="noopener noreferrer">Historique des versions</a></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span class="icon" data-icon="info"></span><span id="toast-text"></span><button id="dismiss-toast" aria-label="Fermer la notification">×</button></div>
 </body></html>

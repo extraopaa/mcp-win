@@ -10,6 +10,81 @@ fn folders(path: &std::path::Path) -> Vec<SharedFolder> {
         writable: true,
     }]
 }
+#[test]
+fn larger_files_are_read_in_bounded_responses_and_oversized_inputs_rejected() {
+    let dir = tempfile::tempdir().unwrap();
+    let scope = folders(dir.path());
+    let bytes = vec![b'A'; 26 * 1024 * 1024];
+    writing::commit(&scope, "", "large.txt", &bytes, None).unwrap();
+    let read = crate::library::read(&scope, "", "large.txt", 1, 0, 32).unwrap();
+    assert_eq!(read["text"].as_str().unwrap().len(), 32);
+    let too_big = dir.path().join("too-big.pdf");
+    fs::File::create(&too_big)
+        .unwrap()
+        .set_len(crate::limits::DOCUMENT_BYTES + 1)
+        .unwrap();
+    assert!(crate::advanced::input(&scope, "", "too-big.pdf").is_err());
+}
+#[test]
+fn studio_accepts_larger_logo_and_normalizes_it() {
+    use base64::Engine;
+    let mut seed = 19u32;
+    let image = image::DynamicImage::ImageRgba8(image::RgbaImage::from_fn(1200, 1200, |_, _| {
+        seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+        image::Rgba([
+            (seed >> 24) as u8,
+            (seed >> 16) as u8,
+            (seed >> 8) as u8,
+            255,
+        ])
+    }));
+    let bytes = crate::advanced::png(&image).unwrap();
+    assert!(bytes.len() > 2 * 1024 * 1024);
+    let qa = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("target/qa-v101");
+    fs::create_dir_all(&qa).unwrap();
+    fs::write(qa.join("large-logo.png"), &bytes).unwrap();
+    let brand = state::Brand {
+        logo_base64: base64::engine::general_purpose::STANDARD.encode(bytes),
+        ..Default::default()
+    };
+    let normalized = state::logo(&brand).unwrap().unwrap();
+    assert!(normalized.len() <= 2 * 1024 * 1024);
+    assert!(image::load_from_memory(&normalized).unwrap().width() <= 2048);
+}
+#[tokio::test]
+async fn custom_brand_controls_word_and_pdf_page_geometry() {
+    let dir = tempfile::tempdir().unwrap();
+    let scope = folders(dir.path());
+    let args = design::Args {
+        path: "custom.docx".into(),
+        title: "Custom layout".into(),
+        internal_brand: Some(state::Brand {
+            body_size_pt: 14,
+            margin_mm: 24,
+            page_size: "us-letter".into(),
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+    design::create(&scope, args.clone()).await.unwrap();
+    let parts = design::unpack(&fs::read(dir.path().join("custom.docx")).unwrap()).unwrap();
+    let document = String::from_utf8(parts["word/document.xml"].clone()).unwrap();
+    let styles = String::from_utf8(parts["word/styles.xml"].clone()).unwrap();
+    assert!(document.contains("w:w=\"12240\" w:h=\"15840\""));
+    assert!(document.contains("w:top=\"1361\""));
+    assert!(styles.contains("w:sz w:val=\"28\""));
+    design::create(
+        &scope,
+        design::Args {
+            path: "custom.pdf".into(),
+            ..args
+        },
+    )
+    .await
+    .unwrap();
+    let (image, _) = crate::advanced::pdf_image(&scope, "", "custom.pdf", 1, 1000).unwrap();
+    assert!((image.height() as f64 / image.width() as f64 - 11.0 / 8.5).abs() < 0.01);
+}
 #[tokio::test]
 async fn spreadsheet_revision_preserves_types_and_refuses_stale_source() {
     use crate::generate::{CellEdit, CellKind};

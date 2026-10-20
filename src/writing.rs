@@ -29,6 +29,20 @@ fn create_without_replace(source: &Path, target: &Path) -> Result<(), String> {
 pub fn hash(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
+pub fn hash_file(path: &Path) -> Result<String, String> {
+    use std::io::Read;
+    let mut file = fs::File::open(path).map_err(|e| e.to_string())?;
+    let mut state = Sha256::new();
+    let mut buffer = [0u8; 65536];
+    loop {
+        let n = file.read(&mut buffer).map_err(|e| e.to_string())?;
+        if n == 0 {
+            break;
+        }
+        state.update(&buffer[..n]);
+    }
+    Ok(format!("{:x}", state.finalize()))
+}
 
 pub fn destination(
     folders: &[SharedFolder],
@@ -74,8 +88,8 @@ pub fn commit(
     expected_hash: Option<&str>,
 ) -> Result<Value, String> {
     crate::v1::jobs::check_write()?;
-    if bytes.len() > 25 * 1024 * 1024 {
-        return Err("La sortie dépasse 25 Mo".into());
+    if bytes.len() as u64 > crate::limits::DOCUMENT_BYTES {
+        return Err("La sortie dépasse 100 Mio".into());
     }
     let _lock = WRITE_LOCK
         .lock()
@@ -84,7 +98,7 @@ pub fn commit(
     let target = destination(folders, folder, relative)?;
     let existed = target.exists();
     if existed {
-        if fs::metadata(&target).map_err(|e| e.to_string())?.len() > 25 * 1024 * 1024 {
+        if fs::metadata(&target).map_err(|e| e.to_string())?.len() > crate::limits::DOCUMENT_BYTES {
             return Err("Original trop volumineux pour une modification sauvegardée".into());
         }
         if !target.is_file() {

@@ -2,6 +2,7 @@
 
 fn destination(link: &str) -> Result<&'static str, String> {
     match link {
+        "releases" => Ok("https://github.com/extraopaa/mcp-win/releases"),
         "repository" => Ok("https://github.com/extraopaa/mcp-win"),
         "documentation" => Ok("https://github.com/extraopaa/mcp-win/blob/main/docs/wiki/Home.md"),
         "getting-started" => {

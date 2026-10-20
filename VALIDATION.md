@@ -1,3 +1,16 @@
+# Validation locale v1.0.1 — 21 octobre 2026
+
+- Rust : 45 tests réussis sur 46 ; le test Internet Cloudflare reste ignoré. Les tests incluent les accès HTTP hostiles, OAuth/PKCE, consentement local, rotation et rejeu des jetons, révocation, fichiers de plus de 25 Mio et logos de plus de 2 Mio.
+- Personnalisation : géométrie Letter du PDF, dimensions/marges Word et taille de police OOXML vérifiées.
+- OCR : cache et reconnaissance après rotation vérifiés sur des images synthétiques ; confiance et relecture signalées.
+- Interface : six vues, états OAuth/jeton, progression de mise à jour, presse-papiers, permissions, CSP, absence de débordement à 900/1180/1440 pixels.
+- Tauri release : 42 outils, création PDF professionnelle, aperçu, index/recherche, révision et annulation, workflows, import d’un grand logo ; parcours OAuth réel HTTP avec validation dans l’interface et révocation immédiate vérifié.
+- Updater : installation native synthétique signée, vérification du paquet, remplacement portable, conservation des préférences et redémarrage réussis.
+- PDF professionnel et écran OAuth inspectés visuellement. Aucune validation avec un assistant tiers réel ; aucune publication v1.0.1 effectuée.
+
+[Changements et limites 1.0.1](docs/V1.0.1.md).
+
+---
 # Validation locale v1.0.0 — 20 octobre 2026
 
 - 42 outils MCP, dont 10 nouveaux outils du Studio documentaire.

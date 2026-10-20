@@ -520,7 +520,7 @@ pub fn spreadsheet(
         {
             return Err("Seuls les classeurs .xlsx peuvent être modifiés. Les formats .xls/.ods sont en lecture seule.".into());
         }
-        if fs::metadata(&source).map_err(|e| e.to_string())?.len() > 25 * 1024 * 1024 {
+        if fs::metadata(&source).map_err(|e| e.to_string())?.len() > crate::limits::DOCUMENT_BYTES {
             return Err("Source trop volumineuse".into());
         }
         let bytes = fs::read(source).map_err(|e| e.to_string())?;

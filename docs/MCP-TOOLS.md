@@ -102,3 +102,7 @@ Pour une modification, ajouter `input_path` et son `expected_sha256`, obtenu par
 `create_binary_file` enregistre `data_base64` dans un nouveau `path`, dans un dossier autorisé en écriture. Le contenu base64 est limité à 3 000 000 caractères, soit environ 2 Mo d'octets. Le fichier n'est ni interprété ni exécuté. `read_file_bytes` permet de récupérer n'importe quel format pris en charge par le stockage local, sans conversion.
 
 Toutes les sorties sont limitées à 25 Mo. Les écritures sont préparées dans le dossier cible puis finalisées sans fichier partiel ; les créations refusent les écrasements. Les chemins absolus, sorties hors dossier et flux alternatifs Windows sont refusés.
+
+## Paramètres et limites 1.0.1
+
+Voir [le détail 1.0.1](V1.0.1.md) pour OAuth, les plafonds de fichiers et les nouveaux réglages. Les réponses textuelles commencent à 4000 caractères. list_files est compact par défaut ; read_file résume les tableurs par défaut. Les options détaillées et la pagination restent disponibles. get_authoring_guide accepte section/offset/limit ; review_document accepte detailed et pages ; ocr_file accepte quality/auto_rotate et word_offset/word_limit ; extract_document_layout accepte compact.

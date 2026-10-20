@@ -18,8 +18,8 @@ const path = require('node:path');
   assert.equal(await page.locator('#frp-settings').isVisible(), true);
   await page.locator('[name=mode][value=cloudflare]').check();
   assert.equal(await page.locator('#lt-settings').isVisible(), true);
-  assert.equal(await page.locator('#require-auth').isChecked(),true);
-  assert.equal(await page.locator('#require-auth').isDisabled(),true);
+  assert.equal(await page.locator('#require-auth').count(),0);
+
   assert.equal(await page.locator('#token-field').isVisible(),true);
   assert.equal(await page.locator('#token-field').isVisible(),true);
   await page.screenshot({ path: path.resolve(__dirname, '../preview-connection.png') });

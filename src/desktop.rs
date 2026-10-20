@@ -23,6 +23,7 @@ pub struct Connection {
     pub port: u16,
     pub token: String,
     pub require_auth: bool,
+    pub auth_mode: String,
     pub relay: String,
     pub frp_server: String,
     pub frp_port: u16,
@@ -38,6 +39,7 @@ impl Default for Connection {
             port: 8787,
             token: uuid::Uuid::new_v4().simple().to_string(),
             require_auth: true,
+            auth_mode: "token".into(),
             relay: "https://localtunnel.me".into(),
             frp_server: String::new(),
             frp_port: 7000,
@@ -115,6 +117,7 @@ impl Desktop {
         desktop
     }
     pub fn stop(&self) {
+        crate::oauth::stop();
         crate::v1::jobs::pause_all();
         if let Some(running) = self.core.running.lock().unwrap().take() {
             running.cancel.cancel();
@@ -357,13 +360,14 @@ async fn launch(
     let server_cancel = cancel.clone();
     let logs = core.logs.clone();
     tauri::async_runtime::spawn(async move {
-        let server_task = tokio::spawn(server::serve(
+        let server_task = tokio::spawn(server::serve_authenticated(
             listener,
             prefs.folders,
             c.require_auth.then_some(c.token),
             server_cancel.clone(),
             logs.clone(),
             public_host,
+            c.auth_mode == "oauth",
         ));
         tokio::select! {
             _ = cancel.cancelled() => {},
@@ -387,6 +391,9 @@ async fn launch(
 }
 
 fn validate_connection(c: &Connection) -> Result<(), String> {
+    if !["token", "oauth"].contains(&c.auth_mode.as_str()) {
+        return Err("Authentification : token ou oauth".into());
+    }
     if !["local", "frp", "cloudflare"].contains(&c.mode.as_str()) {
         return Err("Tunnel localtunnel désactivé : transport non chiffré. Utilisez un relais frp avec certificat vérifié.".into());
     }

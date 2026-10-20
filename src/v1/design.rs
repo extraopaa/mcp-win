@@ -170,12 +170,12 @@ const TYPST: &str = r##"#let d = json("mcp-data.json")
 #let accent = rgb("#" + d.brand.primary)
 #let ink = rgb("#1F2937")
 #set document(title:d.title,author:d.brand.organization)
-#set text(font:d.brand.font,size:10.5pt,fill:ink,lang:"fr")
+#set text(font:d.brand.font,size:d.brand.body_size_pt*1pt,fill:ink,lang:"fr")
 #set par(justify:true,leading:0.72em,spacing:0.9em)
-#set page(paper:"a4",margin:(x:21mm,y:23mm),header:context [#text(size:8pt,fill:accent,d.brand.organization) #h(1fr) #text(size:8pt,fill:gray,d.style)],footer:context [#line(length:100%,stroke:0.4pt+rgb("#e5e7eb")) #v(3pt) #text(size:8pt,fill:gray,d.brand.footer) #h(1fr) #text(size:8pt,counter(page).display("1 / 1",both:true))])
+#set page(paper:d.brand.page_size,margin:d.brand.margin_mm*1mm,header:context [#text(size:8pt,fill:accent,d.brand.organization) #h(1fr) #text(size:8pt,fill:gray,d.style)],footer:context [#line(length:100%,stroke:0.4pt+rgb("#e5e7eb")) #v(3pt) #text(size:8pt,fill:gray,d.brand.footer) #h(1fr) #text(size:8pt,counter(page).display("1 / 1",both:true))])
 #show heading: it => block(above:1.4em,below:0.7em,sticky:true)[#text(fill:accent,weight:"bold",it.body)]
 #set heading(numbering:none)
-#if d.has_logo { image("brand-logo.png",width:36mm,height:17mm,fit:"contain"); v(8mm) }
+#if d.has_logo { image("brand-logo.png",width:d.brand.logo_width_mm*1mm,height:25mm,fit:"contain"); v(8mm) }
 #if d.cover {v(25mm)}
 #text(size:if d.cover {32pt}else{26pt},weight:"bold",fill:accent,d.title)
 #v(5mm)
@@ -266,7 +266,11 @@ fn docx(
         let im = reader.decode().map_err(|e| e.to_string())?;
         let data = advanced::png(&im)?;
         let id = format!("img{}", parts.len() + 1);
-        let max_width = if large { 5_400_000f64 } else { 1_400_000f64 };
+        let max_width = if large {
+            5_400_000f64
+        } else {
+            brand.logo_width_mm as f64 * 36000.0
+        };
         let max_height = if large { 3_000_000f64 } else { 850_000f64 };
         let scale =
             (max_width / im.width().max(1) as f64).min(max_height / im.height().max(1) as f64);
@@ -346,9 +350,15 @@ fn docx(
             body.push_str(&p(source, "Caption"))
         }
     }
-    body.push_str("<w:sectPr><w:headerReference w:type=\"default\" r:id=\"header\"/><w:footerReference w:type=\"default\" r:id=\"footer\"/><w:pgSz w:w=\"11906\" w:h=\"16838\"/><w:pgMar w:top=\"1304\" w:right=\"1191\" w:bottom=\"1304\" w:left=\"1191\" w:header=\"600\" w:footer=\"600\"/></w:sectPr>");
+    let (page_w, page_h) = if brand.page_size == "us-letter" {
+        (12240, 15840)
+    } else {
+        (11906, 16838)
+    };
+    let margin = (brand.margin_mm as f64 * 1440.0 / 25.4).round() as u32;
+    body.push_str(&format!("<w:sectPr><w:headerReference w:type=\"default\" r:id=\"header\"/><w:footerReference w:type=\"default\" r:id=\"footer\"/><w:pgSz w:w=\"{page_w}\" w:h=\"{page_h}\"/><w:pgMar w:top=\"{margin}\" w:right=\"{margin}\" w:bottom=\"{margin}\" w:left=\"{margin}\" w:header=\"600\" w:footer=\"600\"/></w:sectPr>"));
     rels.push_str("</Relationships>");
-    let styles=format!(r#"<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="{font}" w:hAnsi="{font}"/><w:sz w:val="22"/><w:color w:val="1F2937"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="160" w:line="288" w:lineRule="auto"/><w:widowControl/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:pPr><w:spacing w:before="240" w:after="400"/><w:keepNext/></w:pPr><w:rPr><w:b/><w:color w:val="{accent}"/><w:sz w:val="56"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Subtitle"><w:rPr><w:color w:val="8E94A7"/></w:rPr></w:style>{headings}<w:style w:type="paragraph" w:styleId="ListParagraph"><w:pPr><w:ind w:left="300" w:hanging="180"/></w:pPr></w:style><w:style w:type="paragraph" w:styleId="Callout"><w:pPr><w:shd w:fill="F0EDFF"/><w:spacing w:before="160" w:after="200"/></w:pPr><w:rPr><w:b/><w:color w:val="{accent}"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="TableHeader"><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Caption"><w:rPr><w:sz w:val="18"/><w:color w:val="6B7280"/></w:rPr></w:style></w:styles>"#,font=escape(&brand.font),accent=brand.primary,headings=(1..=3).map(|n|format!("<w:style w:type=\"paragraph\" w:styleId=\"Heading{n}\"><w:name w:val=\"heading {n}\"/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val=\"{}\"/><w:spacing w:before=\"300\" w:after=\"160\"/></w:pPr><w:rPr><w:b/><w:color w:val=\"{}\"/><w:sz w:val=\"{}\"/></w:rPr></w:style>",n-1,brand.primary,36-n*4)).collect::<String>());
+    let styles=format!(r#"<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="{font}" w:hAnsi="{font}"/><w:sz w:val="{body_size}"/><w:color w:val="1F2937"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="160" w:line="288" w:lineRule="auto"/><w:widowControl/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:pPr><w:spacing w:before="240" w:after="400"/><w:keepNext/></w:pPr><w:rPr><w:b/><w:color w:val="{accent}"/><w:sz w:val="56"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Subtitle"><w:rPr><w:color w:val="8E94A7"/></w:rPr></w:style>{headings}<w:style w:type="paragraph" w:styleId="ListParagraph"><w:pPr><w:ind w:left="300" w:hanging="180"/></w:pPr></w:style><w:style w:type="paragraph" w:styleId="Callout"><w:pPr><w:shd w:fill="F0EDFF"/><w:spacing w:before="160" w:after="200"/></w:pPr><w:rPr><w:b/><w:color w:val="{accent}"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="TableHeader"><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Caption"><w:rPr><w:sz w:val="18"/><w:color w:val="6B7280"/></w:rPr></w:style></w:styles>"#,font=escape(&brand.font),body_size=brand.body_size_pt as u16*2,accent=brand.primary,headings=(1..=3).map(|n|format!("<w:style w:type=\"paragraph\" w:styleId=\"Heading{n}\"><w:name w:val=\"heading {n}\"/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val=\"{}\"/><w:spacing w:before=\"300\" w:after=\"160\"/></w:pPr><w:rPr><w:b/><w:color w:val=\"{}\"/><w:sz w:val=\"{}\"/></w:rPr></w:style>",n-1,brand.primary,36-n*4)).collect::<String>());
     parts.insert("word/styles.xml".into(), styles.into_bytes());
     parts.insert("word/_rels/document.xml.rels".into(), rels.into_bytes());
     parts.insert("word/document.xml".into(),format!("<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\"><w:body>{body}</w:body></w:document>").into_bytes());
@@ -554,7 +564,7 @@ pub async fn create(folders: &[SharedFolder], mut args: Args) -> Result<Value, S
     }
     let mut result = writing::commit(folders, &args.folder, &args.path, &bytes, None)?;
     result["design"] = json!({"mode":if args.raw{"raw"}else{"professional"},"style":args.style,"brand":brand.id,"cover":cover,"table_of_contents":toc});
-    result["quality"] = report;
+    result["quality"] = quality::compact(&report);
     result["sources"] = json!(sources);
     result["next_action"] = json!(if ext == "pdf" {
         "Appeler review_document pour vérifier visuellement les pages avant livraison."

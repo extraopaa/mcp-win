@@ -1,4 +1,4 @@
-param([string]$PackageDirectory='dist-v1')
+﻿param([string]$PackageDirectory='dist-v101')
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path -Parent $PSScriptRoot
 Push-Location $projectRoot
@@ -38,7 +38,7 @@ try {
     $helper=Start-Process -FilePath (Join-Path $package 'MCP Win.exe') -ArgumentList @('--apply-update',('"'+$fixture+'"')) -WindowStyle Hidden -PassThru
     if(-not $helper.WaitForExit(30000)){Stop-Process -Id $helper.Id;throw 'Installation synthétique bloquée'}
     for($i=0;$i -lt 50 -and -not(Test-Path -LiteralPath (Join-Path $target 'updated.marker'));$i++){Start-Sleep -Milliseconds 100}
-    if(-not(Test-Path -LiteralPath (Join-Path $target 'updated.marker'))){throw 'La fixture mise à jour ne s’est pas relancée'}
+    if(-not(Test-Path -LiteralPath (Join-Path $target 'updated.marker'))){throw 'La fixture ne redemarre pas'}
     if([IO.File]::ReadAllText((Join-Path $target 'settings.json')) -ne 'PRESERVE-USER-SETTINGS'){throw 'Préférences synthétiques altérées'}
     Write-Output 'Updater natif : manifeste signé, vérification du ZIP, remplacement portable, préférences conservées et relance validés. Aucun téléchargement ni publication.'
 }finally{Pop-Location}

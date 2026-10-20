@@ -74,6 +74,8 @@ struct Inner {
     version: Option<String>,
     error: Option<String>,
     progress: u64,
+    downloaded_bytes: u64,
+    total_bytes: u64,
     last_check: u64,
     busy: bool,
     pending: Option<Pending>,
@@ -89,6 +91,8 @@ impl Default for Updater {
                 version: None,
                 error: None,
                 progress: 0,
+                downloaded_bytes: 0,
+                total_bytes: 0,
                 last_check: 0,
                 busy: false,
                 pending: None,
@@ -98,7 +102,7 @@ impl Default for Updater {
 }
 fn snapshot(state: &Updater) -> Value {
     let s = state.inner.lock().unwrap();
-    json!({"status":s.status,"version":s.version,"error":s.error,"progress":s.progress,"current_version":env!("CARGO_PKG_VERSION")})
+    json!({"status":s.status,"version":s.version,"error":s.error,"progress":s.progress,"downloaded_bytes":s.downloaded_bytes,"total_bytes":s.total_bytes,"last_check":s.last_check,"current_version":env!("CARGO_PKG_VERSION")})
 }
 fn client() -> Result<reqwest::Client, String> {
     reqwest::Client::builder()
@@ -268,6 +272,7 @@ pub async fn download_update(state: State<'_, Updater>) -> Result<Value, String>
         s.busy = true;
         s.status = "downloading".into();
         s.progress = 0;
+        s.downloaded_bytes = 0;
         s.error = None;
     }
     let result: Result<Pending, String> = async {
@@ -279,6 +284,7 @@ pub async fn download_update(state: State<'_, Updater>) -> Result<Value, String>
             .await?
             .ok_or("Signature absente")?;
         let m = verified(&bytes, &signature, PUBLIC_KEY, env!("CARGO_PKG_VERSION"))?;
+        state.inner.lock().unwrap().total_bytes = m.size;
         let root = crate::v1::state::root()?.join("updates");
         fs::create_dir_all(&root).map_err(|e| e.to_string())?;
         let used: u64 = walkdir::WalkDir::new(&root)
@@ -315,7 +321,9 @@ pub async fn download_update(state: State<'_, Updater>) -> Result<Value, String>
             }
             file.write_all(&chunk).map_err(|e| e.to_string())?;
             hash.update(&chunk);
-            state.inner.lock().unwrap().progress = received * 100 / m.size;
+            let mut s = state.inner.lock().unwrap();
+            s.progress = received * 100 / m.size;
+            s.downloaded_bytes = received;
         }
         file.sync_all().map_err(|e| e.to_string())?;
         drop(file);
@@ -323,6 +331,7 @@ pub async fn download_update(state: State<'_, Updater>) -> Result<Value, String>
             return Err("Empreinte du paquet incorrecte".into());
         }
         let package = dir.path().join("package.zip");
+        state.inner.lock().unwrap().status = "verifying".into();
         tauri::async_runtime::spawn_blocking(move || validate_archive(&package))
             .await
             .map_err(|e| e.to_string())??;

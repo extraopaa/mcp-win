@@ -1,4 +1,4 @@
-param([string]$PackageDirectory = 'dist-v1')
+﻿param([string]$PackageDirectory = 'dist-v101')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 if (Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('mcp-win.exe','MCP Win.exe') }) { throw 'Fermer MCP Win avant ce test de développement' }
@@ -10,10 +10,18 @@ $fixture = Join-Path $env:TEMP ('mcp-win-ui-' + [guid]::NewGuid().ToString('N'))
 $appProcess = $null
 $privatePath = [IO.Path]::GetFullPath((Join-Path $env:APPDATA 'org.mcpwin.desktop\.mcp-private'))
 $previousPrivateFiles = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$privateBackups = @{}
 if (Test-Path -LiteralPath $privatePath) {
     Get-ChildItem -LiteralPath $privatePath -Recurse -File | ForEach-Object { [void]$previousPrivateFiles.Add($_.FullName) }
 }
+foreach($name in @('brands.json','oauth-clients.json')) {
+    $path=Join-Path $privatePath $name
+    if(Test-Path -LiteralPath $path){$privateBackups[$name]=[IO.File]::ReadAllBytes($path)}
+}
 try {
+    New-Item -ItemType Directory -Path $privatePath -Force | Out-Null
+    [IO.File]::WriteAllText((Join-Path $privatePath 'brands.json'),'{"selected":"default","profiles":[{"id":"default","name":"Validation"}]}',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $privatePath 'oauth-clients.json'),'[]',[Text.UTF8Encoding]::new($false))
     New-Item -ItemType Directory -Path $fixture -Force | Out-Null
     [IO.File]::WriteAllText((Join-Path $fixture 'note.txt'), 'SYNTHETIC-V1')
     $preferences = @{
@@ -29,6 +37,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Le test natif v1 a échoué' }
 } finally {
     if ($appProcess) { $appProcess.Refresh(); if (-not $appProcess.HasExited) { Stop-Process -Id $appProcess.Id } }
+    foreach($name in $privateBackups.Keys){[IO.File]::WriteAllBytes((Join-Path $privatePath $name),$privateBackups[$name])}
     # Remove only newly created synthetic test files; preserve all pre-existing state.
     $expectedPrivate = [IO.Path]::GetFullPath((Join-Path $env:APPDATA 'org.mcpwin.desktop\.mcp-private'))
     if ($privatePath -ne $expectedPrivate) { throw 'Chemin de nettoyage privé inattendu' }

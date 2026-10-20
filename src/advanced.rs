@@ -40,8 +40,8 @@ pub fn engine_path(name: &str) -> Result<PathBuf, String> {
 pub fn input(folders: &[SharedFolder], folder: &str, path: &str) -> Result<PathBuf, String> {
     let path = library::resolve(folders, folder, path)?;
     let meta = fs::metadata(&path).map_err(|e| e.to_string())?;
-    if !meta.is_file() || meta.len() > 25 * 1024 * 1024 {
-        return Err("Fichier requis, maximum 25 Mo".into());
+    if !meta.is_file() || meta.len() > crate::limits::DOCUMENT_BYTES {
+        return Err("Fichier requis, maximum 100 Mio".into());
     }
     Ok(path)
 }
@@ -241,8 +241,8 @@ pub async fn compile_typst_with_inline(
         ));
     }
     let bytes = fs::read(root.join("output.pdf")).map_err(|e| e.to_string())?;
-    if bytes.len() > 25 * 1024 * 1024 {
-        return Err("PDF limité à 25 Mo".into());
+    if bytes.len() as u64 > crate::limits::DOCUMENT_BYTES {
+        return Err("PDF limité à 100 Mio".into());
     }
     Ok(CompiledPdf {
         bytes,
@@ -280,6 +280,10 @@ mod tests {
                 languages: None,
                 layout: None,
                 rotate: None,
+                quality: None,
+                auto_rotate: None,
+                word_offset: None,
+                word_limit: Some(10000),
                 plain_text_only: Some(true),
                 offset: Some(10),
                 limit: Some(20),
@@ -303,6 +307,10 @@ mod tests {
                 languages: None,
                 layout: None,
                 rotate: None,
+                quality: None,
+                auto_rotate: None,
+                word_offset: None,
+                word_limit: Some(10000),
             },
         )
         .await
@@ -316,6 +324,27 @@ mod tests {
             "French accents: {recognized}"
         );
         assert!(!recognized["lines"].as_array().unwrap().is_empty());
+        assert_eq!(recognized["cache_hit"], true);
+        fs::write(
+            tmp.path().join("rotated.png"),
+            png(&image.rotate90()).unwrap(),
+        )
+        .unwrap();
+        let rotated = crate::ocr::recognize(
+            folders.clone(),
+            crate::ocr::OcrArgs {
+                folder: "qa".into(),
+                path: "rotated.png".into(),
+                quality: Some("accurate".into()),
+                ..Default::default()
+            },
+        )
+        .await
+        .unwrap();
+        assert!(
+            rotated["text"].as_str().unwrap().contains("MCP"),
+            "Rotation recovery: {rotated}"
+        );
         typst(
             &folders,
             "qa",
@@ -340,6 +369,10 @@ mod tests {
                 languages: None,
                 layout: None,
                 rotate: None,
+                quality: None,
+                auto_rotate: None,
+                word_offset: None,
+                word_limit: Some(10000),
             },
         )
         .await

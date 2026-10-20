@@ -93,3 +93,7 @@ Le moteur et les modèles sont sous Apache-2.0 ; la version statique embarquée 
 `render_pdf_page(folder,path,page?,width?)` renvoie directement un PNG à l'IA ; largeur 400–2400 px, hauteur plafonnée à 3200 px. Il sert au contrôle visuel et à la lecture des pages difficiles. `read_file` conserve l'extraction directe du texte, plus fidèle et rapide sur un PDF natif.
 
 Documentation officielle : https://typst.app/docs/ et https://learn.microsoft.com/en-us/office/open-xml/ .
+
+## Réponses compactes — 1.0.1
+
+Les lectures et OCR commencent à 4000 caractères : suivre next_offset. list_files utilise compact:true par défaut ; read_file résume les tableurs par défaut, compact:false permet les cellules détaillées. get_authoring_guide accepte section, offset et limit. review_document examine une page par défaut ; préciser pages et detailed:true pour une revue étendue. ocr_file accepte quality (fast/auto/accurate), auto_rotate et word_offset/word_limit ; plain_text_only reste vrai par défaut. extract_document_layout utilise compact:true pour éviter les doublons, compact:false conserve les coordonnées et le texte complet. Ne demander que les pages et champs utiles. Les réglages de profil (body_size_pt, margin_mm, page_size, logo_width_mm) personnalisent PDF et Word. Les limites et la connexion OAuth sont décrites dans V1.0.1.md.

@@ -70,10 +70,14 @@ pub struct Brand {
     pub primary: String,
     pub secondary: String,
     pub font: String,
+    pub body_size_pt: u8,
+    pub margin_mm: u8,
+    pub page_size: String,
+    pub logo_width_mm: u8,
     pub organization: String,
     pub contact: String,
     pub footer: String,
-    /// PNG/JPEG en base64 (sans préfixe), conservé localement. Maximum 2 Mio décodés.
+    /// PNG/JPEG en base64 (sans préfixe), conservé localement. Source jusqu’à 20 Mio, normalisée localement.
     pub logo_base64: String,
 }
 impl Default for Brand {
@@ -84,6 +88,10 @@ impl Default for Brand {
             primary: "6366F1".into(),
             secondary: "3B82F6".into(),
             font: "Lato".into(),
+            body_size_pt: 11,
+            margin_mm: 21,
+            page_size: "a4".into(),
+            logo_width_mm: 36,
             organization: String::new(),
             contact: String::new(),
             footer: String::new(),
@@ -122,14 +130,14 @@ pub fn logo(brand: &Brand) -> Result<Option<Vec<u8>>, String> {
     if brand.logo_base64.is_empty() {
         return Ok(None);
     }
-    if brand.logo_base64.len() > 3_000_000 {
-        return Err("Logo limité à 2 Mio".into());
+    if brand.logo_base64.len() > 28_000_000 {
+        return Err("Logo limité à 20 Mio".into());
     }
     let bytes = base64::engine::general_purpose::STANDARD
         .decode(&brand.logo_base64)
         .map_err(|_| "Base64 du logo invalide")?;
-    if bytes.len() > 2 * 1024 * 1024 {
-        return Err("Logo limité à 2 Mio".into());
+    if bytes.len() > crate::limits::LOGO_BYTES {
+        return Err("Logo limité à 20 Mio".into());
     }
     let format = image::guess_format(&bytes).map_err(|_| "Logo PNG/JPEG requis")?;
     if !matches!(format, image::ImageFormat::Png | image::ImageFormat::Jpeg) {
@@ -137,14 +145,17 @@ pub fn logo(brand: &Brand) -> Result<Option<Vec<u8>>, String> {
     }
     let mut reader = image::ImageReader::with_format(std::io::Cursor::new(bytes), format);
     let mut limits = image::Limits::default();
-    limits.max_alloc = Some(32 * 1024 * 1024);
-    limits.max_image_width = Some(4096);
-    limits.max_image_height = Some(4096);
+    limits.max_alloc = Some(256 * 1024 * 1024);
+    limits.max_image_width = Some(8192);
+    limits.max_image_height = Some(8192);
     reader.limits(limits);
     let image = reader.decode().map_err(|e| e.to_string())?;
-    let mut bytes = crate::advanced::png(&image.thumbnail(1024, 1024))?;
+    let mut bytes = crate::advanced::png(&image.thumbnail(2048, 2048))?;
     if bytes.len() > 2 * 1024 * 1024 {
-        bytes = crate::advanced::png(&image.thumbnail(512, 512))?
+        bytes = crate::advanced::png(&image.thumbnail(1024, 1024))?
+    }
+    if bytes.len() > 2 * 1024 * 1024 {
+        bytes = crate::advanced::png(&image.thumbnail(512, 512))?;
     }
     Ok(Some(bytes))
 }
@@ -170,6 +181,13 @@ pub fn save_brands(mut data: Brands) -> Result<(), String> {
                 return Err("Couleur hexadécimale attendue".into());
             }
         }
+        if !(9..=16).contains(&p.body_size_pt)
+            || !(12..=35).contains(&p.margin_mm)
+            || !(20..=80).contains(&p.logo_width_mm)
+            || !["a4", "us-letter"].contains(&p.page_size.as_str())
+        {
+            return Err("Format A4/Letter, corps 9–16 pt, marges 12–35 mm, logo 20–80 mm".into());
+        }
         if !["Lato", "Libertinus Serif", "DejaVu Sans Mono"].contains(&p.font.as_str()) {
             return Err("Police intégrée : Lato, Libertinus Serif ou DejaVu Sans Mono".into());
         }
@@ -189,7 +207,9 @@ pub fn save_brands(mut data: Brands) -> Result<(), String> {
         {
             return Err("Caractère de contrôle interdit".into());
         }
-        logo(p)?;
+        if let Some(bytes) = logo(p)? {
+            p.logo_base64 = base64::engine::general_purpose::STANDARD.encode(bytes);
+        }
     }
     if !ids.contains(&data.selected) {
         return Err("Choisir un profil par défaut existant".into());

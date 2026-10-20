@@ -10,7 +10,7 @@ const csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 's
 const server = http.createServer((req, res) => {
   if (req.url === '/favicon.ico') {res.writeHead(204).end(); return;}
   const name = req.url === '/' ? 'index.html' : req.url.slice(1);
-  if (!['index.html','style.css','icons.js','app.js','studio.js','updater.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
+  if (!['index.html','style.css','icons.js','app.js','studio.js','updater.js','oauth.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
   res.writeHead(200, {'Content-Type':name.endsWith('.png')?'image/png':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8','Content-Security-Policy':csp});
   res.end(fs.readFileSync(path.join(root, name)));
 });
@@ -25,6 +25,7 @@ const server = http.createServer((req, res) => {
     page.on('console', m => {if (m.type() === 'error') errors.push(m.text());});
     await page.addInitScript(() => {
       window.calls = [];
+      window.testOAuth={requests:[{id:"auth-test",name:"Assistant <img src=x>",redirect_uri:"https://client.example/callback"}],clients:[]};
       window.testUpdate={status:'available',version:'1.1.0',current_version:'1.0.0',progress:0,error:null};
       window.testWorkspace={brands:{selected:'default',profiles:[{id:'default',name:'Professionnel',primary:'6366F1',secondary:'3B82F6',font:'Lato',organization:'',contact:'',footer:'',logo_base64:''}]},indexes:[{folder:'work',status:{documents:0}}],workflows:{jobs:[{id:'job-test',name:'Dossier de livraison',status:'paused',completed:1,steps:3,progress:33}]},reviews:{revisions:[{id:'revision-test',label:'Correction du tarif',path:'devis.docx',output_path:'devis.docx',status:'pending',diff:'- 100 euros\n+ 125 euros'}]}};
       window.testState = {
@@ -40,6 +41,8 @@ const server = http.createServer((req, res) => {
         if (name === 'check_update' || name === 'update_status') return structuredClone(window.testUpdate);
         if (name === 'download_update') {window.testUpdate.status='ready';return structuredClone(window.testUpdate);}
         if (name === 'install_update') return;
+        if (name === 'oauth_status') return structuredClone(window.testOAuth);
+        if (name === 'oauth_decision') {if(args.action==='approve')window.testOAuth.clients.push({id:'client-test',name:'Assistant de test'});window.testOAuth.requests=[];if(args.action==='revoke')window.testOAuth.clients=[];return;}
         if (name === 'snapshot') return structuredClone(s);
         if (name === 'v1_workspace') return structuredClone(window.testWorkspace);
         if (name === 'save_brand_profiles') {window.testWorkspace.brands=structuredClone(args.profiles);return;}
@@ -151,6 +154,14 @@ const server = http.createServer((req, res) => {
     await page.locator('[data-studio=brands]').click();
     assert(await page.locator('#save-brands').isDisabled());
     await page.evaluate(async()=>{window.testState.running=false;window.testState.ready=false;await refresh();});
+    await page.locator('[data-tab=connection]').click();await page.locator('#auth-mode').selectOption('oauth');
+    assert(await page.locator('#token-settings').isHidden());await page.locator('#save-settings').click();
+    await page.evaluate(async()=>{window.testState.running=true;await refresh();await refreshOAuth()});
+    assert.equal(await page.locator('#oauth-requests img').count(),0);
+    await page.locator('#oauth-requests button').filter({hasText:'Autoriser'}).click();
+    await page.waitForFunction(()=>window.testOAuth.clients.length===1);
+    await page.locator('#oauth-clients button').click();await page.waitForFunction(()=>window.testOAuth.clients.length===0);
+    await page.evaluate(async()=>{window.testState.running=false;await refresh()});await page.locator('#auth-mode').selectOption('token');await page.locator('#save-settings').click();
     await page.locator('[data-tab=activity]').click();
     await page.locator('[data-filter=write]').click();
     assert.equal(await page.locator('.log-line').count(),1);
@@ -181,8 +192,10 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(()=>document.getElementById('toast-text').textContent.includes('Erreur synthétique'));
     assert.equal(await page.locator('#toggle-server').isDisabled(),false);
     await page.locator('#open-updates').click();
-    await page.waitForFunction(()=>document.getElementById('update-message').textContent.includes('1.1.0'));
+    await page.waitForFunction(()=>document.getElementById('update-latest').textContent.includes('1.1.0'));
     await page.evaluate(async()=>{window.testState.running=true;await refresh();});
+    await page.locator('#download-update').click();
+    await page.waitForFunction(()=>window.testUpdate.status==='ready');
     await page.waitForFunction(()=>document.getElementById('install-update').disabled);
     await page.evaluate(async()=>{window.testState.running=false;await refresh();});
     await page.waitForFunction(()=>!document.getElementById('install-update').disabled);

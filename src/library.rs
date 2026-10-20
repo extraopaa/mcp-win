@@ -165,8 +165,8 @@ pub fn extract(
     if !info.is_file() {
         return Err("Ce chemin n'est pas un fichier".into());
     }
-    if info.len() > 25 * 1024 * 1024 {
-        return Err("Limite de 25 Mo par fichier".into());
+    if info.len() > crate::limits::DOCUMENT_BYTES {
+        return Err("Limite de 100 Mio par fichier".into());
     }
     let ext = target
         .extension()

@@ -10,6 +10,7 @@ pub struct Args {
     pub page: Option<usize>,
     pub languages: Option<String>,
     pub output_path: Option<String>,
+    pub compact: Option<bool>,
 }
 fn n(w: &Value, k: &str) -> f64 {
     w["box"][k].as_f64().unwrap_or(0.0)
@@ -148,6 +149,10 @@ pub async fn extract(folders: Vec<SharedFolder>, args: Args) -> Result<Value, St
             languages: args.languages,
             layout: Some("auto".into()),
             rotate: None,
+            quality: None,
+            auto_rotate: None,
+            word_offset: None,
+            word_limit: Some(10000),
             plain_text_only: Some(false),
             offset: None,
             limit: None,
@@ -159,6 +164,10 @@ pub async fn extract(folders: Vec<SharedFolder>, args: Args) -> Result<Value, St
     result["pages"] = ocr["pages"].clone();
     result["source"] = json!({"path":args.path,"sha256":hash,"page":args.page.unwrap_or(1)});
     result["text"] = ocr["text"].clone();
+    result["next_text_offset"] = ocr["next_offset"].clone();
+    result["confidence"] = ocr["confidence"].clone();
+    result["needs_review"] = ocr["needs_review"].clone();
+    result["rotation_applied"] = ocr["rotation_applied"].clone();
     if let Some(output) = args.output_path {
         let table = result["tables"]
             .as_array()
@@ -203,6 +212,34 @@ pub async fn extract(folders: Vec<SharedFolder>, args: Args) -> Result<Value, St
         } else {
             return Err("Export OCR : CSV ou XLSX".into());
         }
+    }
+    if args.compact.unwrap_or(true) {
+        let table_lines: std::collections::HashSet<String> = result["tables"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .flat_map(|t| {
+                std::iter::once(&t["columns"]).chain(t["rows"].as_array().into_iter().flatten())
+            })
+            .filter_map(|r| r.as_array())
+            .map(|r| {
+                r.iter()
+                    .filter_map(|v| v.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            })
+            .collect();
+        if let Some(blocks) = result["blocks"].as_array_mut() {
+            blocks.retain(|b| !table_lines.contains(b["text"].as_str().unwrap_or("")));
+            for b in blocks {
+                if let Some(object) = b.as_object_mut() {
+                    object.remove("box");
+                }
+            }
+        }
+        result.as_object_mut().unwrap().remove("text");
+        result.as_object_mut().unwrap().remove("next_text_offset");
+        result["compact"] = json!(true);
     }
     Ok(result)
 }

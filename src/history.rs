@@ -174,7 +174,7 @@ pub fn restore(
                 return Err("Version liée par jonction interdite".into());
             }
         }
-        if m.file_type().is_symlink() || !m.is_file() || m.len() > 25 * 1024 * 1024 {
+        if m.file_type().is_symlink() || !m.is_file() || m.len() > crate::limits::DOCUMENT_BYTES {
             return Err("Version invalide".into());
         }
     }

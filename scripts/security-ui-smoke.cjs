@@ -1,4 +1,4 @@
-﻿const { chromium } = require('../tools/dev/node_modules/playwright');
+const { chromium } = require('../tools/dev/node_modules/playwright');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -23,8 +23,8 @@ const fs = require('node:fs');
  await page.locator('#go-connection').click();
  assert.equal(await page.locator('[value=localtunnel]').count(),0);
  assert(await page.locator('[value=cloudflare]').isChecked());
- assert(await page.locator('#require-auth').isDisabled());
- assert(await page.locator('#require-auth').isChecked());
+
+ assert.equal(await page.locator('#require-auth').count(),0);
  await page.locator('[name=mode][value=frp]').check();
  await page.locator('#frp-ca').fill('-----BEGIN CERTIFICATE-----\nTEST-ONLY');
  await page.locator('#frp-tls-name').fill('relay.example');

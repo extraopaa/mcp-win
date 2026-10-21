@@ -8,6 +8,8 @@ let browser;
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const invoke=(name,args={})=>page.evaluate(([n,a])=>window.__TAURI__.core.invoke(n,a),[name,args]);
  await page.waitForFunction(()=>window.MCPWinOffice&&document.getElementById('token').value.length>20);
+ assert.equal(await page.locator('.brand-version').textContent(),'v'+require('../tauri.conf.json').version);
+ assert.equal((await invoke('update_status')).current_version,require('../tauri.conf.json').version);
  const snapshot=await invoke('snapshot'),folder=snapshot.folders[0];assert(folder&&!folder.writable);
  const source=path.join(folder.path,'office.docx'),original=fs.readFileSync(source);
  const run=(fn,args)=>page.evaluate(fn,args);
@@ -27,9 +29,11 @@ let browser;
  await page.locator('#office-cancel-close').click();assert.equal(await page.locator('#office-frames iframe').count(),1);
  await run(()=>{MCPWinOffice.close()});await page.locator('#office-discard').click();
  await page.waitForFunction(()=>!MCPWinOffice.active);fs.writeFileSync(source,original);
+ if(await page.locator('#toast').isVisible())await page.locator('#dismiss-toast').click();
  for(const kind of ['word','grid','deck','pdf','design']){
   await page.locator(`[data-office-editor="${kind}"]`).click();
   await page.waitForFunction(k=>MCPWinOffice.active?.kind===k&&MCPWinOffice.active?.ready&&!MCPWinOffice.active?.opening,kind,{timeout:180000});
+  if(kind==='word'){await run(()=>MCPWinOffice.command('text.insert',{text:'Orbite Studio\nVos documents, dans MCP Win.\n\nTexte, tableurs, présentations, PDF et composition : cinq éditeurs locaux réunis dans votre espace de travail.'}));await page.waitForTimeout(350);}
   assert.equal(await page.locator('#office-frames iframe:visible').count(),1);
   assert.equal(await page.locator(`[data-office-editor="${kind}"].active`).count(),1);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);

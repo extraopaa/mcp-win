@@ -2,13 +2,18 @@
 
 Les versions stables et leurs changements sont consignés ici. Les préversions et les travaux non publiés ne constituent pas des versions finales.
 
-## En développement — non publié
+## [1.5.0 — Orbite Studio](https://github.com/extraopaa/mcp-win/releases/tag/v1.5.0) · 21 octobre 2026
 
 - Cinq éditeurs bureautiques locaux dans la barre latérale : texte, tableur, présentation, PDF et composition.
 - Moteurs ArtCraft libres embarqués en WebAssembly, identité MCP Win et échanges locaux avec Tauri.
 - Ouverture/enregistrement natifs, sauvegardes, contrôle des conflits et confirmation des modifications avant fermeture.
 - OCR PDF français/anglais relié au moteur local existant.
-- [Portée, compilation et limites](docs/OFFICE.md).
+- Formats importés seulement en lecture convertis vers un format éditable lors de l’enregistrement, en conservant l’original.
+- Barres de défilement HTML masquées, navigation à la molette conservée.
+- Bouton de fermeture des notifications corrigé.
+- Paquet portable et mise à jour signée ; Windows x64 avec WebView2.
+
+[Portée, compilation et limites](docs/OFFICE.md).
 
 ## [1.0.1 — Orbite](https://github.com/extraopaa/mcp-win/releases/tag/v1.0.1) · 21 octobre 2026
 

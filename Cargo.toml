@@ -1,6 +1,6 @@
 [package]
 name = "mcp-win"
-version = "1.0.1"
+version = "1.5.0"
 edition = "2024"
 license = "MIT"
 description = "Application native de partage de documents par MCP HTTP"

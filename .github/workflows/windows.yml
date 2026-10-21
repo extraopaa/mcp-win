@@ -12,6 +12,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install Rust stable
         shell: pwsh
         run: |
@@ -30,6 +33,9 @@ jobs:
         run: |
           ./scripts/fetch-cloudflared.ps1
           ./scripts/fetch-duckdb.ps1
+      - name: Build embedded office editors
+        shell: pwsh
+        run: ./scripts/build-office.ps1
       - name: Test
         run: cargo test --locked
       - name: Build portable application

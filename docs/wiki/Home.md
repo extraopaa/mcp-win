@@ -2,7 +2,7 @@
 
 **MCP Win** est une application Windows libre et gratuite permettant à un assistant IA compatible **Model Context Protocol (MCP)** de lire des fichiers et de créer des documents dans les dossiers que vous autorisez sur votre ordinateur.
 
-Ce wiki documente **MCP Win V1 — Orbite**. Pour les changements récents, consultez également le [README principal](../../README.md) et les [versions publiées](https://github.com/extraopaa/mcp-win/releases).
+Ce wiki documente **MCP Win V1.5 — Orbite Studio**. Pour les changements récents, consultez également le [README principal](../../README.md) et les [versions publiées](https://github.com/extraopaa/mcp-win/releases).
 
 > **À savoir avant de commencer :** une connexion extérieure est **protégée par un jeton manuel ou OAuth**. L’URL seule ne suffit pas ; gardez le jeton secret et ne partagez que les dossiers nécessaires.
 
@@ -13,6 +13,8 @@ Ce wiki documente **MCP Win V1 — Orbite**. Pour les changements récents, cons
 3. [Connecter un assistant IA](./Connexion-IA.md) avec l'adresse MCP fournie par l'application.
 
 **Exemple de demande à l'assistant :** « Liste les dossiers disponibles, lis les documents du dossier partagé, puis prépare un rapport PDF et un classeur récapitulatif. »
+
+La V1.5 inclut aussi [cinq éditeurs bureautiques locaux](../OFFICE.md), accessibles dans la barre latérale.
 
 ## Parcours de lecture
 

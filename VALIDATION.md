@@ -1,4 +1,4 @@
-# Suite bureautique — validation locale, non publiée
+# Validation V1.5 — Orbite Studio · 21 octobre 2026
 
 - Rust : 48 tests réussis, 1 test Internet Cloudflare ignoré. Les protections existantes et les nouveaux contrôles des fichiers/onglets restent couverts.
 - Cinq moteurs WASM : démarrage, édition de texte, calcul de formule (7 × 6 = 42), création de diapositive et de bloc de composition, exports DOCX/XLSX/PPTX/DesignCraft et ouverture/enregistrement PDF vérifiés.
@@ -6,10 +6,12 @@
 - Tauri Windows : cinq éditeurs dans la barre latérale et un seul panneau visible ; lecture seule, écriture native, historique, conflit externe et annulation de fermeture vérifiés sur des fichiers synthétiques.
 - OCR depuis l’éditeur PDF : reconnaissance réelle avec le Tesseract embarqué, texte récupéré dans le dialogue de l’application.
 - Zone d’édition contrôlée à 1180 × 820 et 900 × 680 : un panneau actif, bas de l’éditeur visible et aucun débordement horizontal de la fenêtre.
+- Version 1.5.0 vérifiée dans la barre latérale et dans l’updater natif ; fermeture des notifications testée au clic.
 - Interface existante et CSP : contrôles des six vues, permissions, presse-papiers et absence de débordement réussis.
-- Inventaire de 887 composants bureautiques ; notices et licences conservées dans le paquet local.
+- Inventaire de 887 composants bureautiques ; notices et licences conservées dans le paquet.
+- Updater natif : manifeste signé, vérification du ZIP, remplacement portable, préférences conservées et redémarrage vérifiés sur une fixture synthétique avec l’installateur V1.
 
-[Portée et limites](docs/OFFICE.md). Aucune publication GitHub pour cette intégration.
+[Portée et limites](docs/OFFICE.md). Version technique : 1.5.0.
 
 ---
 # Validation locale v1.0.1 — 21 octobre 2026

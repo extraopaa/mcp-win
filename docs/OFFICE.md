@@ -1,6 +1,6 @@
-# Suite bureautique intégrée — travail non publié
+# V1.5 — Orbite Studio : suite bureautique intégrée
 
-Cette branche ajoute cinq éditeurs locaux à MCP Win. Ils ne sont pas inclus dans le téléchargement stable v1.0.1.
+La version 1.5.0 ajoute cinq éditeurs locaux à MCP Win, dans la série Orbite. [Télécharger Orbite Studio](https://github.com/extraopaa/mcp-win/releases/tag/v1.5.0).
 
 | Entrée de la barre latérale | Éditeur | Format de travail principal |
 | --- | --- | --- |

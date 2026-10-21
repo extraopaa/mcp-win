@@ -1,6 +1,6 @@
 # Développement, architecture et contribution
 
-Le projet MCP Win est écrit en **Rust** avec **Tauri 2**. L'interface est en HTML/CSS/JavaScript embarqués ; **aucun build frontend npm n'est requis** pour compiler l'application.
+Le projet MCP Win est écrit en **Rust** avec **Tauri 2**. L’interface principale est en HTML/CSS/JavaScript. Les éditeurs Rust sont compilés en WebAssembly par `scripts/build-office.ps1`, appelé automatiquement lors du packaging. Node.js et Git sont nécessaires à la compilation ; aucun outil de développement n’est requis pour utiliser le paquet.
 
 ## Organisation du dépôt
 
@@ -22,9 +22,10 @@ Le projet MCP Win est écrit en **Rust** avec **Tauri 2**. L'interface est en HT
 
 ## Compiler sous Windows
 
-Prérequis de développement : **Rust stable MSVC**, outils **C++ Windows**, **CMake** et **WebView2**. Depuis une console PowerShell à la racine :
+Prérequis de développement : **Rust stable MSVC**, **Git**, **Node.js**, outils **C++ Windows**, **CMake** et **WebView2**. Depuis une console PowerShell à la racine :
 
 ```powershell
+./scripts/build-office.ps1
 ./scripts/fetch-frp.ps1
 ./scripts/fetch-engines.ps1
 ./scripts/fetch-cloudflared.ps1

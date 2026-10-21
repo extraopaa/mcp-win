@@ -1,10 +1,11 @@
-# Versions majeures
+# Versions et noms
 
 Chaque version majeure reçoit un nom court, inspiré de l’univers visuel de MCP Win. Le numéro reste la référence technique pour les mises à jour.
 
 | Version | Nom | Statut |
 | --- | --- | --- |
-| V1 | **Orbite** | Version 1.0.1, publiée le 21 octobre 2026 |
+| V1 | **Orbite** | Série 1.x |
+| V1.5 | **Orbite Studio** | Version intermédiaire 1.5.0, 21 octobre 2026 |
 | V2 | **Prisme** | Nom réservé |
 | V3 | **Atlas** | Nom réservé |
 | V4 | **Horizon** | Nom réservé |
@@ -16,7 +17,7 @@ Les noms réservés n’annoncent ni date ni fonctionnalités. Le contenu de cha
 ## Numérotation
 
 - `1.0.0 — Orbite` : première version majeure.
-- `1.1.0` : ajout de fonctions dans la série Orbite.
+- `1.5.0 — Orbite Studio` : version intermédiaire consacrée aux éditeurs bureautiques, dans la série Orbite.
 - `1.0.1` : correctifs dans la série Orbite.
 - `2.0.0 — Prisme` : nouvelle version majeure.
 - Un suffixe comme `-beta.1` désigne une préversion et n’est pas proposé par l’updater stable.

@@ -9,16 +9,22 @@
 Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’URL MCP et le mode de connexion choisi. Il peut alors travailler sur vos PDF, Word, Excel, PowerPoint, images et fichiers texte, même à distance. L’assistant doit prendre en charge **MCP distant / Streamable HTTP** avec **OAuth** ou un en-tête **Authorization**, selon le mode choisi.
 
 <p align="center">
-  <a href="https://github.com/extraopaa/mcp-win/releases/tag/v1.0.1"><strong>Télécharger la V1.0.1 — Orbite · Windows x64</strong></a>
+  <a href="https://github.com/extraopaa/mcp-win/releases/tag/v1.5.0"><strong>Télécharger la V1.5 — Orbite Studio · Windows x64</strong></a>
   &nbsp;·&nbsp; <a href="docs/wiki/Home.md">Guide utilisateur</a>
   &nbsp;·&nbsp; <a href="CHANGELOG.md">Changelog</a>
 </p>
 
 ![Vue d’ensemble de MCP Win](docs/images/overview.png)
 
-> **Nouveautés 1.0.1 :** [OAuth au choix, fichiers jusqu’à 100 Mio, logos jusqu’à 20 Mio, OCR et réponses compactes](docs/V1.0.1.md).
+> **V1.5 — Orbite Studio :** cinq éditeurs locaux dans la barre latérale — texte, tableur, présentation, PDF et composition — avec enregistrement natif et OCR. [Nouveautés et installation](docs/V1.5.md).
 
-> **Branche de développement :** la [suite bureautique intégrée](docs/OFFICE.md) ajoute cinq éditeurs locaux dans la barre latérale. Elle n’est pas encore publiée dans la version stable ci-dessus.
+![Tableur intégré dans Orbite Studio](docs/images/orbite-studio.png)
+
+## Éditer directement dans MCP Win
+
+Ouvrez un éditeur dans la barre latérale et travaillez dans la partie droite de l’application. Les documents restent ouverts dans des onglets. Les cinq moteurs sont embarqués et fonctionnent localement, sans compte bureautique ni Microsoft Office.
+
+Les enregistrements conservent un historique et refusent un écrasement si le fichier a changé ailleurs. Les outils MCP existants restent disponibles pour votre assistant. [Formats et limites de la suite](docs/OFFICE.md).
 
 ## Ce que votre IA peut faire
 
@@ -39,7 +45,7 @@ Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’U
 
 ## Installer et connecter
 
-1. [Téléchargez le paquet Windows x64](https://github.com/extraopaa/mcp-win/releases/download/v1.0.1/mcp-win-v1.0.1-windows-x64.zip) et **extrayez toute l’archive**. Gardez le dossier `engines` à côté de `MCP Win.exe`.
+1. [Téléchargez le paquet Windows x64](https://github.com/extraopaa/mcp-win/releases/download/v1.5.0/mcp-win-v1.5.0-windows-x64.zip) et **extrayez toute l’archive**. Gardez le dossier `engines` à côté de `MCP Win.exe`.
 2. Ouvrez l’application et ajoutez un dossier. Il est en **lecture seule par défaut** ; arrêtez le serveur pour autoriser l’écriture avec le bouton **Droits**.
 3. Choisissez **Tunnel simple** pour Cloudflare sans compte, **Mon propre relais** pour frp, ou **Local uniquement**.
 4. Choisissez **Jeton** ou **OAuth**, puis démarrez le serveur. En OAuth, renseignez l’URL MCP dans votre assistant et validez la demande dans MCP Win. En mode Jeton : Dans votre assistant, ajoutez l’URL MCP et collez le contenu de **Copier les headers JSON** dans les en-têtes sécurisés.
@@ -75,12 +81,13 @@ Le code et les moteurs sont libres. Le client `cloudflared` est open source ; **
 
 ## Limites à connaître
 
-Les documents sont limités à **100 Mio**. Les lectures, recherches et listes sont paginées pour limiter le contexte de l’IA. L’OCR structuré reste une estimation à vérifier, notamment sur les tableaux complexes et les scans dégradés. Les formules Excel sont stockées sans recalcul automatique.
+Les documents sont limités à **100 Mio**. Les lectures, recherches et listes sont paginées pour limiter le contexte de l’IA. L’OCR structuré reste une estimation à vérifier, notamment sur les tableaux complexes et les scans dégradés. Les générateurs MCP stockent les formules Excel ; le tableur intégré dispose de son propre moteur de calcul.
 
-Les PDF peuvent être rendus et contrôlés visuellement. Les contrôles Office portent sur la structure ; le rendu final dépend du lecteur. Les anciens formats DOC/PPT ne sont pas interprétés, et aucune conversion universelle n’est promise.
+Les PDF peuvent être rendus et contrôlés visuellement. Les contrôles Office portent sur la structure ; le rendu final dépend du lecteur. Les importations des éditeurs et celles des outils MCP ont des capacités différentes ; aucune conversion universelle ni compatibilité Office intégrale n’est promise.
 
 ## Documentation
 
+- [Suite bureautique Orbite Studio](docs/OFFICE.md)
 - [Premiers pas et connexion IA](docs/wiki/Home.md)
 - [Les 42 outils et leurs formats](docs/MCP-TOOLS.md)
 - [Composition avancée, Typst et OCR](docs/AUTHORING.md)

@@ -13,6 +13,7 @@ mod limits;
 mod oauth;
 mod ocr;
 mod office;
+mod office_suite;
 mod patching;
 mod pdf_design;
 mod pdf_forms;
@@ -39,6 +40,7 @@ fn main() {
     }
     tauri::Builder::default()
         .manage(updater::Updater::default())
+        .manage(office_suite::OfficeSuite::default())
         .setup(|app| {
             let folder = app.path().app_data_dir()?;
             std::fs::create_dir_all(&folder)?;
@@ -49,6 +51,15 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             desktop::snapshot,
+            office_suite::office_new,
+            office_suite::office_pick,
+            office_suite::office_asset,
+            office_suite::office_ocr,
+            office_suite::office_open_shared,
+            office_suite::office_save,
+            office_suite::office_close,
+            office_suite::office_lifecycle,
+            office_suite::office_close_app,
             desktop::add_folder,
             desktop::remove_folder,
             desktop::set_folder_writable,
@@ -73,6 +84,11 @@ fn main() {
             updater::install_update
         ])
         .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.state::<office_suite::OfficeSuite>().prevent_close() {
+                    api.prevent_close();
+                }
+            }
             if matches!(event, tauri::WindowEvent::Destroyed) {
                 window.state::<desktop::Desktop>().stop();
             }

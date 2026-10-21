@@ -2,6 +2,8 @@
 
 Inventaire Cargo.lock : dÃ©pendances de production, dÃ©veloppement, compilation et plateformes. Les notices fournies par les crates sont recopiÃ©es dans third-party-licenses. Certaines crates proposent plusieurs licences au choix. Les mentions des polices sont Ã©galement incluses.
 
+Les moteurs bureautiques disposent dâ€™un [inventaire complÃ©mentaire](docs/OFFICE-LICENSES.md) et de notices dans third-party-licenses/office.
+
 | BibliothÃ¨que | Version | Licence dÃ©clarÃ©e | Source |
 | --- | --- | --- | --- |
 | adler2 | 2.0.1 | 0BSD OR MIT OR Apache-2.0 | https://crates.io/crates/adler2/2.0.1 |

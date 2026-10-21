@@ -455,7 +455,13 @@ pub fn install_update(
     app: tauri::AppHandle,
     state: State<'_, Updater>,
     desktop: State<'_, crate::desktop::Desktop>,
+    office: State<'_, crate::office_suite::OfficeSuite>,
 ) -> Result<(), String> {
+    if office.has_unsaved() {
+        return Err(
+            "Enregistrez ou fermez les documents modifies avant d’installer la mise a jour".into(),
+        );
+    }
     desktop
         .check_stopped()
         .map_err(|_| "Arrêtez le serveur avant d’installer la mise à jour")?;

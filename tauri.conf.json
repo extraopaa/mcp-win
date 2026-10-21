@@ -7,7 +7,7 @@
   "app": {
     "withGlobalTauri": true,
     "windows": [{ "title": "MCP Win", "width": 1180, "height": 820, "minWidth": 900, "minHeight": 680 }],
-    "security": { "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost" }
+    "security": { "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; frame-src 'self'; connect-src 'self' ipc: http://ipc.localhost" }
   },
   "bundle": { "active": false, "icon": ["icons/icon.ico", "icons/icon.png"] }
 }

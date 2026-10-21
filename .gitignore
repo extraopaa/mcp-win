@@ -24,6 +24,9 @@ documents/*
 !.env.example
 
 /dist-*/
+/vendor/artcraft/
+/tools/office-web/target/
+/ui/office/runtime/
 
 # Release signing secrets (the public key is intentionally tracked).
 *.key

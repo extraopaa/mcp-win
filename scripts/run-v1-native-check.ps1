@@ -1,4 +1,4 @@
-﻿param([string]$PackageDirectory = 'dist-v101')
+﻿param([string]$PackageDirectory = 'dist-v101', [ValidateSet('ui-v1-native.cjs','office-native-smoke.cjs')][string]$ValidationScript = 'ui-v1-native.cjs')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 if (Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('mcp-win.exe','MCP Win.exe') }) { throw 'Fermer MCP Win avant ce test de développement' }
@@ -24,6 +24,12 @@ try {
     [IO.File]::WriteAllText((Join-Path $privatePath 'oauth-clients.json'),'[]',[Text.UTF8Encoding]::new($false))
     New-Item -ItemType Directory -Path $fixture -Force | Out-Null
     [IO.File]::WriteAllText((Join-Path $fixture 'note.txt'), 'SYNTHETIC-V1')
+    if ($ValidationScript -eq 'office-native-smoke.cjs') {
+        foreach($item in @(@('word.docx','office.docx'),@('grid.xlsx','office.xlsx'),@('deck.pptx','office.pptx'))) {
+            Copy-Item -LiteralPath (Join-Path $projectRoot ('target/qa-office/'+$item[0])) -Destination (Join-Path $fixture $item[1])
+        }
+    }
+    if ($ValidationScript -eq 'office-native-smoke.cjs') { Copy-Item -LiteralPath (Join-Path $projectRoot 'target/qa-office/sample.pdf') -Destination (Join-Path $fixture 'office.pdf') }
     $preferences = @{
         connection = @{mode='local';require_auth=$true;port=8787;token=[guid]::NewGuid().ToString('N');relay='';frp_server='';frp_port=7000;frp_token='';public_url=''}
         folders = @(@{id='ui-test';path=$fixture})
@@ -33,7 +39,7 @@ try {
     $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = '--remote-debugging-port=9223'
     $package = if ([IO.Path]::IsPathRooted($PackageDirectory)) { $PackageDirectory } else { Join-Path $projectRoot $PackageDirectory }
     $appProcess = Start-Process -FilePath (Join-Path $package 'MCP Win.exe') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru
-    & node (Join-Path $PSScriptRoot 'ui-v1-native.cjs')
+    & node (Join-Path $PSScriptRoot $ValidationScript)
     if ($LASTEXITCODE -ne 0) { throw 'Le test natif v1 a échoué' }
 } finally {
     if ($appProcess) { $appProcess.Refresh(); if (-not $appProcess.HasExited) { Stop-Process -Id $appProcess.Id } }

@@ -6,11 +6,11 @@ const path = require('node:path');
 const http = require('node:http');
 const root = path.resolve(__dirname, '../ui');
 const output = path.resolve(__dirname, '../target/ui-design');
-const csp = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost";
+const csp = JSON.parse(fs.readFileSync(path.join(root,'../tauri.conf.json'),'utf8')).app.security.csp;
 const server = http.createServer((req, res) => {
   if (req.url === '/favicon.ico') {res.writeHead(204).end(); return;}
   const name = req.url === '/' ? 'index.html' : req.url.slice(1);
-  if (!['index.html','style.css','icons.js','app.js','studio.js','updater.js','oauth.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
+  if (!['index.html','style.css','office.css','office.js','icons.js','app.js','studio.js','updater.js','oauth.js','brand/icon.png','brand/favicon.png'].includes(name)) {res.writeHead(404).end(); return;}
   res.writeHead(200, {'Content-Type':name.endsWith('.png')?'image/png':name.endsWith('.html')?'text/html; charset=utf-8':name.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8','Content-Security-Policy':csp});
   res.end(fs.readFileSync(path.join(root, name)));
 });

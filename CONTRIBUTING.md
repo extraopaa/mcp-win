@@ -4,9 +4,10 @@ Les contributions sont les bienvenues : correction de bugs, nouveaux formats, ac
 
 ## Environnement Windows
 
-Installer Rust stable MSVC, les outils C++ Windows et le runtime WebView2. Depuis la racine du dépôt :
+Installer Rust stable MSVC, Git, Node.js, CMake, les outils C++ Windows et le runtime WebView2. Depuis la racine du dépôt :
 
 ```powershell
+./scripts/build-office.ps1
 ./scripts/fetch-frp.ps1
 ./scripts/fetch-engines.ps1
 ./scripts/fetch-cloudflared.ps1
@@ -16,7 +17,7 @@ cargo test --locked
 cargo run --locked
 ```
 
-Les téléchargements frp, Cloudflare, DuckDB, Typst, Pdfium et modèles OCR sont épinglés et vérifiés par SHA-256. Les moteurs OCR/PDF sont requis pour les tests avancés. Le frontend HTML/CSS/JS ne nécessite aucun build ni dépendance npm.
+Les téléchargements frp, Cloudflare, DuckDB, Typst, Pdfium et modèles OCR sont épinglés et vérifiés par SHA-256. Les moteurs OCR/PDF sont requis pour les tests avancés. Le frontend principal reste en HTML/CSS/JS. Les cinq éditeurs Rust nécessitent la compilation WASM automatisée par `build-office.ps1` ; voir [le guide de la suite](docs/OFFICE.md).
 
 Pour les tests facultatifs de l'interface native, installer Node.js puis `npm ci --prefix tools/dev`. Construire le paquet avec `./scripts/package.ps1`, puis lancer `./scripts/run-native-check.ps1`. Ces tests utilisent uniquement un document synthétique et restaurent les préférences précédentes. Ils ouvrent temporairement un tunnel public et nécessitent donc Internet. Les tests standard n'utilisent aucun relais public.
 

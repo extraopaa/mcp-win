@@ -1,5 +1,6 @@
 // Icônes vectorielles issues des maquettes fournies.
 const ICONS={
+ 'table':'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
  'layers':'<path d="m12 2-9 5 9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/>',
  'layout-dashboard':'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
  'folder-open':'<path d="M6 3h5l2.5 3H20a2 2 0 0 1 2 2v2H8a2 2 0 0 0-2 2l-3 8V6a3 3 0 0 1 3-3Z"/><path d="M2 20l4-10h15l-4 10H2Z"/>',

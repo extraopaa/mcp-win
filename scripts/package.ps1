@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $projectRoot
 try {
+    & (Join-Path $PSScriptRoot 'build-office.ps1')
     & (Join-Path $PSScriptRoot 'fetch-engines.ps1')
     & (Join-Path $PSScriptRoot 'fetch-cloudflared.ps1')
     & (Join-Path $PSScriptRoot 'fetch-duckdb.ps1')
@@ -14,6 +15,8 @@ try {
     & $cargoPath build --release --locked
     if ($LASTEXITCODE -ne 0) { throw 'Compilation échouée' }
     & (Join-Path $PSScriptRoot 'licenses.ps1')
+    & node (Join-Path $PSScriptRoot 'office-licenses.cjs')
+    if ($LASTEXITCODE -ne 0) { throw 'Notices bureautiques incompletes' }
     $dist = if ([IO.Path]::IsPathRooted($OutputDirectory)) { $OutputDirectory } else { Join-Path $projectRoot $OutputDirectory }
     New-Item -ItemType Directory -Path $dist -Force | Out-Null
     for ($attempt = 1; $attempt -le 5; $attempt++) {

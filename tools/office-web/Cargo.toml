@@ -1,0 +1,45 @@
+[package]
+name = "mcp-win-office"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wordcraft-engine = { path = "../../vendor/artcraft/wordcraft/crates/engine" }
+wordcraft-ui-egui = { path = "../../vendor/artcraft/wordcraft/crates/ui-egui" }
+gridcraft-engine = { path = "../../vendor/artcraft/gridcraft/crates/engine" }
+gridcraft-ui-egui = { path = "../../vendor/artcraft/gridcraft/crates/ui-egui" }
+deckcraft-engine = { path = "../../vendor/artcraft/deckcraft/crates/engine" }
+deckcraft-ui-egui = { path = "../../vendor/artcraft/deckcraft/crates/ui-egui" }
+designcraft-engine = { path = "../../vendor/artcraft/designcraft/crates/engine" }
+designcraft-format = { path = "../../vendor/artcraft/designcraft/crates/format" }
+designcraft-ui-egui = { path = "../../vendor/artcraft/designcraft/crates/ui-egui" }
+pdfcraft-ui-egui = { path = "../../vendor/artcraft/pdfcraft/crates/ui-egui" }
+egui = "0.36"
+eframe = { version = "0.36", default-features = false, features = ["glow", "default_fonts"] }
+serde_json = "1"
+base64 = "0.22"
+console_error_panic_hook = "0.1"
+wasm-bindgen = "=0.2.129"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlCanvasElement", "Location", "MessageEvent", "EventTarget"] }
+
+[patch.crates-io]
+krilla = { git = "https://github.com/storytold/craft-libs", rev = "c3487320b2d1de657b860b3c8abb44e1f2b32bd8" }
+hayro = { path = "../../vendor/artcraft/pdfcraft/vendor/hayro" }
+hayro-interpret = { path = "../../vendor/artcraft/pdfcraft/vendor/hayro-interpret" }
+hayro-syntax = { path = "../../vendor/artcraft/pdfcraft/vendor/hayro-syntax" }
+hayro-jbig2 = { path = "../../vendor/artcraft/pdfcraft/vendor/hayro-jbig2" }
+lopdf = { path = "../../vendor/artcraft/pdfcraft/vendor/lopdf" }
+vello_common = { path = "../../vendor/artcraft/pdfcraft/vendor/vello_common" }
+
+[profile.release]
+opt-level = 2
+debug = 0
+lto = "thin"
+codegen-units = 8

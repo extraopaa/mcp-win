@@ -4,23 +4,31 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MCP Win</title>
 <link rel="icon" type="image/png" href="brand/favicon.png">
-<link rel="stylesheet" href="style.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script><script src="updater.js" defer></script><script src="oauth.js" defer></script>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="office.css"><script src="icons.js" defer></script><script src="app.js" defer></script><script src="studio.js" defer></script><script src="updater.js" defer></script><script src="oauth.js" defer></script><script src="office.js" defer></script>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
  <div class="brand"><div class="brand-mark"><img src="brand/icon.png" width="44" height="44" alt="" aria-hidden="true"></div><div><div class="brand-name">MCP Win</div><div class="brand-version">v1.0.1</div></div></div>
- <div class="nav-label">ESPACE DE TRAVAIL</div>
+ <div class="sidebar-scroll"><div class="nav-label">ESPACE DE TRAVAIL</div>
  <nav aria-label="Navigation">
   <button class="nav nav-item active" data-tab="overview" title="Vue d'ensemble"><span class="icon" data-icon="layout-dashboard"></span><span>Vue d'ensemble</span></button>
   <button class="nav nav-item" data-tab="shared-folders" title="Dossiers partagés"><span class="icon" data-icon="folder-open"></span><span>Dossiers partagés</span></button>
   <button class="nav nav-item" data-tab="connection" title="Connexion IA"><span class="icon" data-icon="plug"></span><span>Connexion IA</span><span id="oauth-badge" class="pill purple" hidden></span></button>
   <button class="nav nav-item" data-tab="activity" title="Journal d'activité"><span class="icon" data-icon="activity"></span><span>Journal d'activité</span></button>
  </nav>
+ <div class="nav-divider"></div><div class="nav-label">ÉDITEURS</div>
+ <nav class="office-nav" aria-label="Éditeurs bureautiques">
+  <button class="nav nav-item" data-office-editor="word"><span class="icon" data-icon="file-text"></span><span>Texte</span></button>
+  <button class="nav nav-item" data-office-editor="grid"><span class="icon" data-icon="table"></span><span>Tableur</span></button>
+  <button class="nav nav-item" data-office-editor="deck"><span class="icon" data-icon="monitor"></span><span>Présentation</span></button>
+  <button class="nav nav-item" data-office-editor="pdf"><span class="icon" data-icon="file-text"></span><span>PDF</span></button>
+  <button class="nav nav-item" data-office-editor="design"><span class="icon" data-icon="layout-dashboard"></span><span>Composition</span></button>
+ </nav>
  <div class="nav-divider"></div><div class="nav-label">RESSOURCES</div>
  <nav><button class="nav nav-item" data-tab="studio" title="Studio documentaire"><span class="icon" data-icon="sparkles"></span><span>Studio documentaire</span></button><button class="nav nav-item" data-tab="tools" title="Catalogue des outils"><span class="icon" data-icon="blocks"></span><span>Catalogue des outils</span></button></nav>
 <button class="nav-item update-link" id="open-updates" title="Mises à jour"><span class="icon" data-icon="refresh-cw"></span><span id="update-label">Mises à jour</span></button>
- <div class="sidebar-bottom">
+ </div><div class="sidebar-bottom">
 
   <div class="connection-mini"><div class="live-orbit offline"><span class="icon" data-icon="radio"></span></div><div><div class="mini-title" id="sidebar-status">Chargement…</div><div class="mini-sub" id="sidebar-sub">Initialisation locale</div></div></div>
   <a href="https://github.com/extraopaa/mcp-win" data-external="repository" target="_blank" rel="noreferrer" class="sidebar-link"><span class="icon" data-icon="github"></span><span>GitHub &amp; code source</span><span class="reference-style-2 icon" data-icon="arrow-up-right"></span></a>
@@ -107,6 +115,17 @@
    <div class="card"><div class="activity-head"><div class="seg-tabs" id="activity-filters"><button class="selected" data-filter="all">Tout</button><button data-filter="read">Lectures</button><button data-filter="write">Écritures</button><button data-filter="system">Système</button></div><input class="search-mini" placeholder="Rechercher une opération..." id="activity-search" aria-label="Rechercher une opération"></div><div class="activity-list" id="logs"></div></div>
    <div class="callout"><span class="icon" data-icon="info"></span><span>Horaires en UTC. Le journal est effacé à la fermeture de l’application.</span></div>
   </section>
+  <section class="page" id="office" hidden>
+   <div class="page-header"><h1 class="page-title">Documents</h1><div class="office-actions"><button id="office-open" class="btn secondary">Ouvrir</button><button id="office-ocr" class="btn secondary" hidden>Reconnaître le texte</button><button id="office-save" class="btn primary" disabled>Enregistrer</button><button id="office-save-as" class="btn secondary" disabled>Enregistrer sous</button></div></div>
+   <div id="office-welcome" class="office-launcher">
+    <button data-office-new="word" class="card office-create"><span class="office-kind word">W</span><strong>Document</strong><small>Texte, tableaux et mise en page</small></button>
+    <button data-office-new="grid" class="card office-create"><span class="office-kind grid">X</span><strong>Classeur</strong><small>Cellules, formules et graphiques</small></button>
+    <button data-office-new="deck" class="card office-create"><span class="office-kind deck">P</span><strong>Présentation</strong><small>Diapositives, formes et animations</small></button>
+    <button data-office-new="pdf" class="card office-create"><span class="office-kind pdf">PDF</span><strong>PDF</strong><small>Pages, annotations et formulaires</small></button>
+    <button data-office-new="design" class="card office-create"><span class="office-kind design">D</span><strong>Composition</strong><small>Brochures et documents multipages</small></button>
+   </div>
+   <div id="office-workspace" hidden><div id="office-tabs" class="office-tabs" role="tablist" aria-label="Documents ouverts"></div><div id="office-frames"></div></div>
+  </section>
   <section class="page" id="tools">
 
    <div class="page-header"><div><h1 class="page-title">Catalogue des outils MCP</h1></div><a class="btn secondary" href="https://github.com/extraopaa/mcp-win/blob/main/docs/MCP-TOOLS.md" data-external="tools-reference" target="_blank" rel="noopener noreferrer"><span class="icon" data-icon="external-link"></span> Documentation technique</a></div>
@@ -132,4 +151,6 @@
 <dialog id="help-dialog"><div class="dialog-heading"><div><h2 id="help-title">Guide de démarrage</h2></div><button class="btn secondary small" id="close-help">Fermer</button></div><div id="help-content"></div></dialog>
 <dialog id="update-dialog"><div class="dialog-heading"><h2>Mises à jour</h2><button class="btn secondary small" id="close-updates">Fermer</button></div><div class="update-version"><p id="update-current"></p><strong id="update-latest" hidden></strong></div><p id="update-message" role="status">Recherche automatique au démarrage.</p><progress id="update-progress" max="100" value="0" aria-label="Téléchargement" hidden></progress><p id="update-transfer" class="form-helper" hidden></p><ol class="update-steps" id="update-steps" hidden><li>Téléchargement</li><li>Vérification</li><li>Redémarrage</li></ol><p id="update-hint" class="form-helper"></p><div class="form-actions"><button class="btn secondary" id="check-update">Rechercher</button><button class="btn primary" id="download-update" hidden>Télécharger</button><button class="btn primary" id="install-update" hidden>Installer et redémarrer</button></div><div class="update-footer"><span id="update-last-check"></span><a href="https://github.com/extraopaa/mcp-win/releases" data-external="releases" target="_blank" rel="noopener noreferrer">Historique des versions</a></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span class="icon" data-icon="info"></span><span id="toast-text"></span><button id="dismiss-toast" aria-label="Fermer la notification">×</button></div>
+<dialog id="office-unsaved" class="office-confirm"><h2>Enregistrer les modifications ?</h2><p id="office-unsaved-name"></p><div class="form-actions"><button id="office-cancel-close" class="btn secondary">Annuler</button><button id="office-discard" class="btn secondary">Fermer sans enregistrer</button><button id="office-keep" class="btn primary">Enregistrer</button></div></dialog>
+<dialog id="office-ocr-dialog" class="office-confirm"><h2>Reconnaissance de texte</h2><label class="field">Page<input id="office-ocr-page" type="number" min="1" value="1"></label><div class="form-actions"><button id="office-run-ocr" class="btn primary">Reconnaître</button><button id="office-copy-ocr" class="btn secondary" disabled>Copier le texte</button><button id="office-close-ocr" class="btn secondary">Fermer</button></div><p id="office-ocr-status" role="status"></p><textarea id="office-ocr-text" rows="14" readonly aria-label="Texte reconnu"></textarea></dialog>
 </body></html>

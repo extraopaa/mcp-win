@@ -18,6 +18,8 @@ Ajoutez un dossier, démarrez le serveur et connectez votre assistant avec l’U
 
 > **Nouveautés 1.0.1 :** [OAuth au choix, fichiers jusqu’à 100 Mio, logos jusqu’à 20 Mio, OCR et réponses compactes](docs/V1.0.1.md).
 
+> **Branche de développement :** la [suite bureautique intégrée](docs/OFFICE.md) ajoute cinq éditeurs locaux dans la barre latérale. Elle n’est pas encore publiée dans la version stable ci-dessus.
+
 ## Ce que votre IA peut faire
 
 | Usage | Fonctionnalités |
@@ -87,7 +89,7 @@ Les PDF peuvent être rendus et contrôlés visuellement. Les contrôles Office 
 
 ## Compiler
 
-Installer Rust stable MSVC, les outils C++ Windows, CMake et WebView2, puis :
+Installer Rust stable MSVC, Git, Node.js, les outils C++ Windows, CMake et WebView2, puis :
 
 ```powershell
 ./scripts/fetch-frp.ps1
@@ -99,7 +101,7 @@ cargo test --locked
 ./scripts/package.ps1
 ```
 
-Aucun build frontend ni npm n’est requis pour l’application. Le paquet complet est généré dans `dist/`. Les moteurs téléchargés sont épinglés et leurs empreintes sont vérifiées.
+Le script de paquet compile automatiquement les moteurs bureautiques Rust en WebAssembly. Node.js sert aux scripts de préparation ; npm est nécessaire uniquement pour les tests d’interface. Aucun outil de développement n’est requis pour utiliser le paquet compilé. Le paquet complet est généré dans `dist/`. Les moteurs téléchargés sont épinglés et leurs empreintes sont vérifiées.
 
 ## Licence
 

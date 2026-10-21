@@ -66,3 +66,6 @@ dialog{border:1px solid var(--line);border-radius:19px;padding:28px;width:min(78
 .oauth-row{padding:14px 0;border-bottom:1px solid var(--line)}.oauth-redirect{font-size:11px;overflow-wrap:anywhere;color:#737a90}#oauth-panel h3{font-size:13px;margin-top:24px}#oauth-requests,#oauth-clients{font-size:12px;color:#737a90}
 
 .update-version{padding:14px 16px;background:#f6f5ff;border-radius:12px}.update-version p{font-size:12px;margin:0 0 6px;color:#737a90}.update-version strong{font-size:17px;color:#5d45cc}.update-steps{display:flex;gap:20px;padding:0;list-style:none;font-size:11px;color:#8b90a4}.update-steps li.done{color:#16836b}.update-steps li.current{color:#6c4fe0;font-weight:700}.update-footer{display:flex;justify-content:space-between;gap:12px;margin-top:24px;font-size:11px;color:#858b9d}.update-footer a{color:var(--primary)}
+
+/* Keep scrolling available without browser scrollbar chrome. */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none;width:0;height:0}
